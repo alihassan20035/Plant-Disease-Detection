@@ -1,0 +1,779 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>BATANOX — Guest Detection</title>
+    <link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@400;500;600;700;800&display=swap" rel="stylesheet">
+    <style>
+        *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+
+        :root {
+            --g50:#f0fdf4; --g100:#dcfce7; --g200:#bbf7d0;
+            --g500:#22c55e; --g600:#16a34a; --g700:#15803d;
+            --white:#ffffff;
+            --gr50:#f9fafb; --gr100:#f3f4f6; --gr200:#e5e7eb;
+            --gr300:#d1d5db; --gr400:#9ca3af; --gr500:#6b7280;
+            --gr600:#4b5563; --gr700:#374151; --gr900:#111827;
+            --r50:#fef2f2; --r100:#fee2e2; --r200:#fecaca;
+            --r600:#dc2626; --r700:#b91c1c;
+            --y50:#fefce8; --y200:#fef08a; --y700:#a16207;
+            --b50:#eff6ff; --b200:#bfdbfe; --b700:#1d4ed8;
+            --o50:#fff7ed; --o200:#fed7aa; --o700:#c2410c;
+            --radius:14px;
+            --topbar:66px;
+        }
+
+        body {
+            font-family: 'Plus Jakarta Sans', sans-serif;
+            background: var(--gr50);
+            color: var(--gr900);
+            min-height: 100vh;
+        }
+
+        /* ─── TOPBAR ───────────────────────────────────────────────── */
+        .topbar {
+            position: fixed; top: 0; left: 0; right: 0; height: var(--topbar);
+            background: var(--white); border-bottom: 1px solid var(--gr200);
+            display: flex; align-items: center; padding: 0 28px; gap: 14px;
+            z-index: 200; box-shadow: 0 1px 6px rgba(0,0,0,0.04);
+        }
+        .brand { display: flex; align-items: center; gap: 10px; text-decoration: none; flex-shrink: 0; }
+        .brand-mark {
+            width: 38px; height: 38px; border-radius: 10px;
+            background: linear-gradient(135deg, var(--g700), var(--g500));
+            display: flex; align-items: center; justify-content: center;
+            box-shadow: 0 3px 10px rgba(22,163,74,0.28);
+        }
+        .brand-mark svg { width: 20px; height: 20px; fill: white; }
+        .brand-name { font-size: 20px; font-weight: 800; letter-spacing: -0.4px; color: var(--gr900); }
+        .brand-name em { font-style: normal; color: var(--g600); }
+        .brand-pill {
+            font-size: 11px; font-weight: 700; color: var(--g700);
+            background: var(--g50); border: 1px solid var(--g200);
+            border-radius: 20px; padding: 2px 9px;
+        }
+        .guest-pill {
+            font-size: 11px; font-weight: 700; color: var(--o700);
+            background: var(--o50); border: 1px solid var(--o200);
+            border-radius: 20px; padding: 3px 10px;
+        }
+        .top-spacer { flex: 1; }
+        .top-login-btn {
+            display: flex; align-items: center; gap: 7px;
+            padding: 9px 18px; border-radius: 9px; border: 1.5px solid var(--g200);
+            background: var(--g50); color: var(--g700);
+            font-family: inherit; font-size: 13px; font-weight: 700;
+            text-decoration: none; transition: all 0.15s; cursor: pointer;
+        }
+        .top-login-btn:hover { background: var(--g100); border-color: var(--g500); }
+
+        /* ─── PAGE LAYOUT ──────────────────────────────────────────── */
+        .page {
+            margin-top: var(--topbar);
+            min-height: calc(100vh - var(--topbar));
+            display: flex; flex-direction: column; align-items: center;
+            padding: 40px 16px 60px;
+        }
+        .container { width: 100%; max-width: 860px; }
+
+        /* ─── GUEST BANNER ─────────────────────────────────────────── */
+        .guest-banner {
+            background: linear-gradient(130deg, #78350f 0%, var(--o700) 100%);
+            border-radius: 14px; padding: 18px 26px;
+            display: flex; align-items: center; justify-content: space-between;
+            gap: 16px; margin-bottom: 22px; flex-wrap: wrap;
+        }
+        .gb-left { display: flex; align-items: center; gap: 12px; }
+        .gb-ico {
+            width: 42px; height: 42px; border-radius: 10px;
+            background: rgba(255,255,255,0.18); display: flex;
+            align-items: center; justify-content: center; font-size: 20px; flex-shrink: 0;
+        }
+        .gb-text h3 { font-size: 15px; font-weight: 800; color: white; margin-bottom: 3px; }
+        .gb-text p  { font-size: 12px; color: rgba(255,255,255,0.78); }
+        .gb-btn {
+            padding: 9px 20px; border-radius: 9px; border: 1.5px solid rgba(255,255,255,0.35);
+            background: rgba(255,255,255,0.14); color: white;
+            font-family: inherit; font-size: 13px; font-weight: 700;
+            text-decoration: none; transition: all 0.15s; flex-shrink: 0; white-space: nowrap;
+        }
+        .gb-btn:hover { background: rgba(255,255,255,0.25); border-color: rgba(255,255,255,0.6); }
+
+        /* ─── HERO ─────────────────────────────────────────────────── */
+        .hero {
+            background: linear-gradient(130deg, var(--g700) 0%, var(--g500) 100%);
+            border-radius: 18px; padding: 36px 42px; color: white;
+            margin-bottom: 24px; position: relative; overflow: hidden;
+        }
+        .hero::before {
+            content: ''; position: absolute; top: -50px; right: -50px;
+            width: 240px; height: 240px; border-radius: 50%;
+            background: rgba(255,255,255,0.06);
+        }
+        .hero::after {
+            content: ''; position: absolute; bottom: -60px; right: 80px;
+            width: 160px; height: 160px; border-radius: 50%;
+            background: rgba(255,255,255,0.04);
+        }
+        .hero-pill {
+            display: inline-flex; align-items: center; gap: 6px;
+            background: rgba(255,255,255,0.15); border: 1px solid rgba(255,255,255,0.22);
+            border-radius: 20px; padding: 4px 12px;
+            font-size: 12px; font-weight: 600; margin-bottom: 14px;
+        }
+        .hero h1 { font-size: 28px; font-weight: 800; letter-spacing: -0.5px; margin-bottom: 8px; }
+        .hero p  { font-size: 14px; opacity: 0.85; max-width: 440px; line-height: 1.6; }
+
+        /* ─── CARD ─────────────────────────────────────────────────── */
+        .card {
+            background: var(--white); border: 1px solid var(--gr200);
+            border-radius: var(--radius); margin-bottom: 22px; overflow: hidden;
+        }
+        .card-head {
+            padding: 18px 26px; border-bottom: 1px solid var(--gr100);
+            display: flex; align-items: center; gap: 10px;
+        }
+        .c-ico { font-size: 20px; }
+        .card-head h2 { font-size: 16px; font-weight: 700; color: var(--gr900); }
+        .card-head p  { font-size: 13px; color: var(--gr500); margin-top: 1px; }
+        .card-body { padding: 26px; }
+
+        /* ─── ALERT ────────────────────────────────────────────────── */
+        .alert {
+            padding: 13px 17px; border-radius: 10px; margin-bottom: 22px;
+            font-size: 14px; font-weight: 500;
+            display: flex; align-items: flex-start; gap: 9px;
+        }
+        .alert-err { background: var(--r50); border: 1px solid var(--r100); color: var(--r700); }
+
+        /* ─── DROP ZONE ────────────────────────────────────────────── */
+        .drop-zone {
+            border: 2px dashed var(--gr300); border-radius: 12px;
+            padding: 52px 28px; text-align: center; cursor: pointer;
+            background: var(--gr50); position: relative; transition: all 0.2s;
+        }
+        .drop-zone:hover, .drop-zone.drag { border-color: var(--g500); background: var(--g50); }
+        .drop-zone input[type="file"] {
+            position: absolute; inset: 0; opacity: 0; cursor: pointer;
+            width: 100%; height: 100%;
+        }
+        .dz-ico   { font-size: 44px; margin-bottom: 14px; }
+        .dz-title { font-size: 16px; font-weight: 700; color: var(--gr700); margin-bottom: 5px; }
+        .dz-sub   { font-size: 13px; color: var(--gr500); margin-bottom: 4px; }
+        .dz-types { font-size: 12px; color: var(--gr400); }
+
+        .file-prev {
+            display: none; align-items: center; gap: 14px;
+            padding: 14px 16px; margin-top: 14px;
+            background: var(--g50); border: 1px solid var(--g200); border-radius: 10px;
+        }
+        .file-prev img { width: 60px; height: 60px; object-fit: cover; border-radius: 8px; }
+        .fp-name { font-size: 14px; font-weight: 600; color: var(--gr900); }
+        .fp-size { font-size: 12px; color: var(--gr500); }
+        .fp-chk  { font-size: 22px; margin-left: auto; }
+
+        .plant-row {
+            margin-top: 18px; display: flex; align-items: center;
+            gap: 12px; flex-wrap: wrap;
+        }
+        .plant-row label { font-size: 13px; font-weight: 600; color: var(--gr700); flex-shrink: 0; }
+        .plant-input {
+            flex: 1; min-width: 200px; padding: 11px 16px;
+            border: 1.5px solid var(--gr300); border-radius: 10px;
+            font-family: inherit; font-size: 14px; color: var(--gr900); outline: none;
+            transition: border-color 0.2s, box-shadow 0.2s;
+        }
+        .plant-input:focus { border-color: var(--g500); box-shadow: 0 0 0 3px rgba(34,197,94,0.12); }
+        .plant-input::placeholder { color: var(--gr300); }
+
+        /* ─── BUTTONS ──────────────────────────────────────────────── */
+        .btn-row { margin-top: 22px; display: flex; gap: 10px; flex-wrap: wrap; }
+        .btn-green {
+            padding: 12px 26px; border: none; border-radius: 10px; cursor: pointer;
+            font-family: inherit; font-size: 14px; font-weight: 700; color: white;
+            background: linear-gradient(135deg, var(--g700), var(--g500));
+            box-shadow: 0 4px 14px rgba(34,197,94,0.32);
+            display: flex; align-items: center; gap: 8px; transition: all 0.2s;
+        }
+        .btn-green:hover { transform: translateY(-1px); box-shadow: 0 6px 20px rgba(34,197,94,0.42); }
+        .btn-green:disabled { opacity: 0.6; cursor: not-allowed; transform: none; }
+        .btn-outline {
+            padding: 12px 18px; border: 1.5px solid var(--gr300); border-radius: 10px;
+            cursor: pointer; font-family: inherit; font-size: 14px; font-weight: 600;
+            color: var(--gr600); background: var(--white); transition: all 0.2s;
+        }
+        .btn-outline:hover { background: var(--gr50); }
+
+        /* Spinner inside button */
+        .btn-spin {
+            display: none; width: 16px; height: 16px; border-radius: 50%;
+            border: 2.5px solid rgba(255,255,255,0.35);
+            border-top-color: white; animation: spin 0.7s linear infinite;
+        }
+        @keyframes spin { to { transform: rotate(360deg); } }
+
+        /* ─── RESULTS ──────────────────────────────────────────────── */
+        .res-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 18px; }
+        .img-box { border: 1px solid var(--gr200); border-radius: 11px; overflow: hidden; margin-bottom: 12px; }
+        .img-box img { width: 100%; display: block; }
+        .img-lbl {
+            padding: 7px 14px; font-size: 12px; font-weight: 600;
+            color: var(--gr500); background: var(--gr50); border-top: 1px solid var(--gr100);
+        }
+        .res-stack { display: flex; flex-direction: column; gap: 14px; }
+
+        .status-box { padding: 18px 20px; border-radius: 12px; border: 1.5px solid; }
+        .status-box.is-disease  { background: var(--r50);  border-color: var(--r200); }
+        .status-box.is-healthy  { background: var(--g50);  border-color: var(--g200); }
+        .status-box.is-no-plant { background: var(--o50);  border-color: var(--o200); }
+        .sb-lbl  {
+            font-size: 11px; font-weight: 700; text-transform: uppercase;
+            letter-spacing: 1px; margin-bottom: 7px;
+        }
+        .sb-name { font-size: 18px; font-weight: 800; letter-spacing: -0.3px; }
+        .is-disease  .sb-lbl  { color: var(--r700); }
+        .is-healthy  .sb-lbl  { color: var(--g700); }
+        .is-no-plant .sb-lbl  { color: var(--o700); }
+        .is-disease  .sb-name { color: var(--r700); }
+        .is-healthy  .sb-name { color: var(--g700); }
+        .is-no-plant .sb-name { color: var(--o700); font-size: 14px; font-weight: 600; }
+
+        .conf-hdr {
+            display: flex; justify-content: space-between;
+            font-size: 12px; font-weight: 600; color: var(--gr600); margin-bottom: 5px;
+        }
+        .conf-track { height: 8px; background: var(--gr200); border-radius: 10px; overflow: hidden; }
+        .conf-fill  {
+            height: 100%; border-radius: 10px;
+            background: linear-gradient(90deg, var(--g500), var(--g700));
+            transition: width 1s cubic-bezier(0.4,0,0.2,1);
+        }
+
+        .treat-box {
+            background: var(--y50); border: 1.5px solid var(--y200);
+            border-radius: 12px; padding: 16px 18px;
+        }
+        .treat-ttl { font-size: 13px; font-weight: 700; color: var(--y700); margin-bottom: 7px; }
+        .treat-txt { font-size: 13px; color: var(--gr700); line-height: 1.6; }
+
+        .plant-tag {
+            padding: 10px 14px; background: var(--gr50);
+            border-radius: 10px; font-size: 13px; font-weight: 600; color: var(--gr600);
+        }
+        .plant-tag span { color: var(--g600); font-weight: 700; }
+
+        /* ─── TIMELINE ─────────────────────────────────────────────── */
+        .timeline { display: flex; align-items: center; margin: 12px 0 4px; }
+        .tl-step { display: flex; flex-direction: column; align-items: center; flex: 1; }
+        .tl-dot {
+            width: 22px; height: 22px; border-radius: 50%;
+            border: 2.5px solid var(--gr300); background: var(--white);
+            display: flex; align-items: center; justify-content: center;
+            font-size: 10px; font-weight: 800; color: var(--gr400); position: relative; z-index: 1;
+        }
+        .tl-dot.done { background: var(--g600); border-color: var(--g600); color: white; }
+        .tl-lbl { font-size: 10px; font-weight: 600; color: var(--gr400); margin-top: 4px; text-align: center; }
+        .tl-lbl.done { color: var(--g700); }
+        .tl-line { flex: 1; height: 2.5px; background: var(--gr200); margin-top: -11px; }
+
+        /* ─── GUEST CTA (register prompt) ─────────────────────────── */
+        .cta-box {
+            background: linear-gradient(130deg, var(--g700) 0%, var(--g500) 100%);
+            border-radius: 14px; padding: 28px 32px;
+            display: flex; align-items: center; justify-content: space-between;
+            gap: 20px; flex-wrap: wrap; margin-top: 8px;
+        }
+        .cta-text h3 { font-size: 17px; font-weight: 800; color: white; margin-bottom: 6px; }
+        .cta-text p  { font-size: 13px; color: rgba(255,255,255,0.82); line-height: 1.55; max-width: 360px; }
+        .cta-btns { display: flex; gap: 10px; flex-wrap: wrap; flex-shrink: 0; }
+        .cta-btn-solid {
+            padding: 11px 22px; border-radius: 9px; border: none; cursor: pointer;
+            font-family: inherit; font-size: 13px; font-weight: 700;
+            background: white; color: var(--g700); text-decoration: none;
+            transition: all 0.15s;
+        }
+        .cta-btn-solid:hover { background: var(--g50); transform: translateY(-1px); }
+        .cta-btn-outline {
+            padding: 11px 22px; border-radius: 9px;
+            border: 1.5px solid rgba(255,255,255,0.4);
+            background: rgba(255,255,255,0.12); color: white;
+            font-family: inherit; font-size: 13px; font-weight: 700;
+            text-decoration: none; transition: all 0.15s;
+        }
+        .cta-btn-outline:hover { background: rgba(255,255,255,0.22); border-color: rgba(255,255,255,0.7); }
+
+        /* ─── SUPPORTED PLANTS GRID ────────────────────────────────── */
+        .plants-grid {
+            display: grid; grid-template-columns: repeat(auto-fill, minmax(120px, 1fr));
+            gap: 10px; padding: 4px 0;
+        }
+        .plant-chip {
+            background: var(--gr50); border: 1px solid var(--gr200); border-radius: 9px;
+            padding: 9px 12px; font-size: 12px; font-weight: 600; color: var(--gr700);
+            display: flex; align-items: center; gap: 7px;
+        }
+        .plant-chip span { font-size: 15px; }
+
+        /* ─── LIMITATIONS NOTICE ───────────────────────────────────── */
+        .limit-notice {
+            background: var(--o50); border: 1px solid var(--o200);
+            border-radius: 10px; padding: 13px 16px; margin-top: 18px;
+            font-size: 12px; color: var(--o700); display: flex; align-items: flex-start; gap: 8px;
+        }
+
+        /* ─── OVERLAY (analyzing) ──────────────────────────────────── */
+        .overlay {
+            display: none; position: fixed; inset: 0;
+            background: rgba(17,24,39,0.55); backdrop-filter: blur(4px);
+            z-index: 500; align-items: center; justify-content: center;
+        }
+        .overlay.show { display: flex; }
+        .ov-box {
+            background: white; border-radius: 18px; padding: 44px 48px;
+            text-align: center; box-shadow: 0 20px 60px rgba(0,0,0,0.25);
+        }
+        .ov-spin {
+            width: 48px; height: 48px; border-radius: 50%;
+            border: 4px solid var(--g100); border-top-color: var(--g600);
+            animation: spin 0.8s linear infinite; margin: 0 auto 18px;
+        }
+        .ov-box h3 { font-size: 18px; font-weight: 800; color: var(--gr900); margin-bottom: 8px; }
+        .ov-box p  { font-size: 14px; color: var(--gr500); }
+
+        /* ─── RESPONSIVE ───────────────────────────────────────────── */
+        @media (max-width: 640px) {
+            .res-grid { grid-template-columns: 1fr; }
+            .hero { padding: 28px 22px; }
+            .hero h1 { font-size: 22px; }
+            .topbar { padding: 0 16px; gap: 8px; }
+            .brand-name { font-size: 17px; }
+            .cta-box { padding: 22px 20px; }
+        }
+    </style>
+</head>
+<body>
+
+<!-- ── TOPBAR ───────────────────────────────────────────────────────────── -->
+<header class="topbar">
+    <a href="http://localhost/batanox/guest_login.php" class="brand">
+        <div class="brand-mark">
+            <svg viewBox="0 0 24 24"><path d="M17 8C8 10 5.9 16.17 3.82 21.34L5.71 22l1-2.3A4.49 4.49 0 008 20C19 20 22 3 22 3c-1 2-8 2-13 6 1-2.17 2.64-4.41 8-5z"/></svg>
+        </div>
+        <span class="brand-name">BATA<em>NOX</em></span>
+        <span class="brand-pill">AI Powered</span>
+    </a>
+    <div class="top-spacer"></div>
+    <span class="guest-pill">👤 Guest Mode</span>
+    <a href="http://localhost/batanox/login.php" class="top-login-btn">
+        🔑 Sign In
+    </a>
+    <a href="http://localhost/batanox/register.php" class="top-login-btn" style="background:var(--g600);color:white;border-color:var(--g700);">
+        ✨ Create Account
+    </a>
+</header>
+
+<!-- ── ANALYZING OVERLAY ─────────────────────────────────────────────────── -->
+<div class="overlay" id="overlay">
+    <div class="ov-box">
+        <div class="ov-spin"></div>
+        <h3>Analyzing Plant</h3>
+        <p>AI model scanning for diseases…</p>
+    </div>
+</div>
+
+<!-- ── MAIN PAGE ─────────────────────────────────────────────────────────── -->
+<div class="page">
+<div class="container">
+
+    <!-- Guest warning banner -->
+    <div class="guest-banner">
+        <div class="gb-left">
+            <div class="gb-ico">👤</div>
+            <div class="gb-text">
+                <h3>You are browsing as a Guest</h3>
+                <p>Results are not saved. Create a free account to track records, get reminders, and view history.</p>
+            </div>
+        </div>
+        <a href="http://localhost/batanox/register.php" class="gb-btn">Create Free Account →</a>
+    </div>
+
+    <!-- Hero -->
+    <div class="hero">
+        <div class="hero-pill">🌿 AI-Powered Analysis</div>
+        <h1>Plant Disease Detection</h1>
+        <p>Upload a photo of your plant leaf and our AI will identify diseases and recommend treatments — instantly, no account required.</p>
+    </div>
+
+    <!-- Error alert (shown when Flask passes an error) -->
+    {% if error %}
+    <div class="alert alert-err">
+        ⚠️ <span>{{ error }}</span>
+    </div>
+    {% endif %}
+
+    <!-- ── UPLOAD CARD ─────────────────────────────────────────────────── -->
+    <div class="card">
+        <div class="card-head">
+            <span class="c-ico">📤</span>
+            <div>
+                <h2>Upload Plant Image</h2>
+                <p>Upload a clear photo of a plant leaf for AI analysis</p>
+            </div>
+        </div>
+        <div class="card-body">
+            <form method="POST" action="/guest/predict" enctype="multipart/form-data" id="uploadForm">
+
+                <!-- Drop Zone -->
+                <div class="drop-zone" id="dropZone">
+                    <input type="file" name="image" id="imgInput" accept="image/*">
+                    <div class="dz-ico">🌿</div>
+                    <div class="dz-title">Drop your image here</div>
+                    <div class="dz-sub">or click to browse files</div>
+                    <div class="dz-types">PNG · JPG · WEBP up to 10 MB</div>
+                </div>
+
+                <!-- File preview -->
+                <div class="file-prev" id="filePrev">
+                    <img id="prevImg" src="" alt="preview">
+                    <div>
+                        <div class="fp-name" id="prevName">—</div>
+                        <div class="fp-size" id="prevSize">—</div>
+                    </div>
+                    <span class="fp-chk">✅</span>
+                </div>
+
+                <!-- Optional plant name -->
+                <div class="plant-row">
+                    <label for="plant_name">🌱 Plant Name (optional):</label>
+                    <input type="text" name="plant_name" id="plant_name"
+                           class="plant-input"
+                           placeholder="e.g. Tomato, Corn, Raspberry…"
+                           value="{{ plant_name | default('') | e }}">
+                </div>
+
+                <!-- Limitation notice -->
+                <div class="limit-notice">
+                    ⚠️ <span><strong>Guest Mode:</strong> Detection results will NOT be saved. <a href="http://localhost/batanox/register.php" style="color:var(--o700);font-weight:700;">Create an account</a> to save records, track treatment progress, and get reminders.</span>
+                </div>
+
+                <div class="btn-row">
+                    <button type="submit" class="btn-green" id="analyzeBtn">
+                        <span>🔬 Analyze Plant</span>
+                        <div class="btn-spin" id="btnSpin"></div>
+                    </button>
+                    <button type="button" class="btn-outline" onclick="clearForm()">Clear</button>
+                </div>
+
+            </form>
+        </div>
+    </div>
+
+    <!-- ── RESULTS CARD ────────────────────────────────────────────────── -->
+    {% if disease_name %}
+    <div class="card" id="resultsCard">
+        <div class="card-head">
+            <span class="c-ico">📊</span>
+            <div>
+                <h2>Detection Results</h2>
+                <p>AI analysis complete</p>
+            </div>
+        </div>
+        <div class="card-body">
+            <div class="res-grid">
+
+                <!-- Images column -->
+                <div>
+                    {% if uploaded_image %}
+                    <div class="img-box">
+                        <img src="{{ uploaded_image }}" alt="Your uploaded image">
+                        <div class="img-lbl">📷 Your Image</div>
+                    </div>
+                    {% endif %}
+                    {% if result_image %}
+                    <div class="img-box">
+                        <img src="{{ result_image }}" alt="AI annotated result">
+                        <div class="img-lbl">🤖 AI Annotated</div>
+                    </div>
+                    {% endif %}
+                </div>
+
+                <!-- Info column -->
+                <div class="res-stack">
+
+                    {% if plant_name %}
+                    <div class="plant-tag">
+                        🌱 Plant: <span>{{ plant_name }}</span>
+                    </div>
+                    {% endif %}
+
+                    <!-- Status box — class set by detection_status -->
+                    {% set s = detection_status | default('') %}
+                    {% if s == 'no_plant' %}
+                    <div class="status-box is-no-plant">
+                        <div class="sb-lbl">🚫 No Plant Detected</div>
+                        <div class="sb-name">Please upload a clear photo of a plant leaf.</div>
+                    </div>
+
+                    {% elif s == 'healthy' %}
+                    <div class="status-box is-healthy">
+                        <div class="sb-lbl">✅ Plant Status</div>
+                        <div class="sb-name">{{ disease_name }}</div>
+                    </div>
+                    {% if confidence > 0 %}
+                    <div>
+                        <div class="conf-hdr">
+                            <span>Confidence Score</span>
+                            <span>{{ confidence }}%</span>
+                        </div>
+                        <div class="conf-track">
+                            <div class="conf-fill" id="confFill" style="width:0%"></div>
+                        </div>
+                    </div>
+                    {% endif %}
+
+                    {% else %}
+                    <!-- diseased (or fallback) -->
+                    <div class="status-box is-disease">
+                        <div class="sb-lbl">🦠 Disease Detected</div>
+                        <div class="sb-name">{{ disease_name }}</div>
+                    </div>
+                    {% if confidence > 0 %}
+                    <div>
+                        <div class="conf-hdr">
+                            <span>Confidence Score</span>
+                            <span>{{ confidence }}%</span>
+                        </div>
+                        <div class="conf-track">
+                            <div class="conf-fill" id="confFill" style="width:0%"></div>
+                        </div>
+                    </div>
+                    {% endif %}
+                    <!-- Treatment box -->
+                    <div class="treat-box">
+                        <div class="treat-ttl">💊 Recommended Treatment</div>
+                        <div class="treat-txt" id="treatTxt">Loading treatment advice…</div>
+                    </div>
+                    <!-- Treatment timeline -->
+                    <div>
+                        <div style="font-size:12px;font-weight:700;color:var(--gr500);margin-bottom:6px;">TREATMENT PROGRESS</div>
+                        <div class="timeline">
+                            <div class="tl-step">
+                                <div class="tl-dot done">1</div>
+                                <div class="tl-lbl done">Detected</div>
+                            </div>
+                            <div class="tl-line"></div>
+                            <div class="tl-step">
+                                <div class="tl-dot">2</div>
+                                <div class="tl-lbl">In Progress</div>
+                            </div>
+                            <div class="tl-line"></div>
+                            <div class="tl-step">
+                                <div class="tl-dot">3</div>
+                                <div class="tl-lbl">Recovered</div>
+                            </div>
+                        </div>
+                        <div id="estDays" style="font-size:12px;color:var(--gr500);margin-top:6px;"></div>
+                    </div>
+                    {% endif %}
+
+                    <!-- Guest save prompt -->
+                    <div style="background:var(--b50);border:1px solid var(--b200);border-radius:10px;padding:13px 16px;font-size:13px;color:var(--b700);">
+                        💡 <strong>Want to save this result?</strong>
+                        <a href="http://localhost/batanox/register.php" style="color:var(--b700);font-weight:700;text-decoration:underline;">Create a free account</a> to save records, track treatment, and get recovery reminders.
+                    </div>
+
+                </div><!-- /res-stack -->
+            </div><!-- /res-grid -->
+        </div>
+    </div>
+    {% endif %}
+
+    <!-- ── SUPPORTED PLANTS CARD ──────────────────────────────────────── -->
+    <div class="card">
+        <div class="card-head">
+            <span class="c-ico">🌿</span>
+            <div>
+                <h2>Supported Plants</h2>
+                <p>Our AI model can detect diseases in these plant species</p>
+            </div>
+        </div>
+        <div class="card-body">
+            <div class="plants-grid">
+                <div class="plant-chip"><span>🍅</span> Tomato</div>
+                <div class="plant-chip"><span>🥔</span> Potato</div>
+                <div class="plant-chip"><span>🌽</span> Corn</div>
+                <div class="plant-chip"><span>🍎</span> Apple</div>
+                <div class="plant-chip"><span>🍇</span> Grape</div>
+                <div class="plant-chip"><span>🌾</span> Wheat</div>
+                <div class="plant-chip"><span>🫑</span> Bell Pepper</div>
+                <div class="plant-chip"><span>🫐</span> Blueberry</div>
+                <div class="plant-chip"><span>🍓</span> Strawberry</div>
+                <div class="plant-chip"><span>🌿</span> Raspberry</div>
+                <div class="plant-chip"><span>🌱</span> Soybean</div>
+                <div class="plant-chip"><span>🎃</span> Squash</div>
+                <div class="plant-chip"><span>🍑</span> Peach</div>
+                <div class="plant-chip"><span>🍒</span> Cherry</div>
+            </div>
+        </div>
+    </div>
+
+    <!-- ── CTA BOX ────────────────────────────────────────────────────── -->
+    <div class="cta-box">
+        <div class="cta-text">
+            <h3>🚀 Get the Full Experience</h3>
+            <p>Create a free account to save detection records, track treatment progress, set recovery reminders, and access your full history — all in one place.</p>
+        </div>
+        <div class="cta-btns">
+            <a href="http://localhost/batanox/register.php" class="cta-btn-solid">✨ Create Free Account</a>
+            <a href="http://localhost/batanox/login.php"    class="cta-btn-outline">🔑 Sign In</a>
+        </div>
+    </div>
+
+</div><!-- /container -->
+</div><!-- /page -->
+
+
+<!-- ── FLASK DATA BLOCK ──────────────────────────────────────────────────── -->
+<script id="fd" type="application/json">
+{
+    "diseaseName":     "{{ disease_name     | default('') | e }}",
+    "confidence":      {{ confidence        | default(0) }},
+    "detectionStatus": "{{ detection_status | default('') | e }}"
+}
+</script>
+
+
+<!-- ── APPLICATION JAVASCRIPT ───────────────────────────────────────────── -->
+<script>
+(function () {
+    "use strict";
+
+    /* ── Read Flask data ────────────────────────────────────────── */
+    var fd = {};
+    try { fd = JSON.parse(document.getElementById("fd").textContent); }
+    catch (e) { console.error("Failed to parse Flask data:", e); }
+
+    var diseaseName     = fd.diseaseName     || "";
+    var confidence      = parseFloat(fd.confidence) || 0;
+    var detectionStatus = fd.detectionStatus || "";
+
+    /* ── Treatment database ────────────────────────────────────── */
+    var TREATMENTS = {
+        "early blight":   { text: "Apply copper-based fungicide every 7–10 days. Remove infected leaves immediately. Avoid overhead watering and improve air circulation.", days: 21 },
+        "late blight":    { text: "Use metalaxyl-based fungicide immediately. Remove and destroy infected plants. Avoid overhead irrigation.", days: 28 },
+        "leaf mold":      { text: "Apply fungicide and reduce humidity. Ensure good ventilation. Remove infected foliage promptly.", days: 14 },
+        "common rust":    { text: "Apply triazole fungicide. Use resistant varieties. Plant early to avoid peak rust pressure.", days: 18 },
+        "powdery mildew": { text: "Apply sulfur or potassium bicarbonate spray. Improve canopy airflow. Remove heavily infected parts.", days: 14 },
+        "blast":          { text: "Apply tricyclazole or isoprothiolane fungicide. Use disease-resistant varieties. Periodic field drainage helps.", days: 21 },
+        "scab":           { text: "Apply captan or myclobutanil. Prune trees for good air circulation. Rake and destroy fallen leaves.", days: 30 },
+        "black rot":      { text: "Remove infected fruit and canes. Apply copper fungicide. Improve canopy management.", days: 25 },
+        "bacterial spot": { text: "Apply copper-based bactericide. Avoid overhead irrigation. Remove infected debris.", days: 20 },
+        "septoria":       { text: "Apply chlorothalonil or propiconazole. Use crop rotation. Bury infected residue after harvest.", days: 18 },
+        "mosaic":         { text: "Control aphid vectors. Remove infected plants immediately. Use certified virus-free seeds.", days: 35 },
+        "spider mites":   { text: "Apply miticide or insecticidal soap. Increase humidity around plants. Remove heavily infested leaves.", days: 14 },
+        "leaf scorch":    { text: "Improve irrigation consistency. Apply potassium-rich fertilizer. Remove and destroy affected leaves.", days: 21 },
+        "gray leaf spot": { text: "Apply strobilurin fungicide. Use resistant hybrid varieties. Practice crop rotation.", days: 18 },
+        "default":        { text: "Consult your local agricultural extension office. Remove infected leaves, improve air circulation, avoid overwatering, and apply an appropriate fungicide or bactericide.", days: 21 }
+    };
+
+    function getTreatment(name) {
+        var n = (name || "").toLowerCase();
+        for (var k in TREATMENTS) {
+            if (k !== "default" && n.indexOf(k) !== -1) return TREATMENTS[k];
+        }
+        return TREATMENTS["default"];
+    }
+
+    /* ── Animate confidence bar ────────────────────────────────── */
+    if (confidence > 0) {
+        var fill = document.getElementById("confFill");
+        if (fill) {
+            setTimeout(function () { fill.style.width = confidence + "%"; }, 150);
+        }
+    }
+
+    /* ── Populate treatment text for diseased results ──────────── */
+    if (detectionStatus === "diseased" || (!detectionStatus && diseaseName && diseaseName.toLowerCase().indexOf("healthy") === -1 && diseaseName.toLowerCase().indexOf("no plant") === -1)) {
+        var treatEl = document.getElementById("treatTxt");
+        var daysEl  = document.getElementById("estDays");
+        if (treatEl) {
+            var plan = getTreatment(diseaseName);
+            treatEl.textContent = plan.text;
+            if (daysEl && plan.days > 0) {
+                daysEl.textContent = "⏱ Estimated recovery: ~" + plan.days + " days with proper treatment.";
+            }
+        }
+    }
+
+    /* ── Smooth scroll to results ──────────────────────────────── */
+    if (diseaseName) {
+        var card = document.getElementById("resultsCard");
+        if (card) setTimeout(function () { card.scrollIntoView({ behavior: "smooth", block: "start" }); }, 200);
+    }
+
+    /* ── Drop zone drag & drop ─────────────────────────────────── */
+    var dropZone = document.getElementById("dropZone");
+    var imgInput = document.getElementById("imgInput");
+    var filePrev = document.getElementById("filePrev");
+
+    function showPreview(file) {
+        if (!file || !file.type.match(/^image\//)) return;
+        var reader = new FileReader();
+        reader.onload = function (e) {
+            document.getElementById("prevImg").src          = e.target.result;
+            document.getElementById("prevName").textContent = file.name;
+            document.getElementById("prevSize").textContent = (file.size / 1024).toFixed(1) + " KB";
+            filePrev.style.display = "flex";
+        };
+        reader.readAsDataURL(file);
+    }
+
+    imgInput.addEventListener("change", function (e) {
+        var f = e.target.files[0];
+        if (f) showPreview(f);
+    });
+
+    dropZone.addEventListener("dragover",  function (e) { e.preventDefault(); dropZone.classList.add("drag"); });
+    dropZone.addEventListener("dragleave", function ()  { dropZone.classList.remove("drag"); });
+    dropZone.addEventListener("drop", function (e) {
+        e.preventDefault(); dropZone.classList.remove("drag");
+        var f = e.dataTransfer.files[0];
+        if (f) {
+            try {
+                var dt = new DataTransfer();
+                dt.items.add(f);
+                imgInput.files = dt.files;
+            } catch (ex) {}
+            showPreview(f);
+        }
+    });
+
+    /* ── Form submit — show overlay ────────────────────────────── */
+    document.getElementById("uploadForm").addEventListener("submit", function (e) {
+        var hasFile = imgInput.files && imgInput.files.length > 0;
+        if (!hasFile) {
+            e.preventDefault();
+            alert("Please select an image first.");
+            return;
+        }
+        document.getElementById("overlay").classList.add("show");
+        var btn  = document.getElementById("analyzeBtn");
+        var spin = document.getElementById("btnSpin");
+        btn.disabled = true;
+        spin.style.display = "block";
+    });
+
+    /* ── Clear form ─────────────────────────────────────────────── */
+    window.clearForm = function () {
+        imgInput.value        = "";
+        filePrev.style.display = "none";
+        document.getElementById("prevImg").src = "";
+        document.getElementById("plant_name").value = "";
+    };
+
+})();
+</script>
+
+</body>
+</html>

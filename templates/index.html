@@ -1,0 +1,2172 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>BATANOX — Dashboard</title>
+    <link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@400;500;600;700;800&display=swap" rel="stylesheet">
+    <style>
+        *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+
+        :root {
+            --g50:#f0fdf4; --g100:#dcfce7; --g200:#bbf7d0;
+            --g500:#22c55e; --g600:#16a34a; --g700:#15803d;
+            --white:#ffffff;
+            --gr50:#f9fafb; --gr100:#f3f4f6; --gr200:#e5e7eb;
+            --gr300:#d1d5db; --gr400:#9ca3af; --gr500:#6b7280;
+            --gr600:#4b5563; --gr700:#374151; --gr900:#111827;
+            --r50:#fef2f2; --r100:#fee2e2; --r200:#fecaca;
+            --r600:#dc2626; --r700:#b91c1c;
+            --y50:#fefce8; --y200:#fef08a; --y700:#a16207;
+            --b50:#eff6ff; --b200:#bfdbfe; --b700:#1d4ed8;
+            --o50:#fff7ed; --o200:#fed7aa; --o700:#c2410c;
+            --topbar:66px; --sidebar:270px; --radius:14px;
+        }
+
+        body { font-family:'Plus Jakarta Sans',sans-serif; background:var(--gr50); color:var(--gr900); }
+
+        /* ─── TOPBAR ─────────────────────────────────────────── */
+        .topbar {
+            position:fixed; top:0; left:0; right:0; height:var(--topbar);
+            background:var(--white); border-bottom:1px solid var(--gr200);
+            display:flex; align-items:center; padding:0 28px; gap:14px; z-index:200;
+            box-shadow:0 1px 6px rgba(0,0,0,0.04);
+        }
+        .brand { display:flex; align-items:center; gap:10px; text-decoration:none; flex-shrink:0; }
+        .brand-mark {
+            width:38px; height:38px; border-radius:10px;
+            background:linear-gradient(135deg,var(--g700),var(--g500));
+            display:flex; align-items:center; justify-content:center;
+            box-shadow:0 3px 10px rgba(22,163,74,0.28);
+        }
+        .brand-mark svg { width:20px; height:20px; fill:white; }
+        .brand-name { font-size:20px; font-weight:800; letter-spacing:-0.4px; color:var(--gr900); }
+        .brand-name em { font-style:normal; color:var(--g600); }
+        .brand-pill {
+            font-size:11px; font-weight:700; color:var(--g700);
+            background:var(--g50); border:1px solid var(--g200);
+            border-radius:20px; padding:2px 9px;
+        }
+        .top-spacer { flex:1; }
+        .top-tabs { display:flex; gap:2px; }
+        .top-tab {
+            padding:8px 14px; border-radius:8px; border:none; cursor:pointer;
+            font-family:inherit; font-size:14px; font-weight:600;
+            color:var(--gr600); background:transparent; transition:all 0.15s;
+        }
+        .top-tab:hover { background:var(--gr100); color:var(--gr900); }
+        .top-tab.on { background:var(--g50); color:var(--g700); }
+        .user-chip {
+            display:flex; align-items:center; gap:8px;
+            background:var(--gr50); border:1px solid var(--gr200);
+            border-radius:30px; padding:5px 14px 5px 5px;
+        }
+        .avatar {
+            width:28px; height:28px; border-radius:50%;
+            background:linear-gradient(135deg,var(--g700),var(--g500));
+            display:flex; align-items:center; justify-content:center;
+            font-size:12px; font-weight:800; color:white;
+        }
+        .chip-name { font-size:13px; font-weight:600; color:var(--gr700); }
+        .sign-out {
+            font-size:13px; font-weight:600; color:var(--gr500);
+            text-decoration:none; padding:8px 12px; border-radius:8px; transition:all 0.15s;
+        }
+        .sign-out:hover { background:var(--r50); color:var(--r600); }
+
+        /* ─── LAYOUT ─────────────────────────────────────────── */
+        .layout { margin-top:var(--topbar); display:flex; min-height:calc(100vh - var(--topbar)); }
+
+        /* ─── SIDEBAR ────────────────────────────────────────── */
+        .sidebar {
+            width:var(--sidebar); flex-shrink:0;
+            background:var(--white); border-right:1px solid var(--gr200);
+            position:sticky; top:var(--topbar); height:calc(100vh - var(--topbar));
+            overflow-y:auto; padding:24px 14px;
+            display:flex; flex-direction:column; gap:22px;
+        }
+        .s-lbl { font-size:11px; font-weight:700; color:var(--gr400); text-transform:uppercase; letter-spacing:1px; padding:0 8px; margin-bottom:6px; }
+        .s-item {
+            display:flex; align-items:center; gap:10px; width:100%;
+            padding:10px 12px; border-radius:9px; border:none;
+            font-family:inherit; font-size:14px; font-weight:600;
+            color:var(--gr600); background:transparent; cursor:pointer;
+            text-align:left; transition:all 0.15s;
+        }
+        .s-item:hover { background:var(--gr50); color:var(--gr900); }
+        .s-item.on { background:var(--g50); color:var(--g700); }
+        .s-ico { width:20px; text-align:center; font-size:16px; }
+        .s-badge { margin-left:auto; background:var(--g100); color:var(--g700); font-size:11px; font-weight:700; padding:2px 8px; border-radius:10px; }
+        .s-badge-red { margin-left:auto; background:var(--r100); color:var(--r700); font-size:11px; font-weight:700; padding:2px 8px; border-radius:10px; }
+        .s-info { background:var(--g50); border:1px solid var(--g200); border-radius:12px; padding:15px; font-size:13px; color:var(--g700); line-height:1.55; }
+        .s-info strong { display:block; font-weight:700; margin-bottom:6px; }
+
+        /* ─── MAIN ───────────────────────────────────────────── */
+        .main { flex:1; padding:32px 36px; max-width:980px; }
+
+        /* ─── HERO ───────────────────────────────────────────── */
+        .hero {
+            background:linear-gradient(130deg,var(--g700) 0%,var(--g500) 100%);
+            border-radius:18px; padding:36px 42px; color:white;
+            margin-bottom:24px; position:relative; overflow:hidden;
+        }
+        .hero::before { content:''; position:absolute; top:-50px; right:-50px; width:240px; height:240px; border-radius:50%; background:rgba(255,255,255,0.06); }
+        .hero-pill {
+            display:inline-flex; align-items:center; gap:6px;
+            background:rgba(255,255,255,0.15); border:1px solid rgba(255,255,255,0.22);
+            border-radius:20px; padding:4px 12px; font-size:12px; font-weight:600; margin-bottom:14px;
+        }
+        .hero h1 { font-size:28px; font-weight:800; letter-spacing:-0.5px; margin-bottom:8px; }
+        .hero p  { font-size:14px; opacity:0.85; max-width:440px; line-height:1.6; }
+
+        /* ─── CARD ───────────────────────────────────────────── */
+        .card { background:var(--white); border:1px solid var(--gr200); border-radius:var(--radius); margin-bottom:22px; overflow:hidden; }
+        .card-head { padding:18px 26px; border-bottom:1px solid var(--gr100); display:flex; align-items:center; gap:10px; }
+        .c-ico { font-size:20px; }
+        .card-head h2 { font-size:16px; font-weight:700; color:var(--gr900); }
+        .card-head p  { font-size:13px; color:var(--gr500); margin-top:1px; }
+        .card-body { padding:26px; }
+
+        /* ─── ALERT ──────────────────────────────────────────── */
+        .alert { padding:13px 17px; border-radius:10px; margin-bottom:22px; font-size:14px; font-weight:500; display:flex; align-items:flex-start; gap:9px; }
+        .alert-err { background:var(--r50); border:1px solid var(--r100); color:var(--r700); }
+        .alert-ok  { background:var(--g50); border:1px solid var(--g200); color:var(--g700); }
+
+        /* ─── REMINDERS BANNER ──────────────────────────────── */
+        .reminder-banner {
+            background:var(--o50); border:1.5px solid var(--o200); border-radius:12px;
+            padding:14px 18px; margin-bottom:20px;
+        }
+        .rb-title { font-size:13px; font-weight:700; color:var(--o700); margin-bottom:8px; display:flex; align-items:center; gap:6px; }
+        .rb-item {
+            display:flex; align-items:center; justify-content:space-between;
+            background:white; border:1px solid var(--o200); border-radius:9px;
+            padding:10px 14px; margin-top:8px; font-size:13px;
+        }
+        .rb-item-left { display:flex; flex-direction:column; gap:2px; }
+        .rb-plant { font-weight:700; color:var(--gr900); }
+        .rb-note  { color:var(--gr500); font-size:12px; }
+        .rb-dis   { font-size:12px; color:var(--o700); font-weight:600; }
+
+        /* ─── DROP ZONE ──────────────────────────────────────── */
+        .drop-zone {
+            border:2px dashed var(--gr300); border-radius:12px;
+            padding:52px 28px; text-align:center; cursor:pointer;
+            background:var(--gr50); position:relative; transition:all 0.2s;
+        }
+        .drop-zone:hover, .drop-zone.drag { border-color:var(--g500); background:var(--g50); }
+        .drop-zone input[type="file"] { position:absolute; inset:0; opacity:0; cursor:pointer; width:100%; height:100%; }
+        .dz-ico   { font-size:44px; margin-bottom:14px; }
+        .dz-title { font-size:16px; font-weight:700; color:var(--gr700); margin-bottom:5px; }
+        .dz-sub   { font-size:13px; color:var(--gr500); margin-bottom:4px; }
+        .dz-types { font-size:12px; color:var(--gr400); }
+
+        .file-prev {
+            display:none; align-items:center; gap:14px;
+            padding:14px 16px; margin-top:14px;
+            background:var(--g50); border:1px solid var(--g200); border-radius:10px;
+        }
+        .file-prev img { width:60px; height:60px; object-fit:cover; border-radius:8px; }
+        .fp-name { font-size:14px; font-weight:600; color:var(--gr900); }
+        .fp-size { font-size:12px; color:var(--gr500); }
+        .fp-chk  { font-size:22px; margin-left:auto; }
+
+        .plant-row { margin-top:18px; display:flex; align-items:center; gap:12px; flex-wrap:wrap; }
+        .plant-row label { font-size:13px; font-weight:600; color:var(--gr700); flex-shrink:0; }
+        .plant-input {
+            flex:1; min-width:200px; padding:11px 16px;
+            border:1.5px solid var(--gr300); border-radius:10px;
+            font-family:inherit; font-size:14px; color:var(--gr900); outline:none;
+            transition:border-color 0.2s, box-shadow 0.2s;
+        }
+        .plant-input:focus { border-color:var(--g500); box-shadow:0 0 0 3px rgba(34,197,94,0.12); }
+        .plant-input::placeholder { color:var(--gr300); }
+
+        /* ─── BUTTONS ────────────────────────────────────────── */
+        .btn-row { margin-top:22px; display:flex; gap:10px; flex-wrap:wrap; }
+        .btn-green {
+            padding:12px 26px; border:none; border-radius:10px; cursor:pointer;
+            font-family:inherit; font-size:14px; font-weight:700; color:white;
+            background:linear-gradient(135deg,var(--g700),var(--g500));
+            box-shadow:0 4px 14px rgba(34,197,94,0.32);
+            display:flex; align-items:center; gap:8px; transition:all 0.2s;
+        }
+        .btn-green:hover { transform:translateY(-1px); box-shadow:0 6px 20px rgba(34,197,94,0.42); }
+        .btn-green:disabled { opacity:0.6; cursor:not-allowed; transform:none; }
+        .btn-outline { padding:12px 18px; border:1.5px solid var(--gr300); border-radius:10px; cursor:pointer; font-family:inherit; font-size:14px; font-weight:600; color:var(--gr600); background:var(--white); transition:all 0.2s; }
+        .btn-outline:hover { background:var(--gr50); }
+        .btn-red { padding:9px 16px; border:1.5px solid var(--r200); border-radius:10px; cursor:pointer; font-family:inherit; font-size:13px; font-weight:700; color:var(--r600); background:var(--r50); transition:all 0.2s; }
+        .btn-red:hover { background:var(--r100); }
+        .btn-sm-g { padding:9px 16px; border:none; border-radius:8px; cursor:pointer; font-family:inherit; font-size:13px; font-weight:700; color:white; background:linear-gradient(135deg,var(--g700),var(--g500)); transition:opacity 0.15s; }
+        .btn-sm-g:hover { opacity:0.88; }
+        .btn-sm-o { padding:9px 16px; border:1.5px solid var(--gr300); border-radius:8px; cursor:pointer; font-family:inherit; font-size:13px; font-weight:600; color:var(--gr600); background:var(--white); transition:all 0.15s; }
+        .btn-sm-o:hover { background:var(--gr50); }
+
+        /* ─── RESULTS ────────────────────────────────────────── */
+        .res-grid { display:grid; grid-template-columns:1fr 1fr; gap:18px; }
+        .img-box { border:1px solid var(--gr200); border-radius:11px; overflow:hidden; margin-bottom:12px; }
+        .img-box img { width:100%; display:block; }
+        .img-lbl { padding:7px 14px; font-size:12px; font-weight:600; color:var(--gr500); background:var(--gr50); border-top:1px solid var(--gr100); }
+
+        .res-stack { display:flex; flex-direction:column; gap:14px; }
+
+        .status-box { padding:18px 20px; border-radius:12px; border:1.5px solid; }
+        .status-box.is-disease  { background:var(--r50);  border-color:var(--r200); }
+        .status-box.is-healthy  { background:var(--g50);  border-color:var(--g200); }
+        .status-box.is-no-plant { background:var(--o50);  border-color:var(--o200); }
+        .sb-lbl  { font-size:11px; font-weight:700; text-transform:uppercase; letter-spacing:1px; margin-bottom:7px; opacity:0.65; }
+        .sb-name { font-size:18px; font-weight:800; letter-spacing:-0.3px; }
+        .is-disease  .sb-name { color:var(--r700); }
+        .is-healthy  .sb-name { color:var(--g700); }
+        .is-no-plant .sb-lbl  { color:var(--o700); opacity:1; }
+        .is-no-plant .sb-name { color:var(--o700); font-size:14px; font-weight:600; }
+
+        .conf-hdr { display:flex; justify-content:space-between; font-size:12px; font-weight:600; color:var(--gr600); margin-bottom:5px; }
+        .conf-track { height:8px; background:var(--gr200); border-radius:10px; overflow:hidden; }
+        .conf-fill  { height:100%; border-radius:10px; background:linear-gradient(90deg,var(--g500),var(--g700)); transition:width 1s cubic-bezier(0.4,0,0.2,1); }
+
+        .treat-box { background:var(--y50); border:1.5px solid var(--y200); border-radius:12px; padding:16px 18px; }
+        .treat-ttl { font-size:13px; font-weight:700; color:var(--y700); margin-bottom:7px; }
+        .treat-txt { font-size:13px; color:var(--gr700); line-height:1.6; }
+
+        .plant-tag { padding:10px 14px; background:var(--gr50); border-radius:10px; font-size:13px; font-weight:600; color:var(--gr600); }
+        .plant-tag span { color:var(--g600); font-weight:700; }
+
+        /* ─── RECORDS TABLE ──────────────────────────────────── */
+        .rec-hdr { display:flex; align-items:center; justify-content:space-between; flex-wrap:wrap; gap:10px; width:100%; }
+        .table-wrap { overflow-x:auto; }
+        table { width:100%; border-collapse:collapse; font-size:13px; }
+        thead th { padding:11px 18px; text-align:left; font-size:11px; font-weight:700; color:var(--gr500); text-transform:uppercase; letter-spacing:0.8px; background:var(--gr50); border-bottom:1px solid var(--gr200); white-space:nowrap; }
+        tbody td { padding:13px 18px; border-bottom:1px solid var(--gr100); color:var(--gr700); }
+        tbody tr:last-child td { border-bottom:none; }
+        tbody tr:hover td { background:var(--gr50); }
+
+        /* ─── PILLS ──────────────────────────────────────────── */
+        .pill { display:inline-block; padding:3px 10px; border-radius:20px; font-size:12px; font-weight:600; white-space:nowrap; }
+        .pill-dis  { background:var(--r50);  color:var(--r600); }
+        .pill-ok   { background:var(--g100); color:var(--g700); }
+        /* Status pills */
+        .pill-det  { background:#fef3c7; color:#92400e; }
+        .pill-prog { background:var(--b50);  color:var(--b700); }
+        .pill-rec  { background:var(--g100); color:var(--g700); }
+
+        /* ─── STATUS SELECT ──────────────────────────────────── */
+        .status-sel {
+            padding:5px 10px; border-radius:8px; border:1.5px solid var(--gr300);
+            font-family:inherit; font-size:12px; font-weight:600; color:var(--gr700);
+            background:var(--white); cursor:pointer; outline:none; transition:border-color 0.15s;
+        }
+        .status-sel:focus { border-color:var(--g500); }
+
+        /* ─── TREATMENT PANEL in records ─────────────────────── */
+        .treat-panel {
+            background:var(--y50); border:1px solid var(--y200); border-radius:10px;
+            padding:12px 14px; margin-top:6px; font-size:12px; color:var(--gr700); line-height:1.6;
+            display:none;
+        }
+        .treat-panel.open { display:block; }
+        .treat-toggle {
+            font-size:12px; font-weight:700; color:var(--g600); background:none; border:none;
+            cursor:pointer; padding:0; text-decoration:underline;
+        }
+
+        /* ─── TIMELINE (status stages) ───────────────────────── */
+        .timeline { display:flex; align-items:center; gap:0; margin:12px 0 4px; }
+        .tl-step { display:flex; flex-direction:column; align-items:center; flex:1; }
+        .tl-dot {
+            width:22px; height:22px; border-radius:50%; border:2.5px solid var(--gr300);
+            background:var(--white); display:flex; align-items:center; justify-content:center;
+            font-size:10px; font-weight:800; color:var(--gr400); position:relative; z-index:1;
+        }
+        .tl-dot.done  { background:var(--g600); border-color:var(--g600); color:white; }
+        .tl-dot.active{ background:var(--b700); border-color:var(--b700); color:white; }
+        .tl-lbl { font-size:10px; font-weight:600; color:var(--gr400); margin-top:4px; text-align:center; }
+        .tl-lbl.done   { color:var(--g700); }
+        .tl-lbl.active { color:var(--b700); }
+        .tl-line { flex:1; height:2.5px; background:var(--gr200); margin-top:-11px; }
+        .tl-line.done { background:var(--g500); }
+
+        /* ─── ACTIVITY SECTION ───────────────────────────────── */
+        .activity-card { background:var(--white); border:1px solid var(--gr200); border-radius:var(--radius); margin-bottom:22px; overflow:hidden; }
+        .act-item {
+            display:flex; align-items:flex-start; gap:14px;
+            padding:16px 22px; border-bottom:1px solid var(--gr100);
+        }
+        .act-item:last-child { border-bottom:none; }
+        .act-dot {
+            width:38px; height:38px; border-radius:10px; flex-shrink:0;
+            display:flex; align-items:center; justify-content:center; font-size:18px;
+        }
+        .act-dot-dis { background:var(--r50); }
+        .act-dot-ok  { background:var(--g50); }
+        .act-info { flex:1; }
+        .act-plant { font-size:14px; font-weight:700; color:var(--gr900); }
+        .act-dis   { font-size:13px; color:var(--gr500); margin-top:2px; }
+        .act-date  { font-size:12px; color:var(--gr400); margin-top:4px; }
+        .act-right { display:flex; flex-direction:column; align-items:flex-end; gap:6px; }
+
+        /* ─── EMPTY STATE ────────────────────────────────────── */
+        .empty-msg { padding:52px 24px; text-align:center; color:var(--gr400); font-size:14px; }
+        .e-ico   { font-size:38px; margin-bottom:10px; }
+        .e-ttl   { font-size:15px; font-weight:700; color:var(--gr500); margin-bottom:5px; }
+
+        /* ─── WEBCAM MODULE ──────────────────────────────────── */
+        .cam-divider {
+            display: flex; align-items: center; gap: 14px;
+            margin: 20px 0; color: var(--gr400); font-size: 13px; font-weight: 600;
+        }
+        .cam-divider::before, .cam-divider::after {
+            content: ''; flex: 1; height: 1px; background: var(--gr200);
+        }
+
+        /* Take Picture trigger button */
+        .btn-cam {
+            width: 100%; padding: 13px 20px;
+            border: 2px dashed var(--g300); border-radius: 12px;
+            background: var(--g50); color: var(--g700);
+            font-family: inherit; font-size: 14px; font-weight: 700;
+            cursor: pointer; display: flex; align-items: center;
+            justify-content: center; gap: 9px;
+            transition: all 0.2s; position: relative; overflow: hidden;
+        }
+        .btn-cam:hover {
+            border-color: var(--g500); background: var(--g100);
+            transform: translateY(-1px);
+            box-shadow: 0 4px 16px rgba(34,197,94,0.18);
+        }
+        .btn-cam svg { width: 20px; height: 20px; flex-shrink: 0; }
+
+        /* Webcam panel (hidden by default) */
+        .cam-panel {
+            display: none; border: 1.5px solid var(--g200);
+            border-radius: 14px; overflow: hidden;
+            background: var(--gr900);
+            box-shadow: 0 8px 32px rgba(0,0,0,0.14);
+            margin-top: 4px;
+        }
+        .cam-panel.open { display: block; }
+
+        /* Header bar inside panel */
+        .cam-bar {
+            display: flex; align-items: center; justify-content: space-between;
+            padding: 12px 16px;
+            background: linear-gradient(135deg, #064e3b, var(--g700));
+            color: white;
+        }
+        .cam-bar-left { display: flex; align-items: center; gap: 8px; }
+        .cam-bar-title { font-size: 13px; font-weight: 700; }
+        .cam-live-dot {
+            width: 7px; height: 7px; border-radius: 50%;
+            background: #4ade80;
+            box-shadow: 0 0 0 3px rgba(74,222,128,0.28);
+            animation: camPulse 1.8s ease-in-out infinite;
+        }
+        @keyframes camPulse {
+            0%,100% { box-shadow: 0 0 0 3px rgba(74,222,128,0.28); }
+            50%      { box-shadow: 0 0 0 6px rgba(74,222,128,0.08); }
+        }
+        .cam-close {
+            background: rgba(255,255,255,0.15); border: none; color: white;
+            width: 26px; height: 26px; border-radius: 50%; cursor: pointer;
+            font-size: 13px; display: flex; align-items: center; justify-content: center;
+            transition: background 0.15s;
+        }
+        .cam-close:hover { background: rgba(255,255,255,0.28); }
+
+        /* Viewfinder area */
+        .cam-viewfinder {
+            position: relative; background: #000;
+            aspect-ratio: 4/3; overflow: hidden;
+            --vf-h: 100%;
+        }
+        .cam-viewfinder video, .cam-viewfinder canvas {
+            width: 100%; height: 100%; object-fit: cover; display: block;
+        }
+        .cam-viewfinder canvas { display: none; }
+
+        /* Corner frame guides */
+        .cam-frame {
+            position: absolute; inset: 0; pointer-events: none;
+        }
+        .cam-frame::before, .cam-frame::after,
+        .cam-frame span::before, .cam-frame span::after {
+            content: ''; position: absolute; width: 24px; height: 24px;
+            border-color: rgba(74,222,128,0.8); border-style: solid;
+        }
+        .cam-frame::before  { top: 12px; left: 12px;  border-width: 3px 0 0 3px; border-radius: 3px 0 0 3px; }
+        .cam-frame::after   { top: 12px; right: 12px; border-width: 3px 3px 0 0; border-radius: 0 3px 0 0; }
+        .cam-frame span::before { bottom: 12px; left: 12px;  border-width: 0 0 3px 3px; border-radius: 0 0 0 3px; }
+        .cam-frame span::after  { bottom: 12px; right: 12px; border-width: 0 3px 3px 0; border-radius: 0 0 3px 0; }
+
+        /* Scan-line animation overlay */
+        .cam-scanline {
+            position: absolute; top: 0; left: 0; right: 0;
+            height: 2px; background: linear-gradient(90deg, transparent, rgba(74,222,128,0.7), transparent);
+            animation: camScan 2.4s linear infinite;
+            pointer-events: none; will-change: transform;
+        }
+        .cam-scanline[style*="display: none"],
+        .cam-scanline[style*="display:none"] {
+            animation-play-state: paused;
+        }
+        @keyframes camScan {
+            from { transform: translateY(0); }
+            to   { transform: translateY(var(--vf-h, 100%)); }
+        }
+
+        /* Permission error overlay */
+        .cam-error-overlay {
+            position: absolute; inset: 0; background: rgba(0,0,0,0.85);
+            display: none; flex-direction: column; align-items: center;
+            justify-content: center; gap: 12px; padding: 24px; text-align: center;
+        }
+        .cam-error-overlay.visible { display: flex; }
+        .cam-err-icon { font-size: 40px; }
+        .cam-err-msg  { font-size: 14px; font-weight: 700; color: white; }
+        .cam-err-sub  { font-size: 12px; color: rgba(255,255,255,0.6); line-height: 1.5; }
+
+        /* Loading state overlay */
+        .cam-loading-overlay {
+            position: absolute; inset: 0; background: rgba(0,0,0,0.72);
+            display: none; flex-direction: column; align-items: center;
+            justify-content: center; gap: 12px;
+        }
+        .cam-loading-overlay.visible { display: flex; }
+        .cam-loader {
+            width: 38px; height: 38px;
+            border: 3px solid rgba(255,255,255,0.15);
+            border-top-color: #4ade80; border-radius: 50%;
+            animation: spin 0.8s linear infinite;
+        }
+        .cam-loading-overlay p { font-size: 13px; color: rgba(255,255,255,0.75); font-weight: 600; }
+
+        /* Controls bar */
+        .cam-controls {
+            display: flex; align-items: center; justify-content: center;
+            gap: 12px; padding: 16px; background: #1a1a1a;
+            flex-wrap: wrap;
+        }
+        .cam-btn {
+            display: flex; align-items: center; gap: 7px;
+            padding: 10px 20px; border-radius: 30px; border: none;
+            font-family: inherit; font-size: 13px; font-weight: 700;
+            cursor: pointer; transition: all 0.18s; flex-shrink: 0;
+        }
+        .cam-btn svg { width: 16px; height: 16px; flex-shrink: 0; }
+        .cam-btn:disabled { opacity: 0.38; cursor: not-allowed; transform: none !important; }
+
+        .cam-btn-capture {
+            background: linear-gradient(135deg, var(--g700), var(--g500));
+            color: white; padding: 12px 28px; font-size: 14px;
+            box-shadow: 0 4px 14px rgba(34,197,94,0.38);
+        }
+        .cam-btn-capture:not(:disabled):hover {
+            transform: scale(1.05);
+            box-shadow: 0 6px 22px rgba(34,197,94,0.52);
+        }
+        /* Shutter ring animation */
+        .cam-btn-capture:not(:disabled):active { transform: scale(0.96); }
+
+        .cam-btn-retake {
+            background: rgba(255,255,255,0.1);
+            border: 1.5px solid rgba(255,255,255,0.18);
+            color: rgba(255,255,255,0.85);
+        }
+        .cam-btn-retake:not(:disabled):hover { background: rgba(255,255,255,0.18); }
+
+        .cam-btn-analyze {
+            background: linear-gradient(135deg, #1d4ed8, #3b82f6);
+            color: white;
+            box-shadow: 0 4px 14px rgba(59,130,246,0.35);
+        }
+        .cam-btn-analyze:not(:disabled):hover {
+            transform: scale(1.04);
+            box-shadow: 0 6px 20px rgba(59,130,246,0.5);
+        }
+
+        /* Captured preview strip */
+        .cam-preview-strip {
+            display: none; align-items: center; gap: 13px;
+            padding: 12px 16px; background: #111;
+            border-top: 1px solid rgba(255,255,255,0.07);
+        }
+        .cam-preview-strip.visible { display: flex; }
+        .cam-prev-thumb {
+            width: 56px; height: 56px; border-radius: 8px;
+            object-fit: cover; border: 2px solid var(--g500);
+            flex-shrink: 0;
+        }
+        .cam-prev-info { flex: 1; }
+        .cam-prev-label { font-size: 12px; font-weight: 700; color: #4ade80; }
+        .cam-prev-sub   { font-size: 11px; color: rgba(255,255,255,0.45); margin-top: 2px; }
+
+        /* ─── SPINNER / OVERLAY ──────────────────────────────── */
+        .btn-spin { display:none; width:16px; height:16px; border:2.5px solid rgba(255,255,255,0.35); border-top-color:white; border-radius:50%; animation:spin 0.7s linear infinite; }
+        .overlay  { display:none; position:fixed; inset:0; background:rgba(0,0,0,0.38); z-index:900; align-items:center; justify-content:center; }
+        .ov-box   { background:white; border-radius:18px; padding:40px 48px; text-align:center; box-shadow:0 20px 60px rgba(0,0,0,0.18); }
+        .ov-spin  { width:50px; height:50px; margin:0 auto 18px; border:4px solid var(--g100); border-top-color:var(--g500); border-radius:50%; animation:spin 0.8s linear infinite; }
+        .ov-box h3 { font-size:18px; font-weight:700; margin-bottom:5px; }
+        .ov-box p  { font-size:13px; color:var(--gr500); }
+        @keyframes spin { to { transform:rotate(360deg); } }
+
+        /* ─── TOAST ──────────────────────────────────────────── */
+        .toast { position:fixed; bottom:24px; right:24px; background:var(--gr900); color:white; padding:13px 18px; border-radius:12px; font-size:14px; font-weight:600; z-index:9999; max-width:320px; transform:translateY(70px); opacity:0; transition:all 0.3s cubic-bezier(0.34,1.56,0.64,1); }
+        .toast.show { transform:translateY(0); opacity:1; }
+        .t-ok  { background:var(--g700); }
+        .t-err { background:var(--r700); }
+
+
+        /* ─── SMART DASHBOARD ────────────────────────────────────── */
+        .db-hero {
+            background: linear-gradient(135deg, #0f4c2a 0%, var(--g700) 45%, var(--g500) 100%);
+            border-radius: 18px; padding: 34px 40px; color: white;
+            margin-bottom: 26px; position: relative; overflow: hidden;
+        }
+        .db-hero::before {
+            content: ''; position: absolute; top: -60px; right: -60px;
+            width: 260px; height: 260px; border-radius: 50%;
+            background: rgba(255,255,255,0.05);
+        }
+        .db-hero::after {
+            content: ''; position: absolute; bottom: -40px; left: 30%;
+            width: 180px; height: 180px; border-radius: 50%;
+            background: rgba(255,255,255,0.04);
+        }
+        .db-hero-pill {
+            display: inline-flex; align-items: center; gap: 6px;
+            background: rgba(255,255,255,0.14); border: 1px solid rgba(255,255,255,0.22);
+            border-radius: 20px; padding: 4px 12px; font-size: 12px; font-weight: 600;
+            margin-bottom: 13px;
+        }
+        .db-live-dot {
+            width: 7px; height: 7px; border-radius: 50%; background: #4ade80;
+            box-shadow: 0 0 0 3px rgba(74,222,128,0.3);
+            animation: dbpulse 2s ease-in-out infinite;
+        }
+        @keyframes dbpulse { 0%,100%{box-shadow:0 0 0 3px rgba(74,222,128,0.3)} 50%{box-shadow:0 0 0 6px rgba(74,222,128,0.1)} }
+        .db-hero h1 { font-size: 26px; font-weight: 800; letter-spacing: -0.5px; margin-bottom: 6px; }
+        .db-hero p  { font-size: 13px; opacity: 0.82; line-height: 1.6; max-width: 480px; }
+        .db-hero-meta { margin-top: 16px; display: flex; gap: 20px; flex-wrap: wrap; }
+        .db-hero-meta span { font-size: 12px; opacity: 0.7; font-weight: 500; }
+        .db-hero-meta strong { opacity: 1; font-weight: 700; }
+
+        /* Summary cards */
+        .db-cards {
+            display: grid; grid-template-columns: repeat(auto-fit, minmax(190px, 1fr));
+            gap: 16px; margin-bottom: 24px;
+        }
+        .db-card {
+            background: var(--white); border: 1px solid var(--gr200);
+            border-radius: 14px; padding: 22px 24px;
+            position: relative; overflow: hidden;
+            transition: transform 0.18s, box-shadow 0.18s;
+        }
+        .db-card:hover { transform: translateY(-2px); box-shadow: 0 8px 28px rgba(0,0,0,0.08); }
+        .db-card::before {
+            content: ''; position: absolute; top: 0; left: 0; right: 0; height: 3px;
+            border-radius: 14px 14px 0 0;
+        }
+        .db-card.c-total::before  { background: linear-gradient(90deg, var(--g600), var(--g400)); }
+        .db-card.c-active::before { background: linear-gradient(90deg, #3b82f6, #60a5fa); }
+        .db-card.c-done::before   { background: linear-gradient(90deg, var(--g700), var(--g500)); }
+        .db-card.c-det::before    { background: linear-gradient(90deg, #f97316, #fb923c); }
+        .db-card-icon {
+            width: 42px; height: 42px; border-radius: 11px;
+            display: flex; align-items: center; justify-content: center;
+            font-size: 20px; margin-bottom: 14px;
+        }
+        .c-total .db-card-icon  { background: var(--g50); }
+        .c-active .db-card-icon { background: var(--b50); }
+        .c-done   .db-card-icon { background: var(--g100); }
+        .c-det    .db-card-icon { background: var(--o50); }
+        .db-card-val {
+            font-size: 34px; font-weight: 800; letter-spacing: -1.5px;
+            color: var(--gr900); line-height: 1; margin-bottom: 6px;
+        }
+        .db-card-lbl { font-size: 13px; font-weight: 600; color: var(--gr500); }
+        .db-card-sub { font-size: 11px; color: var(--gr400); margin-top: 4px; }
+
+        /* Progress bar inside card */
+        .db-prog-bar {
+            height: 4px; background: var(--gr100); border-radius: 4px;
+            margin-top: 12px; overflow: hidden;
+        }
+        .db-prog-fill {
+            height: 100%; border-radius: 4px;
+            transition: width 1.2s cubic-bezier(0.4,0,0.2,1);
+        }
+        .c-total  .db-prog-fill { background: var(--g500); }
+        .c-active .db-prog-fill { background: #3b82f6; }
+        .c-done   .db-prog-fill { background: var(--g600); }
+        .c-det    .db-prog-fill { background: #f97316; }
+
+        /* Section header */
+        .db-section { background: var(--white); border: 1px solid var(--gr200); border-radius: 14px; margin-bottom: 20px; overflow: hidden; }
+        .db-section-head { padding: 16px 22px; border-bottom: 1px solid var(--gr100); display: flex; align-items: center; justify-content: space-between; }
+        .db-section-title { font-size: 15px; font-weight: 700; color: var(--gr900); display: flex; align-items: center; gap: 8px; }
+        .db-section-badge { font-size: 11px; font-weight: 700; background: var(--g50); color: var(--g700); border: 1px solid var(--g200); border-radius: 20px; padding: 3px 10px; }
+
+        /* Recent activity items */
+        .db-rec-item {
+            display: flex; align-items: center; gap: 14px;
+            padding: 14px 22px; border-bottom: 1px solid var(--gr100);
+            transition: background 0.12s;
+        }
+        .db-rec-item:last-child { border-bottom: none; }
+        .db-rec-item:hover { background: var(--gr50); }
+        .db-rec-icon {
+            width: 40px; height: 40px; border-radius: 10px;
+            display: flex; align-items: center; justify-content: center;
+            font-size: 18px; flex-shrink: 0;
+        }
+        .db-rec-icon.is-dis { background: var(--r50); }
+        .db-rec-icon.is-ok  { background: var(--g50); }
+        .db-rec-body { flex: 1; min-width: 0; }
+        .db-rec-name { font-size: 13px; font-weight: 700; color: var(--gr900); white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
+        .db-rec-plant { font-size: 12px; color: var(--gr500); margin-top: 1px; }
+        .db-rec-date  { font-size: 11px; color: var(--gr400); margin-top: 3px; }
+        .db-rec-right { flex-shrink: 0; text-align: right; }
+        .db-rec-conf  { font-size: 12px; font-weight: 700; color: var(--g600); }
+
+        /* Quick stats row */
+        .db-insight-row { display: grid; grid-template-columns: 1fr 1fr; gap: 16px; margin-bottom: 20px; }
+        .db-insight {
+            background: var(--white); border: 1px solid var(--gr200); border-radius: 14px;
+            padding: 20px 22px;
+        }
+        .db-insight-lbl { font-size: 11px; font-weight: 700; text-transform: uppercase; letter-spacing: 0.8px; color: var(--gr400); margin-bottom: 10px; }
+        .db-insight-val { font-size: 18px; font-weight: 800; color: var(--gr900); letter-spacing: -0.3px; }
+        .db-insight-sub { font-size: 12px; color: var(--gr500); margin-top: 4px; }
+
+        /* Skeleton loader */
+        .db-skel {
+            background: linear-gradient(90deg, var(--gr100) 25%, var(--gr50) 50%, var(--gr100) 75%);
+            background-size: 200% 100%;
+            animation: dbskel 1.4s ease infinite;
+            border-radius: 6px;
+        }
+        @keyframes dbskel { 0%{background-position:200% 0} 100%{background-position:-200% 0} }
+
+        /* Empty state */
+        .db-empty { padding: 44px 24px; text-align: center; }
+        .db-empty-ico { font-size: 36px; margin-bottom: 12px; }
+        .db-empty-ttl { font-size: 15px; font-weight: 700; color: var(--gr500); margin-bottom: 6px; }
+        .db-empty-sub { font-size: 13px; color: var(--gr400); }
+        .db-refresh-btn {
+            font-size: 12px; font-weight: 700; color: var(--g600);
+            background: none; border: none; cursor: pointer; padding: 0;
+            text-decoration: underline;
+        }
+        @media (max-width: 640px) {
+            .db-cards { grid-template-columns: 1fr 1fr; }
+            .db-insight-row { grid-template-columns: 1fr; }
+        }
+
+        @media (max-width:900px) { .sidebar { display:none; } .main { padding:20px 16px; } }
+        @media (max-width:640px) { .res-grid { grid-template-columns:1fr; } }
+    </style>
+</head>
+<body>
+
+<!-- TOPBAR -->
+<header class="topbar">
+    <a href="/" class="brand">
+        <div class="brand-mark">
+            <svg viewBox="0 0 24 24"><path d="M17 8C8 10 5.9 16.17 3.82 21.34L5.71 22l1-2.3A4.49 4.49 0 008 20C19 20 22 3 22 3c-1 2-8 2-13 6 1-2.17 2.64-4.41 8-5z"/></svg>
+        </div>
+        <span class="brand-name">BATA<em>NOX</em></span>
+        <span class="brand-pill">AI Powered</span>
+    </a>
+    <div class="top-spacer"></div>
+    <div class="top-tabs">
+        <button class="top-tab"    id="tDashboard" onclick="showTab('dashboard')">📊 Dashboard</button>
+        <button class="top-tab on" id="tDetect"    onclick="showTab('detect')">🔬 Detect</button>
+        <button class="top-tab"    id="tActivity"  onclick="showTab('activity')">📅 Activity</button>
+        <button class="top-tab"    id="tRecords"   onclick="showTab('records')">📋 Records</button>
+    </div>
+    <div class="user-chip">
+        <div class="avatar"     id="avatarLetter">U</div>
+        <span class="chip-name" id="chipName">User</span>
+    </div>
+    <a href="http://localhost/batanox/logout.php" class="sign-out">Sign Out</a>
+</header>
+
+<!-- ANALYZE OVERLAY -->
+<div class="overlay" id="overlay">
+    <div class="ov-box">
+        <div class="ov-spin"></div>
+        <h3>Analyzing Plant</h3>
+        <p>AI model scanning for diseases…</p>
+    </div>
+</div>
+
+<!-- TOAST -->
+<div class="toast" id="toast"></div>
+
+<!-- LAYOUT -->
+<div class="layout">
+
+    <!-- SIDEBAR -->
+    <aside class="sidebar">
+        <div>
+            <div class="s-lbl">Navigation</div>
+            <button class="s-item"    id="sDashboard" onclick="showTab('dashboard')">
+                <span class="s-ico">📊</span> Smart Dashboard
+            </button>
+            <button class="s-item on" id="sDetect"   onclick="showTab('detect')">
+                <span class="s-ico">🔬</span> Disease Detection
+            </button>
+            <button class="s-item"    id="sActivity" onclick="showTab('activity')">
+                <span class="s-ico">📅</span> Recent Activity
+                <span class="s-badge" id="actBadge">—</span>
+            </button>
+            <button class="s-item"    id="sRecords"  onclick="showTab('records')">
+                <span class="s-ico">📋</span> My Records
+                <span class="s-badge" id="recBadge">—</span>
+            </button>
+        </div>
+        <div>
+            <div class="s-lbl">Reminders</div>
+            <div id="sideReminders">
+                <div style="font-size:13px;color:var(--gr500);padding:0 8px;">Loading…</div>
+            </div>
+        </div>
+        <div>
+            <div class="s-lbl">How It Works</div>
+            <div class="s-info">
+                <strong>🌿 Quick Guide</strong>
+                Upload a clear photo of a plant leaf. YOLOv8 AI detects diseases and suggests treatments.
+            </div>
+        </div>
+        <div>
+            <div class="s-lbl">Supported Plants</div>
+            <div style="font-size:13px;color:var(--gr600);line-height:1.9;padding:0 8px;">
+                🍅 Tomato &nbsp;·&nbsp; 🥔 Potato<br>
+                🌽 Corn &nbsp;·&nbsp; 🍎 Apple<br>
+                🍇 Grape &nbsp;·&nbsp; 🍓 Strawberry<br>
+                 Bell_pepper &nbsp;·&nbsp;  Blueberry<br>
+                 🌱 Soyabean &nbsp;·&nbsp; 🌿 Raspberry<br>
+                  🎃 Squash &nbsp;·&nbsp; 🍒 Cherry<br>
+                🍑 Peach &nbsp;·&nbsp;
+            </div>
+        </div>
+    </aside>
+
+    <!-- MAIN CONTENT -->
+    <main class="main">
+
+        <!-- ════════ TAB: SMART DASHBOARD ════════ -->
+        <div id="tabDashboard" style="display:none;">
+
+            <div class="db-hero">
+                <div class="db-hero-pill">
+                    <span class="db-live-dot"></span>
+                    Live Dashboard
+                </div>
+                <h1 id="dbHeroTitle">My Plant Health Dashboard</h1>
+                <p>Real-time overview of your disease detection activity and treatment progress.</p>
+                <div class="db-hero-meta">
+                    <span>👤 Logged in as: <strong id="dbUserName">—</strong></span>
+                    <span>🕐 Last updated: <strong id="dbLastUpdated">—</strong></span>
+                </div>
+            </div>
+
+            <!-- Summary Cards -->
+            <div class="db-cards" id="dbCards">
+                <!-- Skeleton loaders -->
+                <div class="db-card c-total">
+                    <div class="db-card-icon">🌿</div>
+                    <div class="db-card-val" id="dbTotal"><span class="db-skel" style="width:40px;height:34px;display:block;"></span></div>
+                    <div class="db-card-lbl">Total Detections</div>
+                    <div class="db-card-sub">All scans ever saved</div>
+                    <div class="db-prog-bar"><div class="db-prog-fill" id="dbTotalBar" style="width:0%"></div></div>
+                </div>
+                <div class="db-card c-det">
+                    <div class="db-card-icon">🦠</div>
+                    <div class="db-card-val" id="dbDetected"><span class="db-skel" style="width:40px;height:34px;display:block;"></span></div>
+                    <div class="db-card-lbl">Newly Detected</div>
+                    <div class="db-card-sub">Awaiting treatment</div>
+                    <div class="db-prog-bar"><div class="db-prog-fill" id="dbDetectedBar" style="width:0%"></div></div>
+                </div>
+                <div class="db-card c-active">
+                    <div class="db-card-icon">💊</div>
+                    <div class="db-card-val" id="dbActive"><span class="db-skel" style="width:40px;height:34px;display:block;"></span></div>
+                    <div class="db-card-lbl">In Treatment</div>
+                    <div class="db-card-sub">Active recovery</div>
+                    <div class="db-prog-bar"><div class="db-prog-fill" id="dbActiveBar" style="width:0%"></div></div>
+                </div>
+                <div class="db-card c-done">
+                    <div class="db-card-icon">✅</div>
+                    <div class="db-card-val" id="dbRecovered"><span class="db-skel" style="width:40px;height:34px;display:block;"></span></div>
+                    <div class="db-card-lbl">Recovered</div>
+                    <div class="db-card-sub">Treatment completed</div>
+                    <div class="db-prog-bar"><div class="db-prog-fill" id="dbRecoveredBar" style="width:0%"></div></div>
+                </div>
+            </div>
+
+            <!-- Insights Row -->
+            <div class="db-insight-row">
+                <div class="db-insight">
+                    <div class="db-insight-lbl">🏆 Most Common Disease</div>
+                    <div class="db-insight-val" id="dbTopDisease">—</div>
+                    <div class="db-insight-sub">Most frequently detected</div>
+                </div>
+                <div class="db-insight">
+                    <div class="db-insight-lbl">📈 Recovery Rate</div>
+                    <div class="db-insight-val" id="dbRecoveryRate">—</div>
+                    <div class="db-insight-sub">Of all your detections</div>
+                </div>
+            </div>
+
+            <!-- Recent Activity Preview -->
+            <div class="db-section">
+                <div class="db-section-head">
+                    <div class="db-section-title">
+                        📅 Recent Activity
+                        <span class="db-section-badge" id="dbRecentBadge">—</span>
+                    </div>
+                    <button class="db-refresh-btn" onclick="loadDashboard(true)">↻ Refresh</button>
+                </div>
+                <div id="dbRecentList">
+                    <div class="db-empty">
+                        <div class="db-empty-ico">⏳</div>
+                        <div class="db-empty-ttl">Loading…</div>
+                    </div>
+                </div>
+                <div style="padding:12px 22px;border-top:1px solid var(--gr100);text-align:center;">
+                    <button class="btn-outline" style="font-size:13px;padding:9px 20px;" onclick="showTab('activity')">View All Activity →</button>
+                </div>
+            </div>
+
+        </div><!-- /tabDashboard -->
+
+        <!-- ════════ TAB: DETECT ════════ -->
+        <div id="tabDetect">
+
+            <!-- Reminders banner (shown if due reminders exist) -->
+            <div id="reminderBanner" style="display:none;"></div>
+
+            <div class="hero">
+                <div class="hero-pill">
+                    <svg width="10" height="10" viewBox="0 0 8 8" fill="currentColor"><circle cx="4" cy="4" r="4"/></svg>
+                    AI-Powered Analysis
+                </div>
+                <h1>Plant Disease Detection</h1>
+                <p>Upload a photo of your plant leaf and our AI will identify diseases and recommend treatments.</p>
+            </div>
+
+            <!-- Error banner -->
+            <div class="alert alert-err" id="errorAlert" style="display:none;">
+                <span>⚠</span><span id="errorMsg"></span>
+            </div>
+
+            <!-- Upload card -->
+            <div class="card">
+                <div class="card-head">
+                    <span class="c-ico">📤</span>
+                    <div>
+                        <h2>Upload or Capture Plant Image</h2>
+                        <p>Upload a file · or use your webcam to take a live photo</p>
+                    </div>
+                </div>
+                <div class="card-body">
+                    <form method="POST" action="/predict" enctype="multipart/form-data" id="uploadForm">
+
+                        <!-- Canvas used to encode webcam snapshot as PNG blob -->
+                        <canvas id="camHiddenCanvas" style="display:none;"></canvas>
+
+                        <!-- ── DROP ZONE ── -->
+                        <div class="drop-zone" id="dropZone">
+                            <!-- File input overlays the entire drop zone for click-to-browse -->
+                            <input type="file" name="image" id="imgInput" accept="image/*">
+                            <div class="dz-ico">🌿</div>
+                            <div class="dz-title">Drop your image here</div>
+                            <div class="dz-sub">or click to browse files</div>
+                            <div class="dz-types">PNG · JPG · WEBP up to 10 MB</div>
+                        </div>
+
+                        <div class="file-prev" id="filePrev">
+                            <img id="prevImg" src="" alt="preview">
+                            <div>
+                                <div class="fp-name" id="prevName">—</div>
+                                <div class="fp-size" id="prevSize">—</div>
+                            </div>
+                            <span class="fp-chk">✅</span>
+                        </div>
+
+                        <!-- ── OR DIVIDER ── -->
+                        <div class="cam-divider">or use your camera</div>
+
+                        <!-- ── TAKE PICTURE BUTTON ── -->
+                        <button type="button" class="btn-cam" id="takePicBtn" onclick="camOpen()">
+                            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                                <path d="M23 19a2 2 0 0 1-2 2H3a2 2 0 0 1-2-2V8a2 2 0 0 1 2-2h4l2-3h6l2 3h4a2 2 0 0 1 2 2z"/>
+                                <circle cx="12" cy="13" r="4"/>
+                            </svg>
+                            📷 &nbsp;Take Picture with Webcam
+                        </button>
+
+                        <!-- ── WEBCAM PANEL ── -->
+                        <div class="cam-panel" id="camPanel">
+
+                            <!-- Header bar -->
+                            <div class="cam-bar">
+                                <div class="cam-bar-left">
+                                    <span class="cam-live-dot" id="camLiveDot" style="display:none"></span>
+                                    <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="white" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                                        <path d="M23 19a2 2 0 0 1-2 2H3a2 2 0 0 1-2-2V8a2 2 0 0 1 2-2h4l2-3h6l2 3h4a2 2 0 0 1 2 2z"/>
+                                        <circle cx="12" cy="13" r="4"/>
+                                    </svg>
+                                    <span class="cam-bar-title" id="camBarTitle">Starting Camera…</span>
+                                </div>
+                                <button type="button" class="cam-close" onclick="camClose()" title="Close camera">✕</button>
+                            </div>
+
+                            <!-- Viewfinder -->
+                            <div class="cam-viewfinder" id="camViewfinder">
+                                <video id="camVideo" autoplay playsinline muted></video>
+                                <canvas id="camCanvas"></canvas>
+
+                                <!-- Corner frame guides -->
+                                <div class="cam-frame"><span></span></div>
+
+                                <!-- Scan line (live mode only) -->
+                                <div class="cam-scanline" id="camScanline" style="display:none"></div>
+
+                                <!-- Loading overlay -->
+                                <div class="cam-loading-overlay visible" id="camLoading">
+                                    <div class="cam-loader"></div>
+                                    <p>Requesting camera access…</p>
+                                </div>
+
+                                <!-- Error overlay -->
+                                <div class="cam-error-overlay" id="camError">
+                                    <div class="cam-err-icon">🚫</div>
+                                    <div class="cam-err-msg" id="camErrMsg">Camera access is required to take a picture.</div>
+                                    <div class="cam-err-sub" id="camErrSub">Please allow camera permission in your browser settings and try again.</div>
+                                    <button type="button" class="btn-cam" style="margin-top:10px;max-width:200px;padding:10px 16px;font-size:12px;" onclick="camStart()">
+                                        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><polyline points="23 4 23 10 17 10"/><path d="M20.49 15a9 9 0 1 1-2.12-9.36L23 10"/></svg>
+                                        Try Again
+                                    </button>
+                                </div>
+                            </div>
+
+                            <!-- Captured preview strip -->
+                            <div class="cam-preview-strip" id="camPreviewStrip">
+                                <img class="cam-prev-thumb" id="camPrevThumb" src="" alt="Captured">
+                                <div class="cam-prev-info">
+                                    <div class="cam-prev-label">✅ Image Captured!</div>
+                                    <div class="cam-prev-sub">Click <strong style="color:rgba(255,255,255,.7)">Analyze Plant</strong> below · or <strong style="color:rgba(255,255,255,.7)">Retake</strong> to redo.</div>
+                                </div>
+                            </div>
+
+                            <!-- Controls row -->
+                            <div class="cam-controls">
+                                <button type="button" class="cam-btn cam-btn-capture" id="camCaptureBtn" onclick="camCapture()" disabled>
+                                    <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round">
+                                        <circle cx="12" cy="12" r="10"/>
+                                        <circle cx="12" cy="12" r="4" fill="currentColor" stroke="none"/>
+                                    </svg>
+                                    Capture Image
+                                </button>
+                                <button type="button" class="cam-btn cam-btn-retake" id="camRetakeBtn" onclick="camRetake()" style="display:none;">
+                                    <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><polyline points="1 4 1 10 7 10"/><path d="M3.51 15a9 9 0 1 0 2.13-9.36L1 10"/></svg>
+                                    Retake
+                                </button>
+                                <button type="button" class="cam-btn cam-btn-analyze" id="camAnalyzeBtn" onclick="camAnalyze()" style="display:none;">
+                                    <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="11" cy="11" r="8"/><line x1="21" y1="21" x2="16.65" y2="16.65"/></svg>
+                                    Analyze Plant
+                                </button>
+                            </div>
+
+                        </div><!-- /cam-panel -->
+
+                        <div class="plant-row">
+                            <label for="plant_name">🌱 Plant Name (optional):</label>
+                            <input type="text" name="plant_name" id="plant_name"
+                                   class="plant-input" placeholder="e.g. Tomato, Corn, Wheat…">
+                        </div>
+
+                        <div class="btn-row">
+                            <button type="submit" class="btn-green" id="analyzeBtn">
+                                <span>🔬 Analyze Plant</span>
+                                <div class="btn-spin" id="btnSpin"></div>
+                            </button>
+                            <button type="button" class="btn-outline" onclick="clearUpload()">Clear</button>
+                        </div>
+
+                    </form>
+                </div>
+            </div>
+
+            <!-- Results card (hidden until Flask returns data) -->
+            <div class="card" id="resultsCard" style="display:none;">
+                <div class="card-head">
+                    <span class="c-ico">📊</span>
+                    <div>
+                        <h2>Detection Results</h2>
+                        <p>AI analysis complete</p>
+                    </div>
+                </div>
+                <div class="card-body">
+                    <div class="res-grid">
+
+                        <!-- Left: images -->
+                        <div>
+                            <div class="img-box" id="origBox" style="display:none;">
+                                <img id="origImg" src="" alt="Your uploaded image">
+                                <div class="img-lbl">📷 Your Image</div>
+                            </div>
+                            <div class="img-box" id="resBox" style="display:none;">
+                                <img id="resImg" src="" alt="AI annotated result">
+                                <div class="img-lbl">🤖 AI Annotated</div>
+                            </div>
+                        </div>
+
+                        <!-- Right: info -->
+                        <div class="res-stack">
+                            <div class="plant-tag" id="plantTag" style="display:none;">
+                                🌱 Plant: <span id="plantTagName">—</span>
+                            </div>
+                            <div class="status-box" id="statusBox">
+                                <div class="sb-lbl"  id="statusLbl">Status</div>
+                                <div class="sb-name" id="statusName">—</div>
+                            </div>
+                            <div id="confRow" style="display:none;">
+                                <div class="conf-hdr">
+                                    <span>Confidence Score</span>
+                                    <span id="confPct">0%</span>
+                                </div>
+                                <div class="conf-track">
+                                    <div class="conf-fill" id="confFill" style="width:0%"></div>
+                                </div>
+                            </div>
+                            <!-- Treatment plan -->
+                            <div class="treat-box" id="treatBox" style="display:none;">
+                                <div class="treat-ttl">💊 Recommended Treatment</div>
+                                <div class="treat-txt" id="treatTxt">—</div>
+                            </div>
+                            <!-- Recovery timeline -->
+                            <div id="timelineBox" style="display:none;">
+                                <div style="font-size:12px;font-weight:700;color:var(--gr500);margin-bottom:6px;">TREATMENT PROGRESS</div>
+                                <div class="timeline">
+                                    <div class="tl-step">
+                                        <div class="tl-dot done" id="tl1">1</div>
+                                        <div class="tl-lbl done">Detected</div>
+                                    </div>
+                                    <div class="tl-line" id="tlLine1"></div>
+                                    <div class="tl-step">
+                                        <div class="tl-dot" id="tl2">2</div>
+                                        <div class="tl-lbl" id="tlLbl2">In Progress</div>
+                                    </div>
+                                    <div class="tl-line" id="tlLine2"></div>
+                                    <div class="tl-step">
+                                        <div class="tl-dot" id="tl3">3</div>
+                                        <div class="tl-lbl" id="tlLbl3">Recovered</div>
+                                    </div>
+                                </div>
+                                <div id="estDaysBox" style="font-size:12px;color:var(--gr500);margin-top:6px;"></div>
+                            </div>
+                            <div class="btn-row" style="margin-top:4px;">
+                                <button class="btn-sm-g" id="saveRecordBtn" onclick="saveRecord()">💾 Save Record</button>
+                                <button class="btn-sm-o" onclick="showTab('activity')">📅 View Activity</button>
+                                <button class="btn-sm-o" onclick="showTab('records')">📋 All Records</button>
+                            </div>
+                            <div id="saveMsg" style="display:none;margin-top:10px;padding:10px 14px;border-radius:9px;font-size:13px;font-weight:600;"></div>
+                        </div>
+
+                    </div>
+                </div>
+            </div><!-- /resultsCard -->
+
+        </div><!-- /tabDetect -->
+
+
+        <!-- ════════ TAB: RECENT ACTIVITY ════════ -->
+        <div id="tabActivity" style="display:none;">
+
+            <div class="hero" style="margin-bottom:24px;">
+                <div class="hero-pill">📅 Activity Log</div>
+                <h1>Recent Activities</h1>
+                <p>Your personal plant disease detection history with treatment progress tracking.</p>
+            </div>
+
+            <!-- Reminders in activity tab -->
+            <div id="actReminderBanner" style="display:none;margin-bottom:20px;"></div>
+
+            <div class="card activity-card" id="activityCard">
+                <div class="card-head">
+                    <div class="rec-hdr">
+                        <div style="display:flex;align-items:center;gap:10px;">
+                            <span class="c-ico">🌿</span>
+                            <div>
+                                <h2>Disease Activity Log</h2>
+                                <p>All your detected diseases — newest first</p>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+                <div id="actContent">
+                    <div class="empty-msg">
+                        <div class="e-ico">⏳</div>
+                        <div class="e-ttl">Loading…</div>
+                    </div>
+                </div>
+            </div>
+        </div><!-- /tabActivity -->
+
+
+        <!-- ════════ TAB: RECORDS ════════ -->
+        <div id="tabRecords" style="display:none;">
+            <div class="card">
+                <div class="card-head">
+                    <div class="rec-hdr">
+                        <div style="display:flex;align-items:center;gap:10px;">
+                            <span class="c-ico">📋</span>
+                            <div>
+                                <h2>My Disease Records</h2>
+                                <p>Full history — update status and track treatment</p>
+                            </div>
+                        </div>
+                        <button class="btn-red" onclick="clearAllRec()">🗑 Clear All</button>
+                    </div>
+                </div>
+                <div id="recContent"></div>
+            </div>
+        </div>
+
+    </main>
+</div><!-- /layout -->
+
+
+<!-- ════════ FLASK DATA BLOCK ════════ -->
+<script id="fd" type="application/json">
+{
+    "userName":        "{{ user.name | default('User') | e }}",
+    "error":           "{{ error | default('') | e }}",
+    "diseaseName":     "{{ disease_name | default('') | e }}",
+    "confidence":      {{ confidence | default(0) }},
+    "uploadedImg":     "{{ uploaded_image | default('') | e }}",
+    "resultImg":       "{{ result_image | default('') | e }}",
+    "plantName":       "{{ plant_name | default('') | e }}",
+    "detectionStatus": "{{ detection_status | default('') | e }}"
+}
+</script>
+
+
+<!-- ════════ APPLICATION JAVASCRIPT ════════ -->
+<script>
+(function () {
+    "use strict";
+
+    /* ── Read Flask data ─────────────────────────────────── */
+    var fd = {};
+    try { fd = JSON.parse(document.getElementById("fd").textContent); }
+    catch (e) { console.error("Failed to parse Flask data:", e); }
+
+    var userName        = fd.userName        || "User";
+    var error           = fd.error           || "";
+    var diseaseName     = fd.diseaseName     || "";
+    var confidence      = parseFloat(fd.confidence) || 0;
+    var uploadedImg     = fd.uploadedImg     || "";
+    var resultImg       = fd.resultImg       || "";
+    var plantName       = fd.plantName       || "";
+    var detectionStatus = fd.detectionStatus || "";
+
+    /* ── Treatment database ──────────────────────────────── */
+    var TREATMENTS = {
+        "early blight":   { text:"Apply copper-based fungicide every 7–10 days. Remove infected leaves immediately. Avoid overhead watering and improve air circulation.", days:21 },
+        "late blight":    { text:"Use metalaxyl-based fungicide immediately. Remove and destroy infected plants. Avoid overhead irrigation.", days:28 },
+        "leaf mold":      { text:"Apply fungicide and reduce humidity. Ensure good ventilation. Remove infected foliage promptly.", days:14 },
+        "common rust":    { text:"Apply triazole fungicide. Use resistant varieties. Plant early to avoid peak rust pressure.", days:18 },
+        "powdery mildew": { text:"Apply sulfur or potassium bicarbonate spray. Improve canopy airflow. Remove heavily infected parts.", days:14 },
+        "blast":          { text:"Apply tricyclazole or isoprothiolane fungicide. Use disease-resistant varieties. Periodic field drainage helps.", days:21 },
+        "scab":           { text:"Apply captan or myclobutanil. Prune trees for good air circulation. Rake and destroy fallen leaves.", days:30 },
+        "black rot":      { text:"Remove infected fruit and canes. Apply copper fungicide. Improve canopy management.", days:25 },
+        "bacterial spot": { text:"Apply copper-based bactericide. Avoid overhead irrigation. Remove infected debris.", days:20 },
+        "septoria":       { text:"Apply chlorothalonil or propiconazole. Use crop rotation. Bury infected residue after harvest.", days:18 },
+        "mosaic":         { text:"Control aphid vectors. Remove infected plants immediately. Use certified virus-free seeds.", days:35 },
+        "default":        { text:"Consult your local agricultural extension office. Remove infected leaves, improve air circulation, avoid overwatering, and apply an appropriate fungicide or bactericide.", days:21 }
+    };
+
+    function getTreatmentPlan(name) {
+        var n = (name || "").toLowerCase();
+        for (var k in TREATMENTS) {
+            if (k !== "default" && n.indexOf(k) !== -1) return TREATMENTS[k];
+        }
+        return TREATMENTS["default"];
+    }
+
+    /* ── Populate user chip ──────────────────────────────── */
+    document.getElementById("chipName").textContent     = userName;
+    document.getElementById("avatarLetter").textContent = userName.charAt(0).toUpperCase();
+
+    /* ── Show error if any ───────────────────────────────── */
+    if (error) {
+        document.getElementById("errorMsg").textContent     = error;
+        document.getElementById("errorAlert").style.display = "flex";
+    }
+
+    /* ── Status helpers ──────────────────────────────────── */
+    function statusLabel(s) {
+        if (s === "in_progress") return "In Progress";
+        if (s === "recovered")   return "Recovered";
+        return "Detected";
+    }
+    function statusPillClass(s) {
+        if (s === "in_progress") return "pill-prog";
+        if (s === "recovered")   return "pill-rec";
+        return "pill-det";
+    }
+    function formatDate(raw) {
+        var dt = new Date(raw);
+        return isNaN(dt.getTime()) ? raw
+             : dt.toLocaleDateString("en-US", { year:"numeric", month:"short", day:"numeric", hour:"2-digit", minute:"2-digit" });
+    }
+
+    /* ══════════════════════════════════════════════════════
+       RESULTS DISPLAY  (runs on page load when Flask has data)
+    ══════════════════════════════════════════════════════ */
+    if (diseaseName) {
+        var card = document.getElementById("resultsCard");
+        card.style.display = "";
+
+        if (uploadedImg) { document.getElementById("origBox").style.display = ""; document.getElementById("origImg").src = uploadedImg; }
+        if (resultImg)   { document.getElementById("resBox").style.display  = ""; document.getElementById("resImg").src  = resultImg; }
+
+        if (plantName) {
+            document.getElementById("plantTag").style.display   = "";
+            document.getElementById("plantTagName").textContent = plantName;
+            document.getElementById("plant_name").value         = plantName;
+        }
+
+        /* ── Determine display mode from detectionStatus ── */
+        var isNoPlant  = detectionStatus === "no_plant";
+        var isHealthy  = detectionStatus === "healthy";
+        var isDiseased = detectionStatus === "diseased";
+
+        /* Fall back to old keyword detection if status is missing */
+        if (!detectionStatus) {
+            var dn = diseaseName.toLowerCase();
+            isNoPlant  = dn.indexOf("no plant") !== -1;
+            isHealthy  = !isNoPlant && dn.indexOf("healthy") !== -1;
+            isDiseased = !isNoPlant && !isHealthy;
+        }
+
+        var statusBox  = document.getElementById("statusBox");
+        var statusLbl  = document.getElementById("statusLbl");
+        var statusName = document.getElementById("statusName");
+
+        statusBox.classList.remove("is-healthy", "is-disease", "is-no-plant");
+
+        if (isNoPlant) {
+            statusBox.classList.add("is-no-plant");
+            statusLbl.textContent  = "🚫 No Plant Detected";
+            statusName.textContent = "Please upload a clear photo of a plant leaf.";
+            /* Hide confidence & treatment — irrelevant */
+            document.getElementById("confRow").style.display     = "none";
+            document.getElementById("treatBox").style.display    = "none";
+            document.getElementById("timelineBox").style.display = "none";
+            /* Disable Save Record — nothing useful to save */
+            var saveBtn = document.getElementById("saveRecordBtn");
+            if (saveBtn) { saveBtn.disabled = true; saveBtn.style.opacity = "0.4"; }
+        } else if (isHealthy) {
+            statusBox.classList.add("is-healthy");
+            statusLbl.textContent  = "✅ Plant Status";
+            statusName.textContent = diseaseName;  /* "Healthy Plant" */
+            if (confidence > 0) {
+                document.getElementById("confRow").style.display = "";
+                document.getElementById("confPct").textContent   = confidence + "%";
+                setTimeout(function () { document.getElementById("confFill").style.width = confidence + "%"; }, 120);
+            }
+            /* No treatment needed for healthy plants */
+            document.getElementById("treatBox").style.display    = "none";
+            document.getElementById("timelineBox").style.display = "none";
+        } else {
+            /* isDiseased */
+            statusBox.classList.add("is-disease");
+            statusLbl.textContent  = "🦠 Disease Detected";
+            statusName.textContent = diseaseName;
+            if (confidence > 0) {
+                document.getElementById("confRow").style.display = "";
+                document.getElementById("confPct").textContent   = confidence + "%";
+                setTimeout(function () { document.getElementById("confFill").style.width = confidence + "%"; }, 120);
+            }
+            var plan = getTreatmentPlan(diseaseName);
+            document.getElementById("treatBox").style.display = "";
+            document.getElementById("treatTxt").textContent   = plan.text;
+            document.getElementById("timelineBox").style.display = "";
+            document.getElementById("tl1").classList.add("done");
+            if (plan.days > 0) {
+                document.getElementById("estDaysBox").textContent = "⏱ Estimated recovery: ~" + plan.days + " days with proper treatment.";
+            }
+        }
+
+        setTimeout(function () { card.scrollIntoView({ behavior:"smooth", block:"start" }); }, 200);
+    }
+
+    /* ── Tab switching ───────────────────────────────────── */
+    var TABS = ["dashboard", "detect", "activity", "records"];
+    window.showTab = function (tab) {
+        TABS.forEach(function (t) {
+            var cap = t.charAt(0).toUpperCase() + t.slice(1);
+            document.getElementById("tab"  + cap).style.display = (t === tab) ? "" : "none";
+            document.getElementById("t"    + cap).classList.toggle("on", t === tab);
+            var sEl = document.getElementById("s" + cap);
+            if (sEl) sEl.classList.toggle("on", t === tab);
+        });
+        if (tab === "records")   loadRecords();
+        if (tab === "activity")  loadActivity();
+        if (tab === "dashboard") loadDashboard(false);
+    };
+
+    /* ══════════════════════════════════════════════════════
+       DROP ZONE / FILE UPLOAD
+    ══════════════════════════════════════════════════════ */
+    var dropZone = document.getElementById("dropZone");
+    var imgInput = document.getElementById("imgInput");
+    var filePrev = document.getElementById("filePrev");
+
+    // Track whether current submit should use webcam blob instead of file input
+    var camBlobFile = null;
+
+    function showFilePreview(file) {
+        if (!file || !file.type.match(/^image\//)) return;
+        var reader = new FileReader();
+        reader.onload = function (e) {
+            document.getElementById("prevImg").src           = e.target.result;
+            document.getElementById("prevName").textContent  = file.name;
+            document.getElementById("prevSize").textContent  = (file.size / 1024).toFixed(1) + " KB";
+            filePrev.style.display = "flex";
+        };
+        reader.readAsDataURL(file);
+    }
+
+    imgInput.addEventListener("change", function (e) {
+        var f = e.target.files[0];
+        if (f) {
+            camBlobFile = null;   // clear any webcam capture
+            showFilePreview(f);
+            camClose();           // close webcam panel if open
+        }
+    });
+
+    dropZone.addEventListener("dragover",  function (e) { e.preventDefault(); dropZone.classList.add("drag"); });
+    dropZone.addEventListener("dragleave", function ()  { dropZone.classList.remove("drag"); });
+    dropZone.addEventListener("drop", function (e) {
+        e.preventDefault(); dropZone.classList.remove("drag");
+        var f = e.dataTransfer.files[0];
+        if (f) {
+            // Inject into the file input so it's included in normal form submit
+            try {
+                var dt = new DataTransfer();
+                dt.items.add(f);
+                imgInput.files = dt.files;
+            } catch (ex) { /* Safari fallback — file won't be in input but blob path handles it */ }
+            camBlobFile = null;
+            showFilePreview(f);
+            camClose();
+        }
+    });
+
+    window.clearUpload = function () {
+        imgInput.value        = "";
+        camBlobFile           = null;
+        filePrev.style.display = "none";
+        document.getElementById("prevImg").src          = "";
+        document.getElementById("plant_name").value     = "";
+        document.getElementById("resultsCard").style.display = "none";
+        recordSaved = false;
+        var btn = document.getElementById("saveRecordBtn");
+        if (btn) { btn.disabled = false; btn.textContent = "💾 Save Record"; btn.style.background = ""; }
+        var msgEl = document.getElementById("saveMsg");
+        if (msgEl) msgEl.style.display = "none";
+        camClose();
+        camFullReset();
+    };
+
+    /* ── Form submit handler ──────────────────────────────
+       Two paths:
+       A) Webcam blob → fetch() multipart POST, write response HTML
+       B) File input  → normal form POST (browser handles it)
+    ───────────────────────────────────────────────────── */
+    document.getElementById("uploadForm").addEventListener("submit", function (e) {
+
+        /* PATH A — webcam capture */
+        if (camBlobFile) {
+            e.preventDefault();
+            var analyzeBtn = document.getElementById("analyzeBtn");
+            analyzeBtn.disabled = true;
+            document.getElementById("btnSpin").style.display = "block";
+            document.getElementById("overlay").style.display = "flex";
+
+            var fd = new FormData();
+            fd.append("image", camBlobFile, "webcam-capture.png");
+            var pn = document.getElementById("plant_name").value.trim();
+            if (pn) fd.append("plant_name", pn);
+
+            fetch("/predict", { method: "POST", body: fd })
+                .then(function (r) { return r.text(); })
+                .then(function (html) {
+                    document.open(); document.write(html); document.close();
+                })
+                .catch(function () {
+                    document.getElementById("overlay").style.display = "none";
+                    analyzeBtn.disabled = false;
+                    document.getElementById("btnSpin").style.display = "none";
+                    showToast("Analysis failed. Please try again.", "t-err");
+                });
+            return;
+        }
+
+        /* PATH B — normal file input */
+        // Guard: must have a file selected
+        if (!imgInput.files || imgInput.files.length === 0) {
+            e.preventDefault();
+            // Show inline error
+            var errEl = document.getElementById("errorAlert");
+            var errMsg = document.getElementById("errorMsg");
+            if (errEl && errMsg) {
+                errMsg.textContent       = "Please select or capture an image before analyzing.";
+                errEl.style.display      = "flex";
+                setTimeout(function () { errEl.style.display = "none"; }, 4000);
+            }
+            showToast("⚠ Please select or capture an image first.", "t-err");
+            return;
+        }
+
+        // All good — show loading state
+        document.getElementById("analyzeBtn").disabled        = true;
+        document.getElementById("btnSpin").style.display      = "block";
+        document.getElementById("overlay").style.display      = "flex";
+    });
+
+    /* ══════════════════════════════════════════════════════
+       WEBCAM MODULE
+       States: idle → loading → live → captured
+    ══════════════════════════════════════════════════════ */
+    var camStream     = null;
+    var camState      = "idle";
+    var camBlobURL    = null;
+
+    var camPanel      = document.getElementById("camPanel");
+    var camVideo      = document.getElementById("camVideo");
+    var camCanvas     = document.getElementById("camCanvas");
+    var camLoading    = document.getElementById("camLoading");
+    var camError      = document.getElementById("camError");
+    var camScanline   = document.getElementById("camScanline");
+    var camLiveDot    = document.getElementById("camLiveDot");
+    var camBarTitle   = document.getElementById("camBarTitle");
+    var camCaptureBtn = document.getElementById("camCaptureBtn");
+    var camRetakeBtn  = document.getElementById("camRetakeBtn");
+    var camAnalyzeBtn = document.getElementById("camAnalyzeBtn");
+    var camPreviewStrip = document.getElementById("camPreviewStrip");
+    var camPrevThumb  = document.getElementById("camPrevThumb");
+    var takePicBtn    = document.getElementById("takePicBtn");
+
+    window.camOpen = function () {
+        camPanel.classList.add("open");
+        takePicBtn.style.display = "none";
+        if (camState === "idle") camStart();
+    };
+
+    window.camStart = function () {
+        camState = "loading";
+        camLoading.classList.add("visible");
+        camError.classList.remove("visible");
+        camScanline.style.display  = "none";
+        camLiveDot.style.display   = "none";
+        camBarTitle.textContent    = "Starting Camera…";
+        camCaptureBtn.disabled     = true;
+        camRetakeBtn.style.display = "none";
+        camAnalyzeBtn.style.display = "none";
+        camPreviewStrip.classList.remove("visible");
+        camVideo.style.display  = "";
+        camCanvas.style.display = "none";
+
+        if (camStream) { camStream.getTracks().forEach(function (t) { t.stop(); }); camStream = null; }
+
+        if (!navigator.mediaDevices || !navigator.mediaDevices.getUserMedia) {
+            camShowError("Webcam not supported in this browser.", "Please use Chrome, Edge, or Firefox.");
+            return;
+        }
+
+        navigator.mediaDevices.getUserMedia({
+            video: { facingMode: "environment", width: { ideal: 1280 }, height: { ideal: 960 } },
+            audio: false
+        })
+        .then(function (stream) {
+            camStream = stream;
+            camVideo.srcObject = stream;
+            camVideo.onloadedmetadata = function () {
+                camVideo.play();
+                camState = "live";
+                camLoading.classList.remove("visible");
+                camScanline.style.display  = "";
+                camLiveDot.style.display   = "";
+                camBarTitle.textContent    = "Live — Position your plant";
+                camCaptureBtn.disabled     = false;
+            };
+        })
+        .catch(function (err) {
+            var msg = "Camera access is required to take a picture.";
+            var sub = "Please allow camera permission in your browser and try again.";
+            if (err.name === "NotFoundError" || err.name === "DevicesNotFoundError") {
+                msg = "No webcam found on this device.";
+                sub = "Please connect a camera and click Try Again.";
+            } else if (err.name === "NotAllowedError" || err.name === "PermissionDeniedError") {
+                msg = "Camera access was denied.";
+                sub = "Click the camera icon in your browser's address bar to allow access, then Try Again.";
+            } else if (err.name === "NotReadableError") {
+                msg = "Camera is in use by another application.";
+                sub = "Close other apps using your camera, then click Try Again.";
+            }
+            camShowError(msg, sub);
+        });
+    };
+
+    function camShowError(msg, sub) {
+        camState = "idle";
+        camLoading.classList.remove("visible");
+        camError.classList.add("visible");
+        camLiveDot.style.display                          = "none";
+        camScanline.style.display                         = "none";
+        camBarTitle.textContent                           = "Camera Unavailable";
+        document.getElementById("camErrMsg").textContent  = msg;
+        document.getElementById("camErrSub").textContent  = sub;
+    }
+
+    window.camCapture = function () {
+        if (camState !== "live") return;
+
+        var vw = camVideo.videoWidth  || 1280;
+        var vh = camVideo.videoHeight || 960;
+        camCanvas.width  = vw;
+        camCanvas.height = vh;
+        camCanvas.getContext("2d").drawImage(camVideo, 0, 0, vw, vh);
+
+        camCanvas.toBlob(function (blob) {
+            if (!blob) { showToast("Capture failed — please try again.", "t-err"); return; }
+
+            if (camBlobURL) URL.revokeObjectURL(camBlobURL);
+            camBlobURL  = URL.createObjectURL(blob);
+            camBlobFile = new File([blob], "webcam-capture.png", { type: "image/png" });
+
+            camState = "captured";
+            camVideo.pause();
+            camVideo.style.display  = "none";
+            camCanvas.style.display = "";
+            camScanline.style.display = "none";
+            camLiveDot.style.display  = "none";
+            camBarTitle.textContent   = "Image Captured ✓";
+
+            camPrevThumb.src = camBlobURL;
+            camPreviewStrip.classList.add("visible");
+
+            camCaptureBtn.style.display  = "none";
+            camRetakeBtn.style.display   = "";
+            camAnalyzeBtn.style.display  = "";
+
+            // Also show in the file preview strip above
+            document.getElementById("prevImg").src           = camBlobURL;
+            document.getElementById("prevName").textContent  = "webcam-capture.png";
+            document.getElementById("prevSize").textContent  = (blob.size / 1024).toFixed(1) + " KB";
+            filePrev.style.display = "flex";
+
+            showToast("📸 Image captured! Click Analyze Plant to continue.", "t-ok");
+        }, "image/png");
+    };
+
+    window.camRetake = function () {
+        if (!camStream) { camStart(); return; }
+        camVideo.srcObject = camStream;
+        camVideo.play();
+        camState    = "live";
+        camBlobFile = null;
+        camCanvas.style.display  = "none";
+        camVideo.style.display   = "";
+        camScanline.style.display = "";
+        camLiveDot.style.display  = "";
+        camBarTitle.textContent   = "Live — Position your plant";
+        camPreviewStrip.classList.remove("visible");
+        camCaptureBtn.style.display  = "";
+        camCaptureBtn.disabled       = false;
+        camRetakeBtn.style.display   = "none";
+        camAnalyzeBtn.style.display  = "none";
+        filePrev.style.display       = "none";
+    };
+
+    window.camAnalyze = function () {
+        if (!camBlobFile) { showToast("Capture an image first.", "t-err"); return; }
+        // Trigger form submit (webcam path detected via camBlobFile)
+        var evt = new Event("submit", { bubbles: true, cancelable: true });
+        document.getElementById("uploadForm").dispatchEvent(evt);
+    };
+
+    window.camClose = function () {
+        if (!camPanel) return;
+        camPanel.classList.remove("open");
+        if (takePicBtn) takePicBtn.style.display = "";
+        // Stop the stream to free camera LED
+        if (camStream) {
+            camStream.getTracks().forEach(function (t) { t.stop(); });
+            camStream = null;
+            if (camState === "live") camState = "idle";
+        }
+    };
+
+    function camFullReset() {
+        camState    = "idle";
+        camBlobFile = null;
+        if (camBlobURL) { URL.revokeObjectURL(camBlobURL); camBlobURL = null; }
+        camVideo.srcObject      = null;
+        camCanvas.style.display = "none";
+        camVideo.style.display  = "";
+        camLoading.classList.add("visible");
+        camError.classList.remove("visible");
+        camScanline.style.display    = "none";
+        camLiveDot.style.display     = "none";
+        camBarTitle.textContent      = "Starting Camera…";
+        camCaptureBtn.disabled       = true;
+        camCaptureBtn.style.display  = "";
+        camRetakeBtn.style.display   = "none";
+        camAnalyzeBtn.style.display  = "none";
+        camPreviewStrip.classList.remove("visible");
+    }
+
+    // Release camera when tab is hidden or page unloads
+    document.addEventListener("visibilitychange", function () {
+        if (document.hidden && camStream) {
+            camStream.getTracks().forEach(function (t) { t.stop(); });
+        }
+    });
+    window.addEventListener("beforeunload", function () {
+        if (camStream) camStream.getTracks().forEach(function (t) { t.stop(); });
+    });
+
+
+
+    /* ══════════════════════════════════════════════════════
+       REMINDERS
+    ══════════════════════════════════════════════════════ */
+    function buildReminderBannerHTML(reminders) {
+        if (!reminders || reminders.length === 0) return "";
+        var items = reminders.map(function (r) {
+            return '<div class="rb-item">'
+                 + '<div class="rb-item-left">'
+                 + '<div class="rb-plant">🌱 ' + esc(r.plant_name || "Plant") + '</div>'
+                 + '<div class="rb-dis">' + esc(r.disease_name) + '</div>'
+                 + '<div class="rb-note">' + esc(r.reminder_note || "Time to apply treatment") + '</div>'
+                 + '</div>'
+                 + '<span class="pill pill-det">Due</span>'
+                 + '</div>';
+        }).join("");
+        return '<div class="reminder-banner">'
+             + '<div class="rb-title">🔔 Treatment Reminders</div>'
+             + items
+             + '</div>';
+    }
+
+    function loadReminders() {
+        fetch("/api/reminders")
+            .then(function (r) { return r.json(); })
+            .then(function (d) {
+                var html = buildReminderBannerHTML(d.reminders);
+                var detectBanner = document.getElementById("reminderBanner");
+                var actBanner    = document.getElementById("actReminderBanner");
+
+                /* Sidebar count */
+                var count = (d.reminders || []).length;
+                var sideEl = document.getElementById("sideReminders");
+                if (count > 0) {
+                    detectBanner.style.display = "";
+                    detectBanner.innerHTML = html;
+                    actBanner.style.display = "";
+                    actBanner.innerHTML = html;
+                    sideEl.innerHTML = d.reminders.map(function (r) {
+                        return '<div style="background:var(--o50);border:1px solid var(--o200);border-radius:8px;padding:9px 12px;margin-bottom:6px;font-size:12px;">'
+                             + '<div style="font-weight:700;color:var(--o700);">🔔 ' + esc(r.plant_name || "Plant") + '</div>'
+                             + '<div style="color:var(--gr600);margin-top:2px;">' + esc(r.reminder_note || "Apply treatment") + '</div>'
+                             + '</div>';
+                    }).join("");
+                } else {
+                    sideEl.innerHTML = '<div style="font-size:13px;color:var(--gr400);padding:0 8px;">No reminders due.</div>';
+                }
+            })
+            .catch(function () {
+                document.getElementById("sideReminders").innerHTML =
+                    '<div style="font-size:13px;color:var(--gr400);padding:0 8px;">Could not load.</div>';
+            });
+    }
+
+    /* ══════════════════════════════════════════════════════
+       RECENT ACTIVITY TAB
+    ══════════════════════════════════════════════════════ */
+    var actLoaded = false;
+
+    function loadActivity() {
+        if (actLoaded) return;
+        actLoaded = true;
+
+        var container = document.getElementById("actContent");
+        container.innerHTML = '<div class="empty-msg"><div class="e-ico">⏳</div><div class="e-ttl">Loading…</div></div>';
+
+        fetch("/api/records")
+            .then(function (r) { return r.json(); })
+            .then(function (d) {
+                document.getElementById("actBadge").textContent = (d.records || []).length;
+
+                if (!d.success || !d.records || d.records.length === 0) {
+                    container.innerHTML =
+                        '<div class="empty-msg"><div class="e-ico">🌿</div>'
+                        + '<div class="e-ttl">No recent activity found</div>'
+                        + '<p>Scan a plant and click <strong>Save Record</strong> to start your log.</p></div>';
+                    return;
+                }
+
+                var html = d.records.map(function (r) {
+                    var healthy  = (r.disease_name || "").toLowerCase().indexOf("healthy") !== -1;
+                    var dotClass = healthy ? "act-dot-ok" : "act-dot-dis";
+                    var icon     = healthy ? "🌿" : "🦠";
+                    var sl       = statusLabel(r.status);
+                    var sp       = statusPillClass(r.status);
+
+                    /* Mini timeline */
+                    var s = r.status;
+                    var tl1cls = "done", tl2cls = "", tl3cls = "", l1cls = "", l2cls = "";
+                    if (s === "in_progress") { tl2cls = "active"; l1cls = "done"; }
+                    if (s === "recovered")   { tl2cls = "done";   tl3cls = "done"; l1cls = "done"; l2cls = "done"; }
+
+                    var miniTL = '';
+                    if (!healthy) {
+                        miniTL = '<div class="timeline" style="margin:10px 0 0;">'
+                            + '<div class="tl-step"><div class="tl-dot ' + tl1cls + '">1</div><div class="tl-lbl ' + tl1cls + '">Detected</div></div>'
+                            + '<div class="tl-line ' + l1cls + '"></div>'
+                            + '<div class="tl-step"><div class="tl-dot ' + tl2cls + '">2</div><div class="tl-lbl ' + tl2cls + '">In Progress</div></div>'
+                            + '<div class="tl-line ' + l2cls + '"></div>'
+                            + '<div class="tl-step"><div class="tl-dot ' + tl3cls + '">3</div><div class="tl-lbl ' + tl3cls + '">Recovered</div></div>'
+                            + '</div>';
+                    }
+
+                    var treatHTML = '';
+                    if (r.treatment) {
+                        var tid = "tr-" + r.id;
+                        treatHTML = '<button class="treat-toggle" onclick="toggleTreat(\'' + tid + '\')">💊 Show Treatment Plan</button>'
+                            + '<div class="treat-panel" id="' + tid + '">' + esc(r.treatment) + '</div>';
+                    }
+
+                    var estHTML = '';
+                    if (r.estimated_days && r.estimated_days > 0) {
+                        estHTML = '<span style="font-size:12px;color:var(--gr500);">⏱ Est. ' + r.estimated_days + ' days recovery</span>';
+                    }
+
+                    var statusSelect = '';
+                    if (!healthy) {
+                        statusSelect = '<select class="status-sel" onchange="updateStatus(' + r.id + ', this.value, this)">'
+                            + '<option value="detected"'    + (s === "detected"    ? ' selected' : '') + '>🔴 Detected</option>'
+                            + '<option value="in_progress"' + (s === "in_progress" ? ' selected' : '') + '>🔵 In Progress</option>'
+                            + '<option value="recovered"'   + (s === "recovered"   ? ' selected' : '') + '>🟢 Recovered</option>'
+                            + '</select>';
+                    }
+
+                    return '<div class="act-item">'
+                         + '<div class="act-dot ' + dotClass + '">' + icon + '</div>'
+                         + '<div class="act-info">'
+                         + '<div class="act-plant">' + esc(r.plant_name || "Unknown Plant") + '</div>'
+                         + '<div class="act-dis">' + esc(r.disease_name) + '</div>'
+                         + miniTL
+                         + '<div style="margin-top:8px;">' + treatHTML + '</div>'
+                         + '<div class="act-date">📅 ' + formatDate(r.scanned_at) + ' &nbsp;|&nbsp; ' + (estHTML || '') + '</div>'
+                         + '</div>'
+                         + '<div class="act-right">'
+                         + '<span class="pill ' + sp + '">' + sl + '</span>'
+                         + statusSelect
+                         + '</div>'
+                         + '</div>';
+                }).join("");
+
+                container.innerHTML = html;
+            })
+            .catch(function () {
+                container.innerHTML = '<div class="empty-msg"><div class="e-ico">⚠</div>'
+                    + '<div class="e-ttl">Could not load activity</div>'
+                    + '<p>Make sure WAMP Server is running.</p></div>';
+            });
+    }
+
+    window.toggleTreat = function (id) {
+        var el = document.getElementById(id);
+        if (el) el.classList.toggle("open");
+    };
+
+    /* ══════════════════════════════════════════════════════
+       UPDATE STATUS
+    ══════════════════════════════════════════════════════ */
+    window.updateStatus = function (recordId, newStatus, selectEl) {
+        fetch("/api/update_status", {
+            method: "POST",
+            headers: { "Content-Type": "application/json" },
+            body: JSON.stringify({ record_id: recordId, status: newStatus })
+        })
+        .then(function (r) { return r.json(); })
+        .then(function (d) {
+            if (d.success) {
+                showToast("✅ Status updated to: " + statusLabel(newStatus), "t-ok");
+                /* Force reload on next visit */
+                actLoaded = false;
+                recLoaded = false;
+                /* Update pill in same row */
+                var row = selectEl.closest(".act-item") || selectEl.closest("tr");
+                if (row) {
+                    var pill = row.querySelector(".pill");
+                    if (pill) {
+                        pill.textContent  = statusLabel(newStatus);
+                        pill.className    = "pill " + statusPillClass(newStatus);
+                    }
+                }
+            } else {
+                showToast("Error: " + (d.error || "Could not update"), "t-err");
+                selectEl.value = selectEl.dataset.prev || "detected";
+            }
+        })
+        .catch(function () { showToast("Network error. Could not update status.", "t-err"); });
+
+        selectEl.dataset.prev = newStatus;
+    };
+
+    /* ══════════════════════════════════════════════════════
+       RECORDS TAB (full table)
+    ══════════════════════════════════════════════════════ */
+    var recLoaded = false;
+
+    function loadRecords() {
+        if (recLoaded) return;
+        recLoaded = true;
+
+        var content = document.getElementById("recContent");
+        content.innerHTML =
+            '<div class="table-wrap"><table><thead><tr>'
+            + '<th>#</th><th>Plant</th><th>Disease</th><th>Confidence</th><th>Status</th><th>Est. Days</th><th>Date</th><th>Treatment</th>'
+            + '</tr></thead><tbody id="recBody">'
+            + '<tr><td colspan="8"><div class="empty-msg"><div class="e-ico">⏳</div><div class="e-ttl">Loading…</div></div></td></tr>'
+            + '</tbody></table></div>';
+
+        fetch("/api/records")
+            .then(function (r) { return r.json(); })
+            .then(function (d) {
+                var badge = document.getElementById("recBadge");
+                var tbody = document.getElementById("recBody");
+                if (!d.success || !d.records || d.records.length === 0) {
+                    badge.textContent = "0";
+                    tbody.innerHTML = '<tr><td colspan="8"><div class="empty-msg">'
+                        + '<div class="e-ico">🌿</div><div class="e-ttl">No records yet</div>'
+                        + '<p>Scan a plant and click <strong>Save Record</strong> to create your first record.</p>'
+                        + '</div></td></tr>';
+                    return;
+                }
+                badge.textContent = d.records.length;
+                tbody.innerHTML = d.records.map(function (r, i) {
+                    var ok  = r.disease_name.toLowerCase().indexOf("healthy") !== -1;
+                    var sp  = statusPillClass(r.status);
+                    var sl  = statusLabel(r.status);
+
+                    var statusSel = ok ? '<span class="pill pill-ok">Healthy</span>'
+                        : '<select class="status-sel" onchange="updateStatus(' + r.id + ', this.value, this)">'
+                          + '<option value="detected"'    + (r.status === "detected"    ? ' selected' : '') + '>🔴 Detected</option>'
+                          + '<option value="in_progress"' + (r.status === "in_progress" ? ' selected' : '') + '>🔵 In Progress</option>'
+                          + '<option value="recovered"'   + (r.status === "recovered"   ? ' selected' : '') + '>🟢 Recovered</option>'
+                          + '</select>';
+
+                    var treatBtn = r.treatment
+                        ? '<button class="treat-toggle" onclick="toggleTreat(\'rtr-' + r.id + '\')">View</button>'
+                          + '<div class="treat-panel" id="rtr-' + r.id + '">' + esc(r.treatment) + '</div>'
+                        : '—';
+
+                    return "<tr>"
+                         + "<td>" + (i + 1) + "</td>"
+                         + "<td>" + esc(r.plant_name || "—") + "</td>"
+                         + "<td><span class='pill " + (ok ? "pill-ok" : "pill-dis") + "'>" + esc(r.disease_name) + "</span></td>"
+                         + "<td>" + (r.confidence > 0 ? r.confidence + "%" : "—") + "</td>"
+                         + "<td>" + statusSel + "</td>"
+                         + "<td>" + (r.estimated_days ? r.estimated_days + " d" : "—") + "</td>"
+                         + "<td style='white-space:nowrap'>" + formatDate(r.scanned_at) + "</td>"
+                         + "<td>" + treatBtn + "</td>"
+                         + "</tr>";
+                }).join("");
+            })
+            .catch(function () {
+                var tbody = document.getElementById("recBody");
+                if (tbody) tbody.innerHTML = '<tr><td colspan="8"><div class="empty-msg">'
+                    + '<div class="e-ico">⚠</div><div class="e-ttl">Could not load records</div>'
+                    + '<p>Make sure WAMP Server is running.</p></div></td></tr>';
+            });
+    }
+
+    window.clearAllRec = function () {
+        if (!confirm("Delete ALL your scan records? This cannot be undone.")) return;
+        fetch("/api/clear_records", { method:"POST" })
+            .then(function (r) { return r.json(); })
+            .then(function (d) {
+                if (d.success) {
+                    showToast("🗑 " + (d.deleted || 0) + " records cleared.", "t-ok");
+                    recLoaded = false; actLoaded = false;
+                    loadRecords();
+                    document.getElementById("recBadge").textContent = "0";
+                    document.getElementById("actBadge").textContent = "0";
+                    /* Reload activity view */
+                    var actContent = document.getElementById("actContent");
+                    actContent.innerHTML = '<div class="empty-msg"><div class="e-ico">🌿</div>'
+                        + '<div class="e-ttl">No activity yet</div>'
+                        + '<p>Scan a plant to start your activity log.</p></div>';
+                }
+            })
+            .catch(function () { showToast("Error clearing records.", "t-err"); });
+    };
+
+    /* ── Toast ───────────────────────────────────────────── */
+    window.showToast = function (msg, cls) {
+        var t = document.getElementById("toast");
+        t.textContent = msg;
+        t.className = "toast " + (cls || "") + " show";
+        setTimeout(function () { t.classList.remove("show"); }, 3500);
+    };
+
+    /* ── Escape HTML ─────────────────────────────────────── */
+    function esc(str) {
+        return String(str || "")
+            .replace(/&/g,"&amp;").replace(/</g,"&lt;")
+            .replace(/>/g,"&gt;").replace(/"/g,"&quot;");
+    }
+    window.esc = esc;
+
+    /* ══════════════════════════════════════════════════════
+       SAVE RECORD  (called by "💾 Save Record" button click)
+       POSTs DIRECTLY to PHP — same origin, cookie forwarded
+       automatically by the browser. No cross-port issues.
+    ══════════════════════════════════════════════════════ */
+    var recordSaved = false;   // prevents double-saving same result
+
+    window.saveRecord = function () {
+        if (!diseaseName) {
+            showToast("No detection result to save.", "t-err");
+            return;
+        }
+        if (recordSaved) {
+            showToast("✅ Already saved!", "t-ok");
+            return;
+        }
+
+        var btn    = document.getElementById("saveRecordBtn");
+        var msgEl  = document.getElementById("saveMsg");
+        btn.disabled     = true;
+        btn.textContent  = "Saving…";
+
+        var payload = {
+            plant_name:   plantName,
+            disease_name: diseaseName,
+            confidence:   confidence,
+            image_path:   uploadedImg,
+            result_path:  resultImg
+        };
+
+        // POST directly to PHP on same origin (localhost/batanox)
+        fetch("http://localhost/batanox/save_record.php", {
+            method:      "POST",
+            headers:     { "Content-Type": "application/json" },
+            credentials: "include",    // forwards the PHPSESSID cookie
+            body:        JSON.stringify(payload)
+        })
+        .then(function (r) { return r.json(); })
+        .then(function (d) {
+            if (d.success) {
+                recordSaved          = true;
+                btn.textContent      = "✅ Saved!";
+                btn.style.background = "#15803d";
+
+                msgEl.textContent    = "✅ Record saved to your activity log.";
+                msgEl.style.display  = "";
+                msgEl.style.background = "#f0fdf4";
+                msgEl.style.color    = "#15803d";
+                msgEl.style.border   = "1px solid #bbf7d0";
+
+                showToast("✅ Record saved to your activity!", "t-ok");
+
+                // Force Activity + Records tabs to reload fresh
+                actLoaded = false;
+                recLoaded = false;
+
+                // Update sidebar badges
+                fetch("/api/records")
+                    .then(function (r) { return r.json(); })
+                    .then(function (d2) {
+                        if (d2.success && d2.records) {
+                            var n = d2.records.length;
+                            document.getElementById("recBadge").textContent = n;
+                            document.getElementById("actBadge").textContent = n;
+                        }
+                    }).catch(function(){});
+            } else {
+                btn.disabled    = false;
+                btn.textContent = "💾 Save Record";
+                var errMsg = d.error || "Could not save. Please try again.";
+                showToast("Error: " + errMsg, "t-err");
+                msgEl.textContent   = "❌ " + errMsg;
+                msgEl.style.display = "";
+                msgEl.style.background = "#fef2f2";
+                msgEl.style.color   = "#b91c1c";
+                msgEl.style.border  = "1px solid #fecaca";
+            }
+        })
+        .catch(function (err) {
+            btn.disabled    = false;
+            btn.textContent = "💾 Save Record";
+            showToast("Network error. Is WAMP running?", "t-err");
+            msgEl.textContent   = "❌ Network error — make sure WAMP Server is running.";
+            msgEl.style.display = "";
+            msgEl.style.background = "#fef2f2";
+            msgEl.style.color   = "#b91c1c";
+            msgEl.style.border  = "1px solid #fecaca";
+        });
+    };
+
+    /* ── Init: load badge counts + reminders ─────────────── */
+    fetch("/api/records")
+        .then(function (r) { return r.json(); })
+        .then(function (d) {
+            if (d.success && d.records) {
+                document.getElementById("recBadge").textContent = d.records.length;
+                document.getElementById("actBadge").textContent = d.records.length;
+            }
+        })
+        .catch(function () {
+            document.getElementById("recBadge").textContent = "?";
+            document.getElementById("actBadge").textContent = "?";
+        });
+
+
+    /* ══════════════════════════════════════════════════════
+       SMART DASHBOARD
+    ══════════════════════════════════════════════════════ */
+    var dbLoaded = false;
+
+    function animateCount(el, target) {
+        var start = 0, duration = 900;
+        var step = function (ts) {
+            if (!start) start = ts;
+            var progress = Math.min((ts - start) / duration, 1);
+            var ease = 1 - Math.pow(1 - progress, 3); // cubic ease-out
+            el.textContent = Math.round(ease * target);
+            if (progress < 1) requestAnimationFrame(step);
+        };
+        requestAnimationFrame(step);
+    }
+
+    function dbStatusPill(s) {
+        if (s === "in_progress") return '<span class="pill pill-prog">In Progress</span>';
+        if (s === "recovered")   return '<span class="pill pill-rec">Recovered</span>';
+        return '<span class="pill pill-det">Detected</span>';
+    }
+
+    window.loadDashboard = function (force) {
+        if (dbLoaded && !force) return;
+        dbLoaded = true;
+
+        // Set user name in hero
+        document.getElementById("dbUserName").textContent = userName || "You";
+        document.getElementById("dbLastUpdated").textContent = new Date().toLocaleTimeString("en-US", { hour: "2-digit", minute: "2-digit" });
+
+        // Fetch dashboard data from PHP via Flask proxy
+        fetch("/api/dashboard")
+            .then(function (r) { return r.json(); })
+            .then(function (d) {
+                if (!d.success) {
+                    document.getElementById("dbRecentList").innerHTML =
+                        '<div class="db-empty"><div class="db-empty-ico">⚠️</div><div class="db-empty-ttl">Could not load dashboard</div><div class="db-empty-sub">' + (d.error || "Server error") + '</div></div>';
+                    return;
+                }
+
+                var total     = d.total     || 0;
+                var active    = d.active    || 0;
+                var recovered = d.recovered || 0;
+                var detected  = d.detected  || 0;
+
+                // Animate the counter cards
+                var elTotal     = document.getElementById("dbTotal");
+                var elDetected  = document.getElementById("dbDetected");
+                var elActive    = document.getElementById("dbActive");
+                var elRecovered = document.getElementById("dbRecovered");
+
+                elTotal.innerHTML     = '<span id="dbTotalN">0</span>';
+                elDetected.innerHTML  = '<span id="dbDetectedN">0</span>';
+                elActive.innerHTML    = '<span id="dbActiveN">0</span>';
+                elRecovered.innerHTML = '<span id="dbRecoveredN">0</span>';
+
+                setTimeout(function () {
+                    animateCount(document.getElementById("dbTotalN"),     total);
+                    animateCount(document.getElementById("dbDetectedN"),  detected);
+                    animateCount(document.getElementById("dbActiveN"),    active);
+                    animateCount(document.getElementById("dbRecoveredN"), recovered);
+                }, 80);
+
+                // Progress bars (% of total)
+                setTimeout(function () {
+                    function pct(n) { return total > 0 ? Math.round((n / total) * 100) : 0; }
+                    document.getElementById("dbTotalBar").style.width     = "100%";
+                    document.getElementById("dbDetectedBar").style.width  = pct(detected)  + "%";
+                    document.getElementById("dbActiveBar").style.width    = pct(active)    + "%";
+                    document.getElementById("dbRecoveredBar").style.width = pct(recovered) + "%";
+                }, 200);
+
+                // Insight: most common disease
+                var topDis = d.top_disease || "No data yet";
+                document.getElementById("dbTopDisease").textContent = topDis;
+
+                // Insight: recovery rate
+                var rate = total > 0 ? Math.round((recovered / total) * 100) + "%" : "N/A";
+                document.getElementById("dbRecoveryRate").textContent = rate;
+
+                // Recent activity list
+                var recent = d.recent || [];
+                document.getElementById("dbRecentBadge").textContent = "Last " + recent.length;
+
+                if (recent.length === 0) {
+                    document.getElementById("dbRecentList").innerHTML =
+                        '<div class="db-empty"><div class="db-empty-ico">🌱</div><div class="db-empty-ttl">No activity yet</div><div class="db-empty-sub">Scan a plant and save a record to see it here.</div></div>';
+                    return;
+                }
+
+                var listHtml = recent.map(function (r) {
+                    var healthy  = (r.disease_name || "").toLowerCase().indexOf("healthy") !== -1;
+                    var iconCls  = healthy ? "is-ok" : "is-dis";
+                    var icon     = healthy ? "🌿" : "🦠";
+                    var conf     = r.confidence > 0 ? r.confidence.toFixed(1) + "%" : "";
+
+                    return '<div class="db-rec-item">' +
+                        '<div class="db-rec-icon ' + iconCls + '">' + icon + '</div>' +
+                        '<div class="db-rec-body">' +
+                            '<div class="db-rec-name">' + esc(r.disease_name) + '</div>' +
+                            '<div class="db-rec-plant">🌱 ' + esc(r.plant_name || "Unknown Plant") + '</div>' +
+                            '<div class="db-rec-date">📅 ' + formatDate(r.scanned_at) + '</div>' +
+                        '</div>' +
+                        '<div class="db-rec-right">' +
+                            dbStatusPill(r.status) +
+                            (conf ? '<div class="db-rec-conf">' + conf + '</div>' : '') +
+                        '</div>' +
+                        '</div>';
+                }).join("");
+
+                document.getElementById("dbRecentList").innerHTML = listHtml;
+            })
+            .catch(function (err) {
+                dbLoaded = false;
+                document.getElementById("dbRecentList").innerHTML =
+                    '<div class="db-empty"><div class="db-empty-ico">⚠️</div><div class="db-empty-ttl">Could not load dashboard</div><div class="db-empty-sub">Make sure WAMP is running.</div></div>';
+            });
+    };
+
+    loadReminders();
+
+}());
+</script>
+</body>
+</html>
