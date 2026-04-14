@@ -664,6 +664,138 @@
 
         @media (max-width:900px) { .sidebar { display:none; } .main { padding:20px 16px; } }
         @media (max-width:640px) { .res-grid { grid-template-columns:1fr; } }
+
+        /* ─── ABOUT DISEASE MODAL ────────────────────────── */
+        .modal-overlay {
+            position:fixed; inset:0; background:rgba(0,0,0,0.55);
+            backdrop-filter:blur(4px); z-index:900;
+            display:none; align-items:center; justify-content:center; padding:20px;
+        }
+        .modal-overlay.open { display:flex; }
+        .modal-box {
+            background:var(--white); border-radius:20px; width:100%; max-width:720px;
+            max-height:90vh; overflow-y:auto; box-shadow:0 24px 80px rgba(0,0,0,0.22);
+            animation:modalIn 0.28s cubic-bezier(0.34,1.56,0.64,1);
+        }
+        @keyframes modalIn { from{opacity:0;transform:scale(0.9) translateY(20px)} to{opacity:1;transform:scale(1) translateY(0)} }
+        .modal-head {
+            padding:24px 28px 18px;
+            background:linear-gradient(130deg,#14532d,#16a34a);
+            border-radius:20px 20px 0 0; position:sticky; top:0; z-index:2;
+        }
+        .modal-head-top { display:flex; align-items:flex-start; justify-content:space-between; gap:12px; }
+        .modal-disease-tag {
+            display:inline-flex; align-items:center; gap:6px;
+            background:rgba(255,255,255,0.15); border:1px solid rgba(255,255,255,0.25);
+            border-radius:20px; padding:3px 12px; font-size:11px; font-weight:700;
+            color:rgba(255,255,255,0.9); text-transform:uppercase; letter-spacing:1px;
+            margin-bottom:8px;
+        }
+        .modal-title { font-size:22px; font-weight:800; color:white; letter-spacing:-0.4px; line-height:1.3; }
+        .modal-conf-badge {
+            flex-shrink:0; background:rgba(255,255,255,0.18); border:1px solid rgba(255,255,255,0.3);
+            border-radius:12px; padding:8px 14px; text-align:center; min-width:90px;
+        }
+        .modal-conf-num { font-size:22px; font-weight:800; color:white; display:block; }
+        .modal-conf-lbl { font-size:10px; color:rgba(255,255,255,0.7); font-weight:600; text-transform:uppercase; letter-spacing:0.8px; }
+        .modal-close {
+            position:absolute; top:16px; right:20px;
+            background:rgba(255,255,255,0.15); border:none; color:white;
+            width:32px; height:32px; border-radius:50%; font-size:18px;
+            cursor:pointer; display:flex; align-items:center; justify-content:center;
+            transition:background 0.15s;
+        }
+        .modal-close:hover { background:rgba(255,255,255,0.28); }
+        .modal-body { padding:26px 28px; display:flex; flex-direction:column; gap:22px; }
+
+        /* Stats row inside modal */
+        .modal-stats { display:grid; grid-template-columns:repeat(3,1fr); gap:12px; }
+        .mstat {
+            background:var(--gr50); border:1px solid var(--gr200); border-radius:12px;
+            padding:14px 16px; text-align:center;
+        }
+        .mstat-val { font-size:18px; font-weight:800; color:var(--g700); display:block; margin-bottom:2px; }
+        .mstat-lbl { font-size:11px; color:var(--gr500); font-weight:600; text-transform:uppercase; letter-spacing:0.7px; }
+
+        /* Section inside modal */
+        .msec { }
+        .msec-title {
+            font-size:13px; font-weight:800; text-transform:uppercase; letter-spacing:0.9px;
+            color:var(--gr500); margin-bottom:10px; display:flex; align-items:center; gap:7px;
+        }
+        .msec-title::after { content:''; flex:1; height:1px; background:var(--gr200); }
+        .msec-desc { font-size:14px; color:var(--gr700); line-height:1.7; }
+        .msec-list { list-style:none; display:flex; flex-direction:column; gap:8px; }
+        .msec-list li {
+            display:flex; align-items:flex-start; gap:10px;
+            font-size:13px; color:var(--gr700); line-height:1.55;
+        }
+        .msec-list li::before { content:''; flex-shrink:0; width:6px; height:6px; border-radius:50%; background:var(--g500); margin-top:6px; }
+
+        /* Medicine cards */
+        .med-grid { display:grid; grid-template-columns:1fr 1fr; gap:10px; }
+        .med-card {
+            background:var(--b50); border:1px solid var(--b200); border-radius:12px;
+            padding:14px 16px;
+        }
+        .med-name { font-size:14px; font-weight:700; color:var(--b700); margin-bottom:4px; }
+        .med-type { font-size:11px; color:var(--gr500); font-weight:600; text-transform:uppercase; letter-spacing:0.7px; margin-bottom:6px; }
+        .med-price { font-size:13px; font-weight:700; color:var(--g700); }
+        .med-desc  { font-size:12px; color:var(--gr600); margin-top:4px; line-height:1.5; }
+
+        /* Cost summary */
+        .cost-box {
+            background:linear-gradient(135deg,var(--g50),#f0fdf4);
+            border:1.5px solid var(--g200); border-radius:14px; padding:18px 20px;
+            display:flex; align-items:center; gap:16px;
+        }
+        .cost-icon { font-size:32px; flex-shrink:0; }
+        .cost-details { flex:1; }
+        .cost-range { font-size:22px; font-weight:800; color:var(--g700); }
+        .cost-note  { font-size:12px; color:var(--gr500); margin-top:2px; line-height:1.4; }
+
+        /* AI Note */
+        .ai-note {
+            background:linear-gradient(135deg,#eff6ff,#dbeafe);
+            border:1.5px solid var(--b200); border-radius:14px; padding:16px 20px;
+            display:flex; align-items:flex-start; gap:12px;
+        }
+        .ai-note-icon { font-size:22px; flex-shrink:0; }
+        .ai-note-text { font-size:13px; color:#1e40af; line-height:1.6; font-weight:500; }
+        .ai-note-text strong { display:block; margin-bottom:3px; font-size:14px; }
+
+        /* About button in results */
+        .btn-about {
+            padding:9px 16px; border:1.5px solid var(--g300,#86efac); border-radius:8px;
+            cursor:pointer; font-family:inherit; font-size:13px; font-weight:700;
+            color:var(--g700); background:var(--g50); transition:all 0.2s;
+            display:flex; align-items:center; gap:6px;
+        }
+        .btn-about:hover { background:var(--g100); border-color:var(--g500); }
+
+        /* Prevention tip styling */
+        .prev-grid { display:grid; grid-template-columns:1fr 1fr; gap:10px; }
+        .prev-card {
+            background:var(--o50); border:1px solid var(--o200); border-radius:12px;
+            padding:13px 15px; display:flex; align-items:flex-start; gap:10px;
+        }
+        .prev-icon { font-size:20px; flex-shrink:0; }
+        .prev-text { font-size:12px; color:var(--gr700); line-height:1.5; }
+        .prev-text strong { display:block; font-size:13px; color:var(--o700); margin-bottom:2px; }
+
+        /* Loading spinner in modal */
+        .modal-loading {
+            display:flex; flex-direction:column; align-items:center; justify-content:center;
+            padding:50px 28px; gap:16px;
+        }
+        .spinner {
+            width:40px; height:40px; border:3px solid var(--gr200);
+            border-top-color:var(--g500); border-radius:50%;
+            animation:spin 0.7s linear infinite;
+        }
+        @keyframes spin { to{transform:rotate(360deg)} }
+        .modal-loading p { font-size:14px; color:var(--gr500); font-weight:500; }
+
     </style>
 </head>
 <body>
@@ -745,7 +877,7 @@
                 🌽 Corn &nbsp;·&nbsp; 🍎 Apple<br>
                 🍇 Grape &nbsp;·&nbsp; 🍓 Strawberry<br>
                  Bell_pepper &nbsp;·&nbsp;  Blueberry<br>
-                 🌱 Soyabean &nbsp;·&nbsp; 🌿 Raspberry<br>
+                  Soyabean &nbsp;·&nbsp; 🌿 Raspberry<br>
                   🎃 Squash &nbsp;·&nbsp; 🍒 Cherry<br>
                 🍑 Peach &nbsp;·&nbsp;
             </div>
@@ -1069,6 +1201,7 @@
                             </div>
                             <div class="btn-row" style="margin-top:4px;">
                                 <button class="btn-sm-g" id="saveRecordBtn" onclick="saveRecord()">💾 Save Record</button>
+                                <button class="btn-about" id="aboutDiseaseBtn" onclick="openAboutDisease()" style="display:none;">🔬 About This Disease</button>
                                 <button class="btn-sm-o" onclick="showTab('activity')">📅 View Activity</button>
                                 <button class="btn-sm-o" onclick="showTab('records')">📋 All Records</button>
                             </div>
@@ -1137,6 +1270,31 @@
 
     </main>
 </div><!-- /layout -->
+
+<!-- ════════ ABOUT THIS DISEASE MODAL ════════ -->
+<div class="modal-overlay" id="aboutModal" onclick="closeAboutModal(event)">
+    <div class="modal-box" role="dialog" aria-modal="true" aria-labelledby="modalTitle">
+        <div class="modal-head" style="position:relative;">
+            <div class="modal-head-top">
+                <div style="flex:1;">
+                    <div class="modal-disease-tag">🔬 Disease Profile</div>
+                    <div class="modal-title" id="modalTitle">Loading…</div>
+                </div>
+                <div class="modal-conf-badge" id="modalConfBadge" style="display:none;">
+                    <span class="modal-conf-num" id="modalConfNum">—</span>
+                    <span class="modal-conf-lbl">Confidence</span>
+                </div>
+            </div>
+            <button class="modal-close" onclick="closeAboutModal()" aria-label="Close">✕</button>
+        </div>
+        <div class="modal-body" id="modalBody">
+            <div class="modal-loading">
+                <div class="spinner"></div>
+                <p>Fetching disease intelligence…</p>
+            </div>
+        </div>
+    </div>
+</div>
 
 
 <!-- ════════ FLASK DATA BLOCK ════════ -->
@@ -1300,6 +1458,9 @@
             if (plan.days > 0) {
                 document.getElementById("estDaysBox").textContent = "⏱ Estimated recovery: ~" + plan.days + " days with proper treatment.";
             }
+            /* Show About Disease button */
+            var aboutBtn = document.getElementById("aboutDiseaseBtn");
+            if (aboutBtn) aboutBtn.style.display = "";
         }
 
         setTimeout(function () { card.scrollIntoView({ behavior:"smooth", block:"start" }); }, 200);
@@ -1748,16 +1909,22 @@
                             + '</div>';
                     }
 
+                    /* Treatment Log link (replaces old simple text panel) */
                     var treatHTML = '';
-                    if (r.treatment) {
-                        var tid = "tr-" + r.id;
-                        treatHTML = '<button class="treat-toggle" onclick="toggleTreat(\'' + tid + '\')">💊 Show Treatment Plan</button>'
-                            + '<div class="treat-panel" id="' + tid + '">' + esc(r.treatment) + '</div>';
-                    }
-
-                    var estHTML = '';
-                    if (r.estimated_days && r.estimated_days > 0) {
-                        estHTML = '<span style="font-size:12px;color:var(--gr500);">⏱ Est. ' + r.estimated_days + ' days recovery</span>';
+                    if (!healthy) {
+                        var estDaysStr = (r.estimated_days && r.estimated_days > 0)
+                            ? ' &nbsp;·&nbsp; ⏱ Est. ' + r.estimated_days + ' days'
+                            : '';
+                        treatHTML =
+                            '<a href="/treatment_log?record_id=' + r.id + '" '
+                            + 'style="display:inline-flex;align-items:center;gap:7px;margin-top:8px;'
+                            + 'padding:8px 16px;border-radius:9px;border:1.5px solid var(--g200);'
+                            + 'background:var(--g50);color:var(--g700);font-size:13px;font-weight:700;'
+                            + 'text-decoration:none;transition:all 0.15s;" '
+                            + 'onmouseover="this.style.background=\'var(--g100)\'" '
+                            + 'onmouseout="this.style.background=\'var(--g50)\'">'
+                            + '📋 View Treatment Log' + estDaysStr
+                            + '</a>';
                     }
 
                     var statusSelect = '';
@@ -1775,8 +1942,8 @@
                          + '<div class="act-plant">' + esc(r.plant_name || "Unknown Plant") + '</div>'
                          + '<div class="act-dis">' + esc(r.disease_name) + '</div>'
                          + miniTL
-                         + '<div style="margin-top:8px;">' + treatHTML + '</div>'
-                         + '<div class="act-date">📅 ' + formatDate(r.scanned_at) + ' &nbsp;|&nbsp; ' + (estHTML || '') + '</div>'
+                         + treatHTML
+                         + '<div class="act-date" style="margin-top:6px;">📅 ' + formatDate(r.scanned_at) + '</div>'
                          + '</div>'
                          + '<div class="act-right">'
                          + '<span class="pill ' + sp + '">' + sl + '</span>'
@@ -1877,10 +2044,15 @@
                           + '<option value="recovered"'   + (r.status === "recovered"   ? ' selected' : '') + '>🟢 Recovered</option>'
                           + '</select>';
 
-                    var treatBtn = r.treatment
-                        ? '<button class="treat-toggle" onclick="toggleTreat(\'rtr-' + r.id + '\')">View</button>'
-                          + '<div class="treat-panel" id="rtr-' + r.id + '">' + esc(r.treatment) + '</div>'
-                        : '—';
+                    var treatBtn = ok
+                        ? '—'
+                        : '<a href="/treatment_log?record_id=' + r.id + '" '
+                          + 'style="display:inline-flex;align-items:center;gap:5px;padding:5px 12px;'
+                          + 'border-radius:7px;border:1.5px solid var(--g200);background:var(--g50);'
+                          + 'color:var(--g700);font-size:12px;font-weight:700;text-decoration:none;'
+                          + 'white-space:nowrap;" '
+                          + 'onmouseover="this.style.background=\'var(--g100)\'" '
+                          + 'onmouseout="this.style.background=\'var(--g50)\'">📋 Log</a>';
 
                     return "<tr>"
                          + "<td>" + (i + 1) + "</td>"
@@ -2165,6 +2337,363 @@
     };
 
     loadReminders();
+
+    /* ══════════════════════════════════════════════════════
+       ABOUT THIS DISEASE  — Modal Logic & Disease Database
+    ══════════════════════════════════════════════════════ */
+
+    /* ── Disease knowledge base ─────────────────────────── */
+    var DISEASE_DB = {
+        "tomato leaf mosaic virus": {
+            description: "Tomato Leaf Mosaic Virus (ToLMV) is a highly contagious viral pathogen belonging to the Tobamovirus genus. It causes characteristic mosaic or mottled patterns on leaves, stunted growth, and reduced fruit quality. The virus spreads primarily through infected plant debris, contaminated tools, and aphid vectors. Once a plant is infected, there is no chemical cure — management focuses on prevention, containment, and vector control.",
+            severity: "High",
+            spread: "Contact / Aphids / Infected tools",
+            season: "Year-round (worse in warm humid conditions)",
+            recoveryDays: 35,
+            treatments: [
+                "Remove and destroy all visibly infected plants immediately — do not compost",
+                "Control aphid populations using insecticidal soap or neem oil spray",
+                "Disinfect all pruning tools with 10% bleach solution between cuts",
+                "Apply mineral oil spray to reduce aphid transmission rates",
+                "Use reflective mulches to deter aphid landing on plants"
+            ],
+            medicines: [
+                { name: "Imidacloprid (Admire Pro)", type: "Systemic Insecticide", price: "$18–$35 / 8 oz", desc: "Controls aphid vectors; apply as soil drench or foliar spray" },
+                { name: "Spinosad (Entrust SC)", type: "Bio-Insecticide", price: "$28–$55 / pint", desc: "Organic-certified aphid control; low mammalian toxicity" },
+                { name: "Neem Oil (70% Cold Pressed)", type: "Organic Repellent", price: "$8–$15 / quart", desc: "Disrupts aphid feeding; also has antifungal properties" },
+                { name: "Pyrethrin (PyGanic)", type: "Contact Insecticide", price: "$22–$40 / quart", desc: "Fast knockdown of aphid colonies; OMRI listed for organic use" }
+            ],
+            prevention: [
+                { icon: "🌱", title: "Use Certified Seeds", text: "Always source seeds from certified virus-free nurseries and seed suppliers" },
+                { icon: "🧤", title: "Sanitize Tools", text: "Disinfect pruning shears with 70% alcohol or 10% bleach solution after each use" },
+                { icon: "🦗", title: "Monitor Aphids", text: "Set up yellow sticky traps to monitor aphid populations weekly" },
+                { icon: "🪴", title: "Resistant Varieties", text: "Select ToMV-resistant tomato varieties (look for 'Tm-2²' resistance genes)" }
+            ],
+            totalCostRange: "$45–$120",
+            costNote: "Estimated total treatment cost including insecticides, removal labor, and preventive measures per 100 sq ft plot"
+        },
+        "early blight": {
+            description: "Early Blight, caused by the fungal pathogen Alternaria solani, is one of the most common foliar diseases of tomato and potato. It appears as dark, concentric-ringed lesions ('bullseye' pattern) on older leaves first, gradually progressing up the plant. High humidity and temperatures between 24–29°C create ideal infection conditions. Spores survive in soil and infected plant debris for multiple seasons.",
+            severity: "Moderate–High",
+            spread: "Wind / Rain splash / Infected debris",
+            season: "Mid-summer to fall; worse in humid conditions",
+            recoveryDays: 21,
+            treatments: [
+                "Apply copper-based fungicide (copper hydroxide) every 7–10 days",
+                "Remove and dispose of infected lower leaves immediately",
+                "Avoid overhead watering; water at soil level in early morning",
+                "Improve plant spacing to enhance air circulation",
+                "Apply organic mulch to prevent soil splash onto lower leaves"
+            ],
+            medicines: [
+                { name: "Copper Hydroxide (Kocide 3000)", type: "Copper Fungicide", price: "$12–$25 / lb", desc: "Broad-spectrum; apply preventively every 7–10 days in wet weather" },
+                { name: "Chlorothalonil (Daconil)", type: "Protectant Fungicide", price: "$10–$22 / quart", desc: "Prevents spore germination; apply before disease onset" },
+                { name: "Mancozeb (Dithane)", type: "Contact Fungicide", price: "$8–$18 / lb", desc: "Effective multi-site fungicide; use in rotation to prevent resistance" },
+                { name: "Azoxystrobin (Quadris)", type: "Systemic Fungicide", price: "$30–$60 / quart", desc: "Systemic protection; excellent curative and preventive activity" }
+            ],
+            prevention: [
+                { icon: "💧", title: "Drip Irrigation", text: "Use drip irrigation instead of overhead watering to keep foliage dry" },
+                { icon: "🌿", title: "Crop Rotation", text: "Rotate tomatoes and potatoes with non-solanaceous crops every 2–3 years" },
+                { icon: "🍂", title: "Remove Debris", text: "Clean up and destroy all plant debris at end of season to remove overwintering spores" },
+                { icon: "📏", title: "Proper Spacing", text: "Space plants 18–24 inches apart to improve airflow and reduce humidity" }
+            ],
+            totalCostRange: "$30–$80",
+            costNote: "Estimated total treatment cost including fungicides and application supplies per season per 100 sq ft"
+        },
+        "late blight": {
+            description: "Late Blight, caused by Phytophthora infestans (the oomycete responsible for the Irish Potato Famine), is one of the most devastating plant diseases worldwide. It spreads with terrifying speed in cool, wet conditions, destroying entire crops within days. Water-soaked lesions on leaves rapidly turn brown and necrotic; white fuzzy sporulation is visible on the underside of infected leaves in humid conditions.",
+            severity: "Critical",
+            spread: "Wind-dispersed sporangia / Rain splash / Infected tubers",
+            season: "Cool, wet weather (15–22°C, >90% humidity)",
+            recoveryDays: 28,
+            treatments: [
+                "Apply metalaxyl-based fungicide immediately upon first sign of infection",
+                "Remove and seal infected plant material in plastic bags before disposal",
+                "Never compost infected material — burn or bag for landfill",
+                "Apply preventive fungicide spray before forecasted cool, wet periods",
+                "Avoid overhead irrigation; keep foliage as dry as possible"
+            ],
+            medicines: [
+                { name: "Metalaxyl-M (Ridomil Gold)", type: "Systemic Fungicide", price: "$35–$70 / lb", desc: "Gold standard for late blight; systemic action through plant tissue" },
+                { name: "Cymoxanil + Famoxadone (Tanos)", type: "Combination Fungicide", price: "$28–$55 / lb", desc: "Dual mode of action; excellent curative and preventive" },
+                { name: "Fluopicolide (Presidio)", type: "Systemic Fungicide", price: "$45–$90 / pint", desc: "Novel mode of action; use in rotation to manage resistance" },
+                { name: "Copper Octanoate (Cueva)", type: "Organic Copper", price: "$14–$28 / quart", desc: "Organically approved option; protective (not curative) activity" }
+            ],
+            prevention: [
+                { icon: "🌦️", title: "Monitor Weather", text: "Use blight forecasting tools (BlightPro) to anticipate high-risk periods" },
+                { icon: "🧬", title: "Resistant Varieties", text: "Plant late blight–resistant varieties such as 'Defiant PhR' or 'Mountain Magic'" },
+                { icon: "🥔", title: "Certified Seed Tubers", text: "Use only certified disease-free potato seed; inspect tubers before planting" },
+                { icon: "🚿", title: "Avoid Wet Foliage", text: "Never leave foliage wet overnight; improve drainage around plants" }
+            ],
+            totalCostRange: "$60–$150",
+            costNote: "Estimated total cost including emergency fungicide application and potential replanting per 100 sq ft"
+        },
+        "powdery mildew": {
+            description: "Powdery Mildew is a widespread fungal disease caused by various Erysiphales species, recognizable by its distinctive white to grayish powdery coating on leaf surfaces. Unlike most fungi, it thrives in warm, dry conditions with low humidity — and does not require free water on leaves for infection. It can affect hundreds of plant species and spreads rapidly through airborne conidia.",
+            severity: "Moderate",
+            spread: "Airborne conidia / Wind",
+            season: "Late spring through fall; dry warm days, cool nights",
+            recoveryDays: 14,
+            treatments: [
+                "Apply sulfur-based fungicide or potassium bicarbonate spray at first sign",
+                "Use baking soda solution (1 tbsp per gallon water + a few drops dish soap) for organic control",
+                "Prune and remove heavily infected leaves and stems",
+                "Improve air circulation by opening up the plant canopy",
+                "Apply neem oil as both a preventive and mild curative treatment"
+            ],
+            medicines: [
+                { name: "Sulfur Dust (Bonide Sulfur Plant Fungicide)", type: "Protectant Fungicide", price: "$6–$14 / 4 lb", desc: "Highly effective preventive; do not apply when temp >90°F" },
+                { name: "Potassium Bicarbonate (Milstop)", type: "Organic Fungicide", price: "$15–$30 / lb", desc: "OMRI-listed; curative activity by disrupting pH on leaf surface" },
+                { name: "Myclobutanil (Eagle 20EW)", type: "Systemic DMI Fungicide", price: "$18–$35 / 8 oz", desc: "Excellent systemic curative; rotate with other modes of action" },
+                { name: "Tebuconazole (Spectracide Immunox)", type: "Triazole Fungicide", price: "$12–$22 / pint", desc: "Broad-spectrum; curative and preventive against powdery mildew" }
+            ],
+            prevention: [
+                { icon: "✂️", title: "Prune for Airflow", text: "Prune plants to open the canopy and reduce humidity in the leaf zone" },
+                { icon: "☀️", title: "Sunlight Exposure", text: "Plant in full sun locations; powdery mildew is suppressed by UV light" },
+                { icon: "🌿", title: "Resistant Cultivars", text: "Choose mildew-resistant cultivars — most modern varieties have improved resistance" },
+                { icon: "🚫", title: "Avoid Excess Nitrogen", text: "Do not over-fertilize with nitrogen — it produces lush growth susceptible to infection" }
+            ],
+            totalCostRange: "$20–$60",
+            costNote: "Estimated total treatment cost for a typical home garden or small plot over one season"
+        },
+        "leaf spot": {
+            description: "Leaf Spot diseases encompass a broad group of fungal and bacterial infections that produce distinct circular to irregular spots on leaves, typically with defined margins. Common causal agents include Septoria lycopersici, Cercospora spp., and Alternaria spp. Infected spots often show a tan or brown center with a darker border, and in advanced stages, affected leaves yellow and drop prematurely, weakening the plant.",
+            severity: "Moderate",
+            spread: "Rain splash / Wind / Contaminated tools",
+            season: "Warm, humid conditions throughout growing season",
+            recoveryDays: 21,
+            treatments: [
+                "Apply mancozeb or chlorothalonil fungicide at first symptom appearance",
+                "Remove and destroy all infected leaves to reduce spore reservoir",
+                "Avoid wetting foliage during irrigation; use drip systems",
+                "Improve airflow by proper plant spacing and pruning",
+                "Apply preventive copper-based spray during high-humidity periods"
+            ],
+            medicines: [
+                { name: "Chlorothalonil (Bravo 720)", type: "Protectant Fungicide", price: "$10–$22 / quart", desc: "Multi-site fungicide; apply preventively; excellent spectrum of activity" },
+                { name: "Mancozeb (Dithane M-45)", type: "Contact Fungicide", price: "$8–$18 / lb", desc: "Broad-spectrum protectant; effective against many Cercospora species" },
+                { name: "Propiconazole (Banner Maxx)", type: "Systemic Fungicide", price: "$22–$45 / quart", desc: "Systemic DMI fungicide; curative and preventive action" },
+                { name: "Copper Hydroxide (Kocide)", type: "Copper Bactericide/Fungicide", price: "$12–$25 / lb", desc: "Effective against bacterial leaf spot; apply during wet weather" }
+            ],
+            prevention: [
+                { icon: "🌧️", title: "Avoid Leaf Wetness", text: "Water at the base of plants; avoid wetting foliage, especially in evenings" },
+                { icon: "🔄", title: "Rotate Crops", text: "Practice 2–3 year crop rotation to reduce pathogen buildup in soil" },
+                { icon: "🧹", title: "Garden Sanitation", text: "Remove and destroy infected plant debris at end of each growing season" },
+                { icon: "📊", title: "Monitor Regularly", text: "Scout plants weekly; early detection dramatically improves treatment success" }
+            ],
+            totalCostRange: "$25–$70",
+            costNote: "Estimated total treatment cost for fungicide applications over one growing season per 100 sq ft"
+        },
+        "common rust": {
+            description: "Common Rust, caused by Puccinia sorghi on corn and Phragmidium spp. on roses, presents as brick-red to orange-brown pustules on leaf surfaces that release powdery spores when ruptured. The disease can cause significant yield losses in susceptible crops and spreads rapidly under cool, moist conditions. Severe infections cause premature leaf death and weaken the overall plant structure.",
+            severity: "Moderate–High",
+            spread: "Wind-dispersed urediniospores",
+            season: "Cool, humid conditions (16–23°C with high humidity)",
+            recoveryDays: 18,
+            treatments: [
+                "Apply triazole fungicide (propiconazole, tebuconazole) at first pustule appearance",
+                "Remove heavily infected leaves to reduce local spore load",
+                "Apply fungicide preventively when conditions favor rust development",
+                "Use strobilurin fungicides for excellent protective and curative activity",
+                "Ensure good plant nutrition — potassium deficiency increases rust severity"
+            ],
+            medicines: [
+                { name: "Propiconazole (Tilt)", type: "Triazole Fungicide", price: "$20–$40 / pint", desc: "Excellent systemic activity against rusts; curative and preventive" },
+                { name: "Pyraclostrobin (Headline)", type: "Strobilurin Fungicide", price: "$35–$65 / quart", desc: "Broad-spectrum systemic; also improves plant health" },
+                { name: "Tebuconazole (Folicur)", type: "DMI Fungicide", price: "$25–$50 / pint", desc: "Highly effective against rust pathogens; systemic uptake" },
+                { name: "Sulfur (Bonide Sulfur)", type: "Protective Fungicide", price: "$6–$14 / 4 lb", desc: "Organic option; preventive only; reapply after rain" }
+            ],
+            prevention: [
+                { icon: "🌽", title: "Resistant Hybrids", text: "Select rust-resistant corn hybrids or rose cultivars for your region" },
+                { icon: "📅", title: "Early Planting", text: "Plant early in the season to allow crops to develop before peak rust pressure" },
+                { icon: "🌬️", title: "Improve Airflow", text: "Adequate plant spacing promotes air circulation and reduces leaf moisture" },
+                { icon: "🔭", title: "Scout Weekly", text: "Begin scouting for rust pustules from mid-season; early detection is key" }
+            ],
+            totalCostRange: "$35–$90",
+            costNote: "Estimated total treatment cost per acre/season including fungicide applications and labor"
+        }
+    };
+
+    /* ── Fuzzy match to disease DB ───────────────────────── */
+    function lookupDisease(name) {
+        if (!name) return null;
+        var n = name.toLowerCase().trim();
+        // Exact
+        if (DISEASE_DB[n]) return DISEASE_DB[n];
+        // Partial match
+        var keys = Object.keys(DISEASE_DB);
+        for (var i = 0; i < keys.length; i++) {
+            if (n.indexOf(keys[i]) !== -1 || keys[i].indexOf(n) !== -1) {
+                return DISEASE_DB[keys[i]];
+            }
+        }
+        // Keyword match
+        for (var j = 0; j < keys.length; j++) {
+            var words = keys[j].split(" ");
+            for (var k = 0; k < words.length; k++) {
+                if (words[k].length > 4 && n.indexOf(words[k]) !== -1) {
+                    return DISEASE_DB[keys[j]];
+                }
+            }
+        }
+        return null;
+    }
+
+    /* ── Severity badge ──────────────────────────────────── */
+    function severityColor(sev) {
+        if (!sev) return { bg: "#f3f4f6", color: "#6b7280" };
+        var s = sev.toLowerCase();
+        if (s.indexOf("critical") !== -1) return { bg: "#fef2f2", color: "#b91c1c" };
+        if (s.indexOf("high") !== -1)     return { bg: "#fff7ed", color: "#c2410c" };
+        if (s.indexOf("moderate") !== -1) return { bg: "#fefce8", color: "#a16207" };
+        return { bg: "#f0fdf4", color: "#15803d" };
+    }
+
+    /* ── Build modal HTML ────────────────────────────────── */
+    function buildModalContent(info, name, conf) {
+        var sevColor = severityColor(info.severity);
+
+        // Stats row
+        var stats = '<div class="modal-stats">'
+            + '<div class="mstat"><span class="mstat-val">~' + info.recoveryDays + 'd</span><span class="mstat-lbl">Recovery Time</span></div>'
+            + '<div class="mstat"><span class="mstat-val" style="color:#c2410c;">' + (info.severity || "Moderate") + '</span><span class="mstat-lbl">Severity</span></div>'
+            + '<div class="mstat"><span class="mstat-val">' + info.totalCostRange + '</span><span class="mstat-lbl">Est. Cost</span></div>'
+            + '</div>';
+
+        // Meta info
+        var meta = '<div style="display:flex;gap:12px;flex-wrap:wrap;">'
+            + '<div style="background:var(--gr50);border:1px solid var(--gr200);border-radius:9px;padding:8px 13px;font-size:12px;color:var(--gr600);"><strong style="color:var(--gr900);">📡 Spread:</strong> ' + esc(info.spread) + '</div>'
+            + '<div style="background:var(--gr50);border:1px solid var(--gr200);border-radius:9px;padding:8px 13px;font-size:12px;color:var(--gr600);"><strong style="color:var(--gr900);">📆 Season:</strong> ' + esc(info.season) + '</div>'
+            + '</div>';
+
+        // Description
+        var desc = '<div class="msec">'
+            + '<div class="msec-title">📖 What is this disease?</div>'
+            + '<p class="msec-desc">' + esc(info.description) + '</p>'
+            + '</div>';
+
+        // Treatments
+        var treatItems = info.treatments.map(function(t) {
+            return '<li>' + esc(t) + '</li>';
+        }).join("");
+        var treat = '<div class="msec">'
+            + '<div class="msec-title">🩺 Treatment Methods</div>'
+            + '<ul class="msec-list">' + treatItems + '</ul>'
+            + '</div>';
+
+        // Medicines
+        var medCards = info.medicines.map(function(m) {
+            return '<div class="med-card">'
+                + '<div class="med-name">' + esc(m.name) + '</div>'
+                + '<div class="med-type">' + esc(m.type) + '</div>'
+                + '<div class="med-price">💲 ' + esc(m.price) + '</div>'
+                + '<div class="med-desc">' + esc(m.desc) + '</div>'
+                + '</div>';
+        }).join("");
+        var meds = '<div class="msec">'
+            + '<div class="msec-title">💊 Recommended Medicines</div>'
+            + '<div class="med-grid">' + medCards + '</div>'
+            + '</div>';
+
+        // Cost box
+        var cost = '<div class="msec">'
+            + '<div class="msec-title">💰 Estimated Treatment Cost</div>'
+            + '<div class="cost-box">'
+            + '<div class="cost-icon">💵</div>'
+            + '<div class="cost-details">'
+            + '<div class="cost-range">' + esc(info.totalCostRange) + ' USD</div>'
+            + '<div class="cost-note">' + esc(info.costNote) + '</div>'
+            + '</div>'
+            + '</div>'
+            + '</div>';
+
+        // Prevention
+        var prevCards = info.prevention.map(function(p) {
+            return '<div class="prev-card">'
+                + '<div class="prev-icon">' + p.icon + '</div>'
+                + '<div class="prev-text"><strong>' + esc(p.title) + '</strong>' + esc(p.text) + '</div>'
+                + '</div>';
+        }).join("");
+        var prev = '<div class="msec">'
+            + '<div class="msec-title">⚠️ Prevention Tips</div>'
+            + '<div class="prev-grid">' + prevCards + '</div>'
+            + '</div>';
+
+        // AI note
+        var ai = '<div class="ai-note">'
+            + '<div class="ai-note-icon">🧠</div>'
+            + '<div class="ai-note-text">'
+            + '<strong>AI Advisory Note</strong>'
+            + 'This analysis was generated by BATANOX\'s AI detection system with a confidence of '
+            + (conf > 0 ? conf.toFixed(1) + '%' : 'N/A')
+            + '. For critical crop decisions, always consult a certified agricultural extension officer or plant pathologist to confirm the diagnosis and obtain locally-specific treatment guidance.'
+            + '</div>'
+            + '</div>';
+
+        return stats + meta + desc + treat + meds + cost + prev + ai;
+    }
+
+    /* ── Modal open/close ────────────────────────────────── */
+    window.openAboutDisease = function () {
+        var modal = document.getElementById("aboutModal");
+        var modalTitle = document.getElementById("modalTitle");
+        var modalBody  = document.getElementById("modalBody");
+        var modalConfBadge = document.getElementById("modalConfBadge");
+        var modalConfNum   = document.getElementById("modalConfNum");
+
+        // Show modal with loading state
+        modal.classList.add("open");
+        document.body.style.overflow = "hidden";
+
+        modalTitle.textContent = diseaseName || "Disease Profile";
+
+        if (confidence > 0) {
+            modalConfBadge.style.display = "";
+            modalConfNum.textContent = confidence.toFixed(1) + "%";
+        }
+
+        // Show loading momentarily then render content
+        modalBody.innerHTML = '<div class="modal-loading"><div class="spinner"></div><p>Fetching disease intelligence…</p></div>';
+
+        setTimeout(function () {
+            var info = lookupDisease(diseaseName);
+            if (info) {
+                modalBody.innerHTML = buildModalContent(info, diseaseName, confidence);
+            } else {
+                // Fallback for unknown diseases
+                modalBody.innerHTML =
+                    '<div class="ai-note" style="margin:0;">'
+                    + '<div class="ai-note-icon">🔬</div>'
+                    + '<div class="ai-note-text">'
+                    + '<strong>Disease: ' + esc(diseaseName) + '</strong>'
+                    + 'Detailed profile for this specific disease is not yet in the local database. '
+                    + 'General recommendation: isolate affected plants, improve air circulation, avoid overwatering, '
+                    + 'and consult your local agricultural extension office for targeted treatment. '
+                    + 'Detection confidence: ' + (confidence > 0 ? confidence.toFixed(1) + '%' : 'N/A') + '.'
+                    + '</div>'
+                    + '</div>'
+                    + '<div class="ai-note" style="margin-top:14px;background:linear-gradient(135deg,#fff7ed,#ffedd5);border-color:#fed7aa;">'
+                    + '<div class="ai-note-icon">🌐</div>'
+                    + '<div class="ai-note-text" style="color:#92400e;">'
+                    + '<strong>Get More Info</strong>'
+                    + 'Search for "' + esc(diseaseName) + ' treatment" on the USDA Plant Disease Database '
+                    + 'or contact your local cooperative extension service for region-specific advice.'
+                    + '</div>'
+                    + '</div>';
+            }
+        }, 600);
+    };
+
+    window.closeAboutModal = function (e) {
+        if (e && e.target !== document.getElementById("aboutModal")) return;
+        document.getElementById("aboutModal").classList.remove("open");
+        document.body.style.overflow = "";
+    };
+
+    /* Close on Escape key */
+    document.addEventListener("keydown", function (e) {
+        if (e.key === "Escape") window.closeAboutModal();
+    });
 
 }());
 </script>
