@@ -1064,6 +1064,10 @@ elseif ($sec === 'logs'): ?>
               </td>
               <?php endif; ?>
               <td class="no-print">
+                <a href="http://localhost:5000/treatment_log?record_id=<?= (int)$lr['id'] ?>"
+                   class="tbtn"
+                   style="background:var(--g50);color:var(--g700);border:1px solid var(--g200);margin-bottom:4px;display:inline-block;"
+                   title="View Treatment Log">📋 Log</a>
                 <a href="admin.php?del=<?= (int)$lr['id'] ?>&section=logs<?= $fq||$fstat||$fplant||$fuser||$fdfrom||$fdto ? '&q='.urlencode($fq).'&fstat='.urlencode($fstat).'&fplant='.urlencode($fplant).'&fuser='.urlencode($fuser).'&dfrom='.urlencode($fdfrom).'&dto='.urlencode($fdto) : '' ?>"
                    class="tbtn tbtn-del"
                    onclick="return confirm('Delete this detection record?')">Delete</a>

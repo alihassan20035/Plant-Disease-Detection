@@ -1,0 +1,1231 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Treatment Log — BATANOX</title>
+    <link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@400;500;600;700;800&display=swap" rel="stylesheet">
+    <style>
+        *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+
+        :root {
+            --g50:#f0fdf4; --g100:#dcfce7; --g200:#bbf7d0;
+            --g500:#22c55e; --g600:#16a34a; --g700:#15803d;
+            --white:#ffffff;
+            --gr50:#f9fafb; --gr100:#f3f4f6; --gr200:#e5e7eb;
+            --gr300:#d1d5db; --gr400:#9ca3af; --gr500:#6b7280;
+            --gr600:#4b5563; --gr700:#374151; --gr900:#111827;
+            --r50:#fef2f2; --r100:#fee2e2; --r200:#fecaca;
+            --r600:#dc2626; --r700:#b91c1c;
+            --y50:#fefce8; --y200:#fef08a; --y700:#a16207;
+            --b50:#eff6ff; --b100:#dbeafe; --b200:#bfdbfe; --b700:#1d4ed8;
+            --o50:#fff7ed; --o200:#fed7aa; --o700:#c2410c;
+            --p50:#faf5ff; --p200:#e9d5ff; --p700:#7e22ce;
+            --topbar:66px;
+            --radius:14px;
+        }
+
+        body {
+            font-family: 'Plus Jakarta Sans', sans-serif;
+            background: var(--gr50);
+            color: var(--gr900);
+            min-height: 100vh;
+        }
+
+        /* ─── TOPBAR ─────────────────────────────────────────── */
+        .topbar {
+            position: fixed; top: 0; left: 0; right: 0;
+            height: var(--topbar);
+            background: var(--white);
+            border-bottom: 1px solid var(--gr200);
+            display: flex; align-items: center;
+            padding: 0 28px; gap: 14px; z-index: 200;
+            box-shadow: 0 1px 6px rgba(0,0,0,0.04);
+        }
+        .brand { display: flex; align-items: center; gap: 10px; text-decoration: none; flex-shrink: 0; }
+        .brand-mark {
+            width: 38px; height: 38px; border-radius: 10px;
+            background: linear-gradient(135deg, var(--g700), var(--g500));
+            display: flex; align-items: center; justify-content: center;
+            box-shadow: 0 3px 10px rgba(22,163,74,0.28);
+        }
+        .brand-mark svg { width: 20px; height: 20px; fill: white; }
+        .brand-name { font-size: 20px; font-weight: 800; letter-spacing: -0.4px; color: var(--gr900); }
+        .brand-name em { font-style: normal; color: var(--g600); }
+        .top-spacer { flex: 1; }
+        .back-btn {
+            display: flex; align-items: center; gap: 7px;
+            padding: 8px 16px; border-radius: 9px;
+            border: 1.5px solid var(--gr200); background: var(--white);
+            font-family: inherit; font-size: 13px; font-weight: 600;
+            color: var(--gr600); cursor: pointer; text-decoration: none;
+            transition: all 0.15s;
+        }
+        .back-btn:hover { background: var(--gr50); color: var(--gr900); }
+
+        /* ─── PAGE BODY ──────────────────────────────────────── */
+        .page { padding-top: calc(var(--topbar) + 32px); padding-bottom: 60px; }
+        .container { max-width: 900px; margin: 0 auto; padding: 0 28px; }
+
+        /* ─── HERO ───────────────────────────────────────────── */
+        .hero {
+            background: linear-gradient(130deg, var(--g700) 0%, var(--g500) 100%);
+            border-radius: 18px; padding: 36px 42px; color: white;
+            margin-bottom: 28px; position: relative; overflow: hidden;
+        }
+        .hero::before {
+            content: ''; position: absolute; top: -60px; right: -60px;
+            width: 260px; height: 260px; border-radius: 50%;
+            background: rgba(255,255,255,0.06);
+        }
+        .hero::after {
+            content: ''; position: absolute; bottom: -40px; right: 120px;
+            width: 160px; height: 160px; border-radius: 50%;
+            background: rgba(255,255,255,0.04);
+        }
+        .hero-pill {
+            display: inline-flex; align-items: center; gap: 6px;
+            background: rgba(255,255,255,0.15);
+            border: 1px solid rgba(255,255,255,0.22);
+            border-radius: 20px; padding: 4px 12px;
+            font-size: 12px; font-weight: 600; margin-bottom: 14px;
+        }
+        .hero h1 { font-size: 26px; font-weight: 800; letter-spacing: -0.5px; margin-bottom: 6px; }
+        .hero-sub { font-size: 14px; opacity: 0.85; line-height: 1.6; max-width: 500px; }
+        .hero-meta { display: flex; gap: 18px; margin-top: 18px; flex-wrap: wrap; }
+        .hero-meta-item {
+            background: rgba(255,255,255,0.12);
+            border: 1px solid rgba(255,255,255,0.18);
+            border-radius: 9px; padding: 8px 16px;
+            font-size: 13px; font-weight: 600;
+        }
+        .hero-meta-item span { opacity: 0.7; font-weight: 500; display: block; font-size: 11px; margin-bottom: 2px; }
+
+        /* ─── CARD ───────────────────────────────────────────── */
+        .card {
+            background: var(--white);
+            border: 1px solid var(--gr200);
+            border-radius: var(--radius);
+            margin-bottom: 22px;
+            overflow: hidden;
+        }
+        .card-head {
+            padding: 18px 26px;
+            border-bottom: 1px solid var(--gr100);
+            display: flex; align-items: center;
+            justify-content: space-between; gap: 12px;
+        }
+        .card-head-left { display: flex; align-items: center; gap: 12px; }
+        .c-ico { font-size: 20px; }
+        .card-head h2 { font-size: 16px; font-weight: 700; color: var(--gr900); }
+        .card-head p { font-size: 13px; color: var(--gr500); margin-top: 1px; }
+        .card-body { padding: 26px; }
+
+        /* ─── DETAIL GRID (top section) ─────────────────────── */
+        .detail-grid {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 14px;
+        }
+        @media (max-width: 600px) { .detail-grid { grid-template-columns: 1fr; } }
+
+        .detail-field {
+            background: var(--gr50);
+            border: 1px solid var(--gr200);
+            border-radius: 11px;
+            padding: 14px 18px;
+        }
+        .detail-field.full { grid-column: 1 / -1; }
+        .df-label {
+            font-size: 11px; font-weight: 700; text-transform: uppercase;
+            letter-spacing: 0.8px; color: var(--gr400); margin-bottom: 7px;
+        }
+        .df-value {
+            font-size: 15px; font-weight: 700; color: var(--gr900);
+        }
+        .df-value.small { font-size: 13px; font-weight: 600; }
+
+        /* Toggle switches */
+        .toggle-row {
+            display: flex; align-items: center;
+            justify-content: space-between; gap: 12px;
+            flex-wrap: wrap;
+        }
+        .toggle-label { font-size: 14px; font-weight: 600; color: var(--gr700); }
+        .toggle-desc { font-size: 12px; color: var(--gr400); margin-top: 1px; }
+        .toggle-wrap { display: flex; align-items: center; gap: 9px; }
+        .toggle-text { font-size: 13px; font-weight: 700; }
+        .toggle-switch {
+            position: relative; width: 46px; height: 26px;
+            flex-shrink: 0;
+        }
+        .toggle-switch input {
+            opacity: 0; width: 0; height: 0; position: absolute;
+        }
+        .toggle-slider {
+            position: absolute; inset: 0;
+            background: var(--gr300); border-radius: 26px;
+            cursor: pointer; transition: background 0.2s;
+        }
+        .toggle-slider::before {
+            content: ''; position: absolute;
+            width: 20px; height: 20px; border-radius: 50%;
+            background: white; top: 3px; left: 3px;
+            transition: transform 0.2s;
+            box-shadow: 0 1px 4px rgba(0,0,0,0.18);
+        }
+        .toggle-switch input:checked + .toggle-slider { background: var(--g600); }
+        .toggle-switch input:checked + .toggle-slider::before { transform: translateX(20px); }
+
+        /* Pills */
+        .pill {
+            display: inline-flex; align-items: center;
+            padding: 3px 10px; border-radius: 20px;
+            font-size: 12px; font-weight: 700;
+        }
+        .pill-green  { background: var(--g100);  color: var(--g700); }
+        .pill-red    { background: var(--r100);  color: var(--r700); }
+        .pill-blue   { background: var(--b100);  color: var(--b700); }
+        .pill-yellow { background: var(--y50);   color: var(--y700); border: 1px solid var(--y200); }
+        .pill-gray   { background: var(--gr100); color: var(--gr600); }
+        .pill-purple { background: var(--p50);   color: var(--p700); border: 1px solid var(--p200); }
+
+        /* Status badge */
+        .status-badge {
+            display: inline-flex; align-items: center; gap: 6px;
+            padding: 5px 14px; border-radius: 20px;
+            font-size: 13px; font-weight: 700;
+        }
+        .sb-detected    { background: var(--r100);  color: var(--r700); }
+        .sb-in_progress { background: var(--b100);  color: var(--b700); }
+        .sb-recovered   { background: var(--g100);  color: var(--g700); }
+
+        /* ─── WEEKLY TABLE ────────────────────────────────────── */
+        .week-table-wrap { overflow-x: auto; }
+        table.week-table {
+            width: 100%; border-collapse: collapse;
+            font-size: 13px;
+        }
+        table.week-table th {
+            padding: 11px 14px; text-align: left;
+            background: var(--gr50);
+            font-size: 11px; font-weight: 700; text-transform: uppercase;
+            letter-spacing: 0.7px; color: var(--gr400);
+            border-bottom: 2px solid var(--gr200);
+            white-space: nowrap;
+        }
+        table.week-table td {
+            padding: 12px 14px;
+            border-bottom: 1px solid var(--gr100);
+            vertical-align: middle;
+        }
+        table.week-table tr:last-child td { border-bottom: none; }
+        table.week-table tr:hover td { background: var(--gr50); }
+        .week-num {
+            width: 32px; height: 32px; border-radius: 8px;
+            background: var(--g100); color: var(--g700);
+            display: flex; align-items: center; justify-content: center;
+            font-size: 13px; font-weight: 800;
+        }
+        .yes-chip { color: var(--r600); font-weight: 700; }
+        .no-chip  { color: var(--g600); font-weight: 700; }
+        .na-chip  { color: var(--gr400); font-style: italic; }
+
+        /* Severity badges */
+        .sev-none     { background: var(--g100);  color: var(--g700);  }
+        .sev-low      { background: var(--g50);   color: var(--g600);  border: 1px solid var(--g200); }
+        .sev-moderate { background: var(--y50);   color: var(--y700);  border: 1px solid var(--y200); }
+        .sev-high     { background: var(--r50);   color: var(--r700);  border: 1px solid var(--r200); }
+        .sev-critical { background: #4c0519;      color: #fda4af;      }
+
+        /* Recovery bar */
+        .rec-bar-wrap { width: 80px; }
+        .rec-bar-bg {
+            height: 7px; background: var(--gr200);
+            border-radius: 10px; overflow: hidden;
+        }
+        .rec-bar-fill {
+            height: 100%; border-radius: 10px;
+            background: linear-gradient(90deg, var(--g500), var(--g700));
+            transition: width 0.6s ease;
+        }
+        .rec-pct { font-size: 11px; font-weight: 700; color: var(--g700); margin-top: 3px; }
+
+        /* Notes col */
+        .note-text {
+            font-size: 12px; color: var(--gr600);
+            max-width: 180px; line-height: 1.5;
+        }
+
+        /* ─── ADD WEEK FORM ──────────────────────────────────── */
+        .form-grid {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 16px; margin-bottom: 20px;
+        }
+        @media (max-width: 600px) { .form-grid { grid-template-columns: 1fr; } }
+
+        .form-group { display: flex; flex-direction: column; gap: 7px; }
+        .form-group.full { grid-column: 1 / -1; }
+
+        .f-label {
+            font-size: 12px; font-weight: 700;
+            color: var(--gr600); text-transform: uppercase; letter-spacing: 0.6px;
+        }
+        .f-input, .f-select, .f-textarea {
+            padding: 11px 14px;
+            border: 1.5px solid var(--gr300);
+            border-radius: 10px;
+            font-family: inherit; font-size: 14px; color: var(--gr900);
+            outline: none; background: var(--white);
+            transition: border-color 0.2s, box-shadow 0.2s;
+        }
+        .f-input:focus, .f-select:focus, .f-textarea:focus {
+            border-color: var(--g500);
+            box-shadow: 0 0 0 3px rgba(34,197,94,0.12);
+        }
+        .f-textarea { resize: vertical; min-height: 80px; }
+        .f-select { cursor: pointer; }
+
+        /* Radio group */
+        .radio-group { display: flex; gap: 10px; flex-wrap: wrap; }
+        .radio-opt {
+            display: flex; align-items: center; gap: 7px;
+            padding: 9px 16px; border-radius: 9px;
+            border: 1.5px solid var(--gr200); cursor: pointer;
+            font-size: 13px; font-weight: 600; color: var(--gr600);
+            background: var(--white); transition: all 0.15s;
+            user-select: none;
+        }
+        .radio-opt input { display: none; }
+        .radio-opt.selected-yes {
+            background: var(--r50); border-color: var(--r200); color: var(--r700);
+        }
+        .radio-opt.selected-no {
+            background: var(--g50); border-color: var(--g200); color: var(--g700);
+        }
+        .radio-opt.selected-na {
+            background: var(--gr100); border-color: var(--gr300); color: var(--gr600);
+        }
+
+        /* Recovery slider */
+        .slider-wrap { display: flex; align-items: center; gap: 12px; }
+        .slider-wrap input[type="range"] {
+            flex: 1; accent-color: var(--g600);
+            cursor: pointer; height: 6px;
+        }
+        .slider-val {
+            min-width: 42px; font-size: 14px; font-weight: 800;
+            color: var(--g700); text-align: right;
+        }
+
+        /* Action buttons */
+        .btn-green {
+            padding: 12px 24px; border: none; border-radius: 10px;
+            cursor: pointer; font-family: inherit; font-size: 14px; font-weight: 700;
+            color: white;
+            background: linear-gradient(135deg, var(--g700), var(--g500));
+            box-shadow: 0 4px 14px rgba(34,197,94,0.32);
+            display: inline-flex; align-items: center; gap: 8px;
+            transition: all 0.2s;
+        }
+        .btn-green:hover { transform: translateY(-1px); box-shadow: 0 6px 20px rgba(34,197,94,0.42); }
+        .btn-green:disabled { opacity: 0.6; cursor: not-allowed; transform: none; }
+        .btn-outline {
+            padding: 11px 20px; border: 1.5px solid var(--gr300); border-radius: 10px;
+            cursor: pointer; font-family: inherit; font-size: 14px; font-weight: 600;
+            color: var(--gr600); background: var(--white); transition: all 0.15s;
+            display: inline-flex; align-items: center; gap: 7px;
+        }
+        .btn-outline:hover { background: var(--gr50); color: var(--gr900); }
+        .btn-row { display: flex; gap: 10px; flex-wrap: wrap; align-items: center; }
+
+        /* ─── TOAST ──────────────────────────────────────────── */
+        .toast {
+            position: fixed; bottom: 28px; left: 50%; transform: translateX(-50%) translateY(80px);
+            padding: 12px 24px; border-radius: 12px; font-size: 14px; font-weight: 600;
+            color: white; z-index: 9999; transition: transform 0.3s ease;
+            pointer-events: none; white-space: nowrap;
+        }
+        .toast.show { transform: translateX(-50%) translateY(0); }
+        .toast-ok  { background: #166534; }
+        .toast-err { background: #991b1b; }
+
+        /* ─── EMPTY STATE ────────────────────────────────────── */
+        .empty-msg { padding: 40px 24px; text-align: center; color: var(--gr400); }
+        .e-ico { font-size: 36px; margin-bottom: 10px; }
+        .e-ttl { font-size: 15px; font-weight: 700; color: var(--gr500); margin-bottom: 5px; }
+        .e-sub { font-size: 13px; }
+
+        /* ─── PROGRESS SUMMARY ───────────────────────────────── */
+        .progress-summary {
+            display: grid; grid-template-columns: repeat(3, 1fr); gap: 14px;
+            margin-bottom: 22px;
+        }
+        @media (max-width: 500px) { .progress-summary { grid-template-columns: 1fr 1fr; } }
+        .ps-card {
+            background: var(--white); border: 1px solid var(--gr200);
+            border-radius: 12px; padding: 16px 20px; text-align: center;
+        }
+        .ps-num {
+            font-size: 28px; font-weight: 800; color: var(--gr900);
+            letter-spacing: -0.5px; line-height: 1;
+        }
+        .ps-lbl { font-size: 12px; color: var(--gr500); font-weight: 600; margin-top: 5px; }
+
+        /* ─── ALERT BOXES ────────────────────────────────────── */
+        .alert {
+            padding: 13px 17px; border-radius: 10px;
+            font-size: 14px; font-weight: 500;
+            display: flex; align-items: flex-start; gap: 9px;
+            margin-bottom: 18px;
+        }
+        .alert-ok  { background: var(--g50);  border: 1px solid var(--g200);  color: var(--g700); }
+        .alert-err { background: var(--r50);  border: 1px solid var(--r100);  color: var(--r700); }
+        .alert-info{ background: var(--b50);  border: 1px solid var(--b200);  color: var(--b700); }
+        .alert-warn{ background: var(--y50);  border: 1px solid var(--y200);  color: var(--y700); }
+
+        /* ─── LOADING SPINNER ────────────────────────────────── */
+        .loading-wrap { padding: 60px; text-align: center; color: var(--gr400); }
+        .spinner {
+            width: 36px; height: 36px; border-radius: 50%;
+            border: 3px solid var(--gr200); border-top-color: var(--g600);
+            animation: spin 0.7s linear infinite;
+            margin: 0 auto 14px;
+        }
+        @keyframes spin { to { transform: rotate(360deg); } }
+
+        /* ─── ADMIN NOTICE ────────────────────────────────────── */
+        .admin-strip {
+            background: #fefce8;
+            border: 1px solid #fef08a;
+            border-radius: 10px;
+            padding: 10px 16px;
+            font-size: 13px; color: #713f12; font-weight: 600;
+            margin-bottom: 22px;
+        }
+
+        /* ─── EDIT ROW IN TABLE ──────────────────────────────── */
+        .edit-cell-btn {
+            padding: 5px 12px; border-radius: 7px;
+            border: 1.5px solid var(--gr200); background: var(--white);
+            font-family: inherit; font-size: 12px; font-weight: 600;
+            color: var(--gr500); cursor: pointer; transition: all 0.15s;
+        }
+        .edit-cell-btn:hover { background: var(--g50); border-color: var(--g200); color: var(--g700); }
+    </style>
+</head>
+<body>
+
+<!-- ══════════ TOPBAR ══════════ -->
+<div class="topbar">
+    <a href="#" class="brand">
+        <div class="brand-mark">
+            <svg viewBox="0 0 24 24"><path d="M17 8C8 10 5.9 16.17 3.82 21.34L5.71 22l1-2.3A4.49 4.49 0 008 20C19 20 22 3 22 3c-1 2-8 2-13 6 1-2.17 2.64-4.41 8-5z"/></svg>
+        </div>
+        <span class="brand-name">BATA<em>NOX</em></span>
+    </a>
+    <div class="top-spacer"></div>
+    <a href="/" class="back-btn" id="backBtn">← Back to Dashboard</a>
+</div>
+
+<!-- ══════════ PAGE ══════════ -->
+<div class="page">
+    <div class="container">
+
+        <!-- Loading state -->
+        <div id="pageLoader">
+            <div class="loading-wrap">
+                <div class="spinner"></div>
+                <div>Loading treatment log…</div>
+            </div>
+        </div>
+
+        <!-- Loaded content -->
+        <div id="pageContent" style="display:none;">
+
+            <!-- ── HERO ─────────────────────────────────────── -->
+            <div class="hero">
+                <div class="hero-pill">🌿 Treatment Log</div>
+                <h1 id="heroTitle">Treatment Log</h1>
+                <div class="hero-sub" id="heroSub"></div>
+                <div class="hero-meta" id="heroMeta"></div>
+            </div>
+
+            <!-- ── DETAIL OVERVIEW CARD ─────────────────────── -->
+            <div class="card">
+                <div class="card-head">
+                    <div class="card-head-left">
+                        <span class="c-ico">📋</span>
+                        <div>
+                            <h2>Detection Summary</h2>
+                            <p>Key information about this plant detection record</p>
+                        </div>
+                    </div>
+                    <div id="statusBadge"></div>
+                </div>
+                <div class="card-body">
+                    <div class="detail-grid" id="detailGrid"></div>
+                </div>
+            </div>
+
+            <!-- ── META TOGGLES CARD ─────────────────────────── -->
+            <div class="card" id="metaCard">
+                <div class="card-head">
+                    <div class="card-head-left">
+                        <span class="c-ico">⚙️</span>
+                        <div>
+                            <h2>Record Settings</h2>
+                            <p>Update key flags for this detection record</p>
+                        </div>
+                    </div>
+                    <button class="btn-outline" onclick="saveMeta()" id="metaSaveBtn">
+                        💾 Save Changes
+                    </button>
+                </div>
+                <div class="card-body">
+                    <div style="display:flex; flex-direction:column; gap:18px;">
+
+                        <!-- Disease Detected -->
+                        <div class="detail-field">
+                            <div class="toggle-row">
+                                <div>
+                                    <div class="toggle-label">🦠 Disease Detected</div>
+                                    <div class="toggle-desc">Was a disease found in this scan?</div>
+                                </div>
+                                <div class="toggle-wrap">
+                                    <span class="toggle-text" id="ddText">–</span>
+                                    <label class="toggle-switch">
+                                        <input type="checkbox" id="toggleDD" onchange="updateToggleText('dd')">
+                                        <span class="toggle-slider"></span>
+                                    </label>
+                                </div>
+                            </div>
+                        </div>
+
+                        <!-- Agri Office Contacted -->
+                        <div class="detail-field">
+                            <div class="toggle-row">
+                                <div>
+                                    <div class="toggle-label">🏛️ Local Agriculture Office Contacted</div>
+                                    <div class="toggle-desc">Have you reported this to your local agriculture office?</div>
+                                </div>
+                                <div class="toggle-wrap">
+                                    <span class="toggle-text" id="agriText">–</span>
+                                    <label class="toggle-switch">
+                                        <input type="checkbox" id="toggleAgri" onchange="updateToggleText('agri')">
+                                        <span class="toggle-slider"></span>
+                                    </label>
+                                </div>
+                            </div>
+                        </div>
+
+                        <!-- Treatment Status -->
+                        <div class="detail-field" id="statusField">
+                            <div class="toggle-row">
+                                <div>
+                                    <div class="toggle-label">📊 Treatment Status</div>
+                                    <div class="toggle-desc">Current progress of treatment (only if disease detected)</div>
+                                </div>
+                                <div>
+                                    <select class="f-select" id="statusSelect" style="min-width:170px;">
+                                        <option value="detected">🔴 Detected</option>
+                                        <option value="in_progress">🔵 In Progress</option>
+                                        <option value="recovered">🟢 Recovered</option>
+                                    </select>
+                                </div>
+                            </div>
+                        </div>
+
+                    </div>
+                </div>
+            </div>
+
+            <!-- ── PROGRESS SUMMARY ──────────────────────────── -->
+            <div class="progress-summary" id="progressSummary" style="display:none;"></div>
+
+            <!-- ── WEEKLY TRACKING TABLE ─────────────────────── -->
+            <div class="card" id="weekTableCard" style="display:none;">
+                <div class="card-head">
+                    <div class="card-head-left">
+                        <span class="c-ico">📅</span>
+                        <div>
+                            <h2>Weekly Treatment Tracking</h2>
+                            <p>Monitor your plant's weekly recovery progress</p>
+                        </div>
+                    </div>
+                </div>
+                <div id="weekTableWrap">
+                    <div class="empty-msg">
+                        <div class="e-ico">📊</div>
+                        <div class="e-ttl">No weekly entries yet</div>
+                        <div class="e-sub">Add your first weekly log entry below.</div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- ── ADD/EDIT WEEK FORM ─────────────────────────── -->
+            <div class="card" id="addWeekCard" style="display:none;">
+                <div class="card-head">
+                    <div class="card-head-left">
+                        <span class="c-ico">➕</span>
+                        <div>
+                            <h2 id="addWeekTitle">Add Weekly Entry</h2>
+                            <p>Log this week's plant condition and treatment progress</p>
+                        </div>
+                    </div>
+                </div>
+                <div class="card-body">
+                    <div id="weekFormMsg"></div>
+
+                    <div class="form-grid">
+                        <!-- Week Number -->
+                        <div class="form-group">
+                            <label class="f-label">Week Number</label>
+                            <input type="number" class="f-input" id="fWeekNum"
+                                   min="1" max="52" placeholder="e.g. 1">
+                        </div>
+
+                        <!-- Severity Level -->
+                        <div class="form-group">
+                            <label class="f-label">Severity Level</label>
+                            <select class="f-select" id="fSeverity">
+                                <option value="Critical">🔴 Critical</option>
+                                <option value="High">🟠 High</option>
+                                <option value="Moderate" selected>🟡 Moderate</option>
+                                <option value="Low">🟢 Low</option>
+                                <option value="None">✅ None (Recovered)</option>
+                            </select>
+                        </div>
+
+                        <!-- Infected Leaf -->
+                        <div class="form-group">
+                            <label class="f-label">Infected Leaf Present?</label>
+                            <div class="radio-group">
+                                <label class="radio-opt selected-yes" id="infYesOpt">
+                                    <input type="radio" name="infLeaf" value="1" checked> 🍂 Yes
+                                </label>
+                                <label class="radio-opt" id="infNoOpt">
+                                    <input type="radio" name="infLeaf" value="0"> 🌿 No
+                                </label>
+                            </div>
+                        </div>
+
+                        <!-- Improvement -->
+                        <div class="form-group">
+                            <label class="f-label">Improvement Observed?</label>
+                            <div class="radio-group">
+                                <label class="radio-opt" id="impYesOpt">
+                                    <input type="radio" name="improve" value="1"> ✅ Yes
+                                </label>
+                                <label class="radio-opt" id="impNoOpt">
+                                    <input type="radio" name="improve" value="0"> ❌ No
+                                </label>
+                                <label class="radio-opt selected-na" id="impNaOpt">
+                                    <input type="radio" name="improve" value="na" checked> – N/A
+                                </label>
+                            </div>
+                        </div>
+
+                        <!-- Recovery % -->
+                        <div class="form-group full">
+                            <label class="f-label">Estimated Recovery %</label>
+                            <div class="slider-wrap">
+                                <input type="range" id="fRecovery" min="0" max="100" value="0"
+                                       oninput="document.getElementById('fRecVal').textContent = this.value + '%'">
+                                <span class="slider-val" id="fRecVal">0%</span>
+                            </div>
+                        </div>
+
+                        <!-- Notes -->
+                        <div class="form-group full">
+                            <label class="f-label">Notes / Observations</label>
+                            <textarea class="f-textarea" id="fNotes"
+                                      placeholder="e.g. Applied copper fungicide on Monday. Lower leaves showing improvement. Top leaves still showing spots..."></textarea>
+                        </div>
+                    </div>
+
+                    <div class="btn-row">
+                        <button class="btn-green" onclick="saveWeekEntry()" id="saveWeekBtn">
+                            💾 Save Weekly Entry
+                        </button>
+                        <button class="btn-outline" onclick="resetWeekForm()" id="cancelEditBtn" style="display:none;">
+                            ✕ Cancel Edit
+                        </button>
+                    </div>
+                </div>
+            </div>
+
+            <!-- ── TREATMENT PLAN CARD ────────────────────────── -->
+            <div class="card" id="treatPlanCard" style="display:none;">
+                <div class="card-head">
+                    <div class="card-head-left">
+                        <span class="c-ico">💊</span>
+                        <div>
+                            <h2>Recommended Treatment Plan</h2>
+                            <p>AI-generated guidance for this disease</p>
+                        </div>
+                    </div>
+                </div>
+                <div class="card-body">
+                    <div style="background:var(--y50);border:1.5px solid var(--y200);border-radius:12px;padding:18px 22px;">
+                        <div style="font-size:12px;font-weight:700;text-transform:uppercase;letter-spacing:0.8px;color:var(--y700);margin-bottom:8px;">Treatment Recommendation</div>
+                        <div style="font-size:14px;color:var(--gr700);line-height:1.7;" id="treatPlanText"></div>
+                    </div>
+                    <div style="margin-top:14px;font-size:13px;color:var(--gr500);display:flex;align-items:center;gap:7px;">
+                        <span>⏱</span>
+                        <span id="estDaysText"></span>
+                    </div>
+                </div>
+            </div>
+
+        </div><!-- /pageContent -->
+    </div><!-- /container -->
+</div><!-- /page -->
+
+<!-- ── TOAST ─────────────────────────────────────────────────── -->
+<div class="toast" id="toast"></div>
+
+<script>
+(function () {
+    'use strict';
+
+    /* ── Helpers ─────────────────────────────────────────── */
+    function esc(s) {
+        return String(s ?? '').replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;');
+    }
+    function fmt(d) {
+        if (!d) return '—';
+        var dt = new Date(d.replace(' ', 'T'));
+        return dt.toLocaleDateString('en-GB', { day:'2-digit', month:'short', year:'numeric' });
+    }
+    function showToast(msg, cls) {
+        var t = document.getElementById('toast');
+        t.textContent = msg;
+        t.className = 'toast ' + cls;
+        t.classList.add('show');
+        setTimeout(function () { t.classList.remove('show'); }, 3000);
+    }
+
+    /* ── State ───────────────────────────────────────────── */
+    var recordId  = null;
+    var record    = null;
+    var weeks     = [];
+    var editingWeek = null; // week_number being edited, or null
+
+    /* ── Read record_id from URL ─────────────────────────── */
+    var params = new URLSearchParams(window.location.search);
+    recordId   = parseInt(params.get('record_id') || '0', 10);
+
+    if (!recordId) {
+        document.getElementById('pageLoader').innerHTML =
+            '<div class="alert alert-err" style="margin:40px 28px;">⚠ No record_id specified in the URL. '
+            + 'Please open this page from the Activity Log in your dashboard.</div>';
+        document.getElementById('pageLoader').style.display = 'block';
+        return;
+    }
+
+    /* ── Determine API base ──────────────────────────────── */
+    // If loaded via Flask (:5000) use /api/... proxies
+    // If loaded directly from WAMP (:80) call PHP files directly
+    function apiGet(path) {
+        return fetch(path, { credentials: 'include' }).then(function (r) { return r.json(); });
+    }
+    function apiPost(path, body) {
+        return fetch(path, {
+            method: 'POST', credentials: 'include',
+            headers: { 'Content-Type': 'application/json' },
+            body: JSON.stringify(body)
+        }).then(function (r) { return r.json(); });
+    }
+
+    /* ── Load record + weeks ─────────────────────────────── */
+    function loadData() {
+        document.getElementById('pageLoader').style.display = 'block';
+        document.getElementById('pageContent').style.display = 'none';
+
+        apiGet('/api/treatment_log?record_id=' + recordId)
+            .then(function (d) {
+                if (!d.success) {
+                    document.getElementById('pageLoader').innerHTML =
+                        '<div class="alert alert-err" style="margin:40px 28px;">❌ ' + esc(d.error || 'Failed to load record.') + '</div>';
+                    return;
+                }
+                record = d.record;
+                weeks  = d.weeks || [];
+                renderPage();
+                document.getElementById('pageLoader').style.display = 'none';
+                document.getElementById('pageContent').style.display = 'block';
+            })
+            .catch(function (err) {
+                document.getElementById('pageLoader').innerHTML =
+                    '<div class="alert alert-err" style="margin:40px 28px;">⚠ Could not reach server. Make sure WAMP is running.<br><small>' + err + '</small></div>';
+            });
+    }
+
+    /* ── Render page ─────────────────────────────────────── */
+    function renderPage() {
+        var healthy = record.disease_detected === 0 ||
+                      (record.disease_name || '').toLowerCase().indexOf('healthy') !== -1;
+
+        /* Hero */
+        document.getElementById('heroTitle').textContent =
+            (record.plant_name || 'Unknown Plant') + ' — Treatment Log';
+        document.getElementById('heroSub').textContent =
+            'Detailed tracking for: ' + (record.disease_name || 'Unknown');
+
+        var ownerMeta = record.is_admin_view && record.owner_name
+            ? '<div class="hero-meta-item"><span>Patient (User)</span>' + esc(record.owner_name) + ' — ' + esc(record.owner_email || '') + '</div>'
+            : '';
+
+        document.getElementById('heroMeta').innerHTML =
+            ownerMeta
+            + '<div class="hero-meta-item"><span>Plant</span>' + esc(record.plant_name || '—') + '</div>'
+            + '<div class="hero-meta-item"><span>Detected</span>' + fmt(record.scanned_at) + '</div>'
+            + '<div class="hero-meta-item"><span>Weeks Logged</span>' + weeks.length + '</div>';
+
+        /* Admin notice banner */
+        var existingBanner = document.getElementById('adminNoticeBanner');
+        if (existingBanner) existingBanner.remove();
+        if (record.is_admin_view) {
+            var banner = document.createElement('div');
+            banner.id = 'adminNoticeBanner';
+            banner.className = 'admin-strip';
+            banner.innerHTML = '🛡 <strong>Admin View:</strong> You are viewing the treatment log for user '
+                + '<strong>' + esc(record.owner_name || 'Unknown') + '</strong>'
+                + ' (' + esc(record.owner_email || '') + ').'
+                + ' Changes you make here will be saved to their record.';
+            document.getElementById('pageContent').insertBefore(
+                banner,
+                document.getElementById('pageContent').querySelector('.card')
+            );
+        }
+
+        /* Status badge */
+        var s = record.status || 'detected';
+        var sLabel = { detected: '🔴 Detected', in_progress: '🔵 In Progress', recovered: '🟢 Recovered' };
+        document.getElementById('statusBadge').innerHTML =
+            '<span class="status-badge sb-' + s + '">' + (sLabel[s] || s) + '</span>';
+
+        /* Detail grid */
+        var dg = document.getElementById('detailGrid');
+        dg.innerHTML =
+            '<div class="detail-field"><div class="df-label">Plant Name</div>'
+            + '<div class="df-value">🌱 ' + esc(record.plant_name || '—') + '</div></div>'
+
+            + '<div class="detail-field"><div class="df-label">Disease Detected</div>'
+            + '<div class="df-value">'
+            + (healthy
+                ? '<span class="pill pill-green">✅ No — Healthy</span>'
+                : '<span class="pill pill-red">🦠 Yes — ' + esc(record.disease_name) + '</span>')
+            + '</div></div>'
+
+            + '<div class="detail-field"><div class="df-label">Treatment Status</div>'
+            + '<div class="df-value"><span class="status-badge sb-' + s + '">' + (sLabel[s] || s) + '</span></div></div>'
+
+            + '<div class="detail-field"><div class="df-label">Agriculture Office Contacted</div>'
+            + '<div class="df-value">'
+            + (record.agri_contacted
+                ? '<span class="pill pill-green">✅ Yes</span>'
+                : '<span class="pill pill-gray">❌ No</span>')
+            + '</div></div>'
+
+            + '<div class="detail-field"><div class="df-label">Scan Date</div>'
+            + '<div class="df-value small">' + fmt(record.scanned_at) + '</div></div>'
+
+            + '<div class="detail-field"><div class="df-label">Est. Recovery Days</div>'
+            + '<div class="df-value small">'
+            + (record.estimated_days ? '⏱ ~' + record.estimated_days + ' days' : '—')
+            + '</div></div>'
+
+            + (record.is_admin_view && record.owner_name
+                ? '<div class="detail-field full"><div class="df-label">Record Owner</div>'
+                  + '<div class="df-value small">👤 ' + esc(record.owner_name) + ' &nbsp;·&nbsp; ' + esc(record.owner_email || '') + '</div></div>'
+                : '');
+
+        /* Meta toggles */
+        var dd   = document.getElementById('toggleDD');
+        var agri = document.getElementById('toggleAgri');
+        dd.checked   = record.disease_detected === 1;
+        agri.checked = record.agri_contacted === 1;
+        updateToggleText('dd');
+        updateToggleText('agri');
+
+        /* Status select */
+        document.getElementById('statusSelect').value = s;
+
+        /* Hide status select for healthy plants */
+        document.getElementById('statusField').style.display = healthy ? 'none' : '';
+
+        /* Weekly table + add form — only show if disease detected */
+        if (!healthy) {
+            renderProgressSummary();
+            renderWeekTable();
+            document.getElementById('progressSummary').style.display = 'grid';
+            document.getElementById('weekTableCard').style.display   = '';
+            document.getElementById('addWeekCard').style.display     = '';
+
+            /* Pre-fill next week number */
+            var nextWeek = weeks.length > 0
+                ? Math.max.apply(null, weeks.map(function (w) { return w.week_number; })) + 1
+                : 1;
+            document.getElementById('fWeekNum').value = nextWeek;
+        }
+
+        /* Treatment plan */
+        if (record.treatment && !healthy) {
+            document.getElementById('treatPlanCard').style.display = '';
+            document.getElementById('treatPlanText').textContent = record.treatment;
+            document.getElementById('estDaysText').textContent =
+                record.estimated_days
+                ? 'Estimated recovery: approximately ' + record.estimated_days + ' days with proper treatment.'
+                : 'Follow treatment guidelines and monitor weekly.';
+        }
+    }
+
+    /* ── Render progress summary ─────────────────────────── */
+    function renderProgressSummary() {
+        var totalWeeks = weeks.length;
+        var improved   = weeks.filter(function (w) { return w.improvement === 1; }).length;
+        var lastRec    = weeks.length > 0
+            ? (weeks[weeks.length - 1].recovery_pct || 0)
+            : 0;
+
+        document.getElementById('progressSummary').innerHTML =
+            '<div class="ps-card"><div class="ps-num">' + totalWeeks + '</div><div class="ps-lbl">Weeks Tracked</div></div>'
+            + '<div class="ps-card"><div class="ps-num" style="color:var(--g700);">' + improved + '</div><div class="ps-lbl">Weeks with Improvement</div></div>'
+            + '<div class="ps-card"><div class="ps-num" style="color:var(--b700);">' + lastRec + '%</div><div class="ps-lbl">Latest Recovery %</div></div>';
+    }
+
+    /* ── Render weekly table ─────────────────────────────── */
+    function renderWeekTable() {
+        var wrap = document.getElementById('weekTableWrap');
+
+        if (weeks.length === 0) {
+            wrap.innerHTML =
+                '<div class="empty-msg"><div class="e-ico">📊</div>'
+                + '<div class="e-ttl">No weekly entries yet</div>'
+                + '<div class="e-sub">Add your first weekly log entry below to start tracking.</div></div>';
+            return;
+        }
+
+        var sevClass = {
+            'None': 'pill sev-none', 'Low': 'pill sev-low',
+            'Moderate': 'pill sev-moderate', 'High': 'pill sev-high',
+            'Critical': 'pill sev-critical'
+        };
+
+        var rows = weeks.map(function (w) {
+            var infCell = w.infected_leaf
+                ? '<span class="yes-chip">🍂 Yes</span>'
+                : '<span class="no-chip">✅ No</span>';
+
+            var impCell;
+            if (w.improvement === null || w.improvement === undefined) {
+                impCell = '<span class="na-chip">—</span>';
+            } else {
+                impCell = w.improvement
+                    ? '<span class="no-chip">✅ Yes</span>'
+                    : '<span class="yes-chip">❌ No</span>';
+            }
+
+            var sev = w.severity_level || 'Moderate';
+            var sevBadge = '<span class="' + (sevClass[sev] || 'pill pill-gray') + '">' + esc(sev) + '</span>';
+
+            var recBar = w.recovery_pct !== null && w.recovery_pct !== undefined
+                ? '<div class="rec-bar-wrap">'
+                  + '<div class="rec-bar-bg"><div class="rec-bar-fill" style="width:' + w.recovery_pct + '%"></div></div>'
+                  + '<div class="rec-pct">' + w.recovery_pct + '%</div></div>'
+                : '<span class="na-chip">—</span>';
+
+            var noteCell = w.notes
+                ? '<div class="note-text">' + esc(w.notes) + '</div>'
+                : '<span class="na-chip">—</span>';
+
+            return '<tr>'
+                + '<td><div class="week-num">' + w.week_number + '</div></td>'
+                + '<td>' + infCell + '</td>'
+                + '<td>' + impCell + '</td>'
+                + '<td>' + sevBadge + '</td>'
+                + '<td>' + recBar + '</td>'
+                + '<td>' + noteCell + '</td>'
+                + '<td><button class="edit-cell-btn" onclick="editWeek(' + w.week_number + ')">✏ Edit</button></td>'
+                + '</tr>';
+        }).join('');
+
+        wrap.innerHTML =
+            '<div class="week-table-wrap">'
+            + '<table class="week-table">'
+            + '<thead><tr>'
+            + '<th>Week #</th>'
+            + '<th>Infected Leaf</th>'
+            + '<th>Improvement</th>'
+            + '<th>Severity Level</th>'
+            + '<th>Recovery %</th>'
+            + '<th>Notes</th>'
+            + '<th>Action</th>'
+            + '</tr></thead>'
+            + '<tbody>' + rows + '</tbody>'
+            + '</table></div>';
+    }
+
+    /* ── Toggle texts ────────────────────────────────────── */
+    window.updateToggleText = function (which) {
+        if (which === 'dd') {
+            var on = document.getElementById('toggleDD').checked;
+            document.getElementById('ddText').textContent = on ? 'Yes' : 'No';
+            document.getElementById('ddText').style.color = on ? 'var(--r700)' : 'var(--g700)';
+        } else {
+            var on2 = document.getElementById('toggleAgri').checked;
+            document.getElementById('agriText').textContent = on2 ? 'Yes' : 'No';
+            document.getElementById('agriText').style.color = on2 ? 'var(--g700)' : 'var(--gr500)';
+        }
+    };
+
+    /* ── Save meta + status ──────────────────────────────── */
+    window.saveMeta = function () {
+        var btn = document.getElementById('metaSaveBtn');
+        btn.disabled = true;
+        btn.textContent = 'Saving…';
+
+        var dd   = document.getElementById('toggleDD').checked   ? 1 : 0;
+        var agri = document.getElementById('toggleAgri').checked ? 1 : 0;
+        var stat = document.getElementById('statusSelect').value;
+
+        // Save meta flags
+        var metaPayload = {
+            record_id:        recordId,
+            disease_detected: dd,
+            agri_contacted:   agri
+        };
+
+        // Also update status via update_status.php
+        var statusPayload = { record_id: recordId, status: stat };
+
+        var metaPath   = '/api/treatment_log';
+        var statusPath = '/api/update_status';
+
+        Promise.all([
+            fetch(metaPath, {
+                method: 'POST', credentials: 'include',
+                headers: { 'Content-Type': 'application/json' },
+                body: JSON.stringify(metaPayload)
+            }).then(function (r) { return r.json(); }),
+            fetch(statusPath, {
+                method: 'POST', credentials: 'include',
+                headers: { 'Content-Type': 'application/json' },
+                body: JSON.stringify(statusPayload)
+            }).then(function (r) { return r.json(); })
+        ]).then(function (results) {
+            var ok = results.every(function (r) { return r.success; });
+            if (ok) {
+                // Update local record
+                record.disease_detected = dd;
+                record.agri_contacted   = agri;
+                record.status           = stat;
+                showToast('✅ Record settings saved!', 'toast-ok');
+                // Re-render detail grid to reflect new values
+                renderPage();
+            } else {
+                var err = results.map(function (r) { return r.error || ''; }).filter(Boolean).join(' | ');
+                showToast('❌ ' + (err || 'Save failed'), 'toast-err');
+            }
+        }).catch(function () {
+            showToast('❌ Network error. Make sure WAMP is running.', 'toast-err');
+        }).finally(function () {
+            btn.disabled = false;
+            btn.textContent = '💾 Save Changes';
+        });
+    };
+
+    /* ── Radio group helpers ─────────────────────────────── */
+    document.querySelectorAll('input[name="infLeaf"]').forEach(function (r) {
+        r.addEventListener('change', function () {
+            document.getElementById('infYesOpt').className = 'radio-opt';
+            document.getElementById('infNoOpt').className  = 'radio-opt';
+            if (this.value === '1') {
+                document.getElementById('infYesOpt').className = 'radio-opt selected-yes';
+            } else {
+                document.getElementById('infNoOpt').className  = 'radio-opt selected-no';
+            }
+        });
+    });
+    document.querySelectorAll('input[name="improve"]').forEach(function (r) {
+        r.addEventListener('change', function () {
+            document.getElementById('impYesOpt').className = 'radio-opt';
+            document.getElementById('impNoOpt').className  = 'radio-opt';
+            document.getElementById('impNaOpt').className  = 'radio-opt';
+            if (this.value === '1')  document.getElementById('impYesOpt').className = 'radio-opt selected-yes';
+            if (this.value === '0')  document.getElementById('impNoOpt').className  = 'radio-opt selected-no';
+            if (this.value === 'na') document.getElementById('impNaOpt').className  = 'radio-opt selected-na';
+        });
+    });
+
+    /* ── Edit a week ─────────────────────────────────────── */
+    window.editWeek = function (weekNum) {
+        var w = weeks.find(function (x) { return x.week_number === weekNum; });
+        if (!w) return;
+        editingWeek = weekNum;
+
+        document.getElementById('addWeekTitle').textContent = 'Edit Week ' + weekNum + ' Entry';
+        document.getElementById('fWeekNum').value = weekNum;
+        document.getElementById('fSeverity').value = w.severity_level || 'Moderate';
+        document.getElementById('fNotes').value = w.notes || '';
+
+        var rec = w.recovery_pct !== null && w.recovery_pct !== undefined ? w.recovery_pct : 0;
+        document.getElementById('fRecovery').value = rec;
+        document.getElementById('fRecVal').textContent = rec + '%';
+
+        // Infected leaf
+        document.querySelectorAll('input[name="infLeaf"]').forEach(function (r) {
+            r.checked = (String(r.value) === String(w.infected_leaf));
+            if (r.checked) r.dispatchEvent(new Event('change'));
+        });
+
+        // Improvement
+        var impVal = (w.improvement === null || w.improvement === undefined) ? 'na' : String(w.improvement);
+        document.querySelectorAll('input[name="improve"]').forEach(function (r) {
+            r.checked = (r.value === impVal);
+            if (r.checked) r.dispatchEvent(new Event('change'));
+        });
+
+        document.getElementById('cancelEditBtn').style.display = '';
+        document.getElementById('saveWeekBtn').textContent = '💾 Update Week ' + weekNum;
+
+        // Scroll to form
+        document.getElementById('addWeekCard').scrollIntoView({ behavior: 'smooth', block: 'start' });
+    };
+
+    /* ── Reset form ──────────────────────────────────────── */
+    window.resetWeekForm = function () {
+        editingWeek = null;
+        document.getElementById('addWeekTitle').textContent = 'Add Weekly Entry';
+        document.getElementById('fNotes').value = '';
+        document.getElementById('fRecovery').value = 0;
+        document.getElementById('fRecVal').textContent = '0%';
+        document.getElementById('fSeverity').value = 'Moderate';
+        document.getElementById('fWeekNum').value =
+            weeks.length > 0
+            ? Math.max.apply(null, weeks.map(function (w) { return w.week_number; })) + 1
+            : 1;
+
+        // Reset radios
+        document.querySelector('input[name="infLeaf"][value="1"]').checked = true;
+        document.getElementById('infYesOpt').className = 'radio-opt selected-yes';
+        document.getElementById('infNoOpt').className  = 'radio-opt';
+
+        document.querySelector('input[name="improve"][value="na"]').checked = true;
+        document.getElementById('impYesOpt').className = 'radio-opt';
+        document.getElementById('impNoOpt').className  = 'radio-opt';
+        document.getElementById('impNaOpt').className  = 'radio-opt selected-na';
+
+        document.getElementById('cancelEditBtn').style.display = 'none';
+        document.getElementById('saveWeekBtn').textContent = '💾 Save Weekly Entry';
+        document.getElementById('weekFormMsg').innerHTML = '';
+    };
+
+    /* ── Save week entry ─────────────────────────────────── */
+    window.saveWeekEntry = function () {
+        var btn = document.getElementById('saveWeekBtn');
+        var msgEl = document.getElementById('weekFormMsg');
+
+        var weekNum  = parseInt(document.getElementById('fWeekNum').value, 10);
+        var severity = document.getElementById('fSeverity').value;
+        var notes    = document.getElementById('fNotes').value.trim();
+        var recPct   = parseInt(document.getElementById('fRecovery').value, 10);
+
+        var infChecked = document.querySelector('input[name="infLeaf"]:checked');
+        var impChecked = document.querySelector('input[name="improve"]:checked');
+
+        if (!weekNum || weekNum < 1) {
+            msgEl.innerHTML = '<div class="alert alert-err">⚠ Please enter a valid week number.</div>';
+            return;
+        }
+
+        // Check duplicate (if adding, not editing)
+        if (!editingWeek) {
+            var existing = weeks.find(function (w) { return w.week_number === weekNum; });
+            if (existing) {
+                msgEl.innerHTML = '<div class="alert alert-warn">⚠ Week ' + weekNum + ' already has an entry. '
+                    + 'Click the ✏ Edit button in the table to update it.</div>';
+                return;
+            }
+        }
+
+        var infLeaf    = infChecked ? parseInt(infChecked.value, 10) : 1;
+        var impRaw     = impChecked ? impChecked.value : 'na';
+        var improvement = impRaw === 'na' ? null : parseInt(impRaw, 10);
+
+        var payload = {
+            record_id: recordId,
+            week: {
+                week_number:   weekNum,
+                infected_leaf: infLeaf,
+                improvement:   improvement,
+                severity_level: severity,
+                recovery_pct:  recPct,
+                notes:         notes || null
+            }
+        };
+
+        btn.disabled = true;
+        btn.textContent = 'Saving…';
+        msgEl.innerHTML = '';
+
+        fetch('/api/treatment_log', {
+            method: 'POST', credentials: 'include',
+            headers: { 'Content-Type': 'application/json' },
+            body: JSON.stringify(payload)
+        })
+        .then(function (r) { return r.json(); })
+        .then(function (d) {
+            if (d.success) {
+                showToast('✅ Week ' + weekNum + ' entry saved!', 'toast-ok');
+
+                // Update local data
+                var idx = weeks.findIndex(function (w) { return w.week_number === weekNum; });
+                var newRow = {
+                    id: d.week_id, week_number: weekNum,
+                    infected_leaf: infLeaf, improvement: improvement,
+                    severity_level: severity, recovery_pct: recPct,
+                    notes: notes || null, logged_at: new Date().toISOString()
+                };
+                if (idx >= 0) weeks[idx] = newRow;
+                else weeks.push(newRow);
+                weeks.sort(function (a, b) { return a.week_number - b.week_number; });
+
+                renderProgressSummary();
+                renderWeekTable();
+                resetWeekForm();
+            } else {
+                msgEl.innerHTML = '<div class="alert alert-err">❌ ' + esc(d.error || 'Save failed.') + '</div>';
+            }
+        })
+        .catch(function () {
+            msgEl.innerHTML = '<div class="alert alert-err">❌ Network error. Make sure WAMP is running.</div>';
+        })
+        .finally(function () {
+            btn.disabled = false;
+            btn.textContent = editingWeek
+                ? '💾 Update Week ' + editingWeek
+                : '💾 Save Weekly Entry';
+        });
+    };
+
+    /* ── Back button ─────────────────────────────────────── */
+    document.getElementById('backBtn').addEventListener('click', function (e) {
+        e.preventDefault();
+        // Try to go back; fallback to dashboard
+        if (history.length > 1) {
+            history.back();
+        } else {
+            window.location.href = '/';
+        }
+    });
+
+    /* ── Bootstrap ───────────────────────────────────────── */
+    loadData();
+})();
+</script>
+</body>
+</html>
