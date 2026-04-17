@@ -4,30 +4,20 @@
  *
  * Role-based redirect after login:
  *   admin  →  admin.php
- *   user   →  http://localhost:5000/
- *
- * Session keys written:
- *   $_SESSION['user_id']   int
- *   $_SESSION['user_name'] string
- *   $_SESSION['name']      string  (alias)
- *   $_SESSION['role']      'user'|'admin'
- *   $_SESSION['user_role'] 'user'|'admin'  (legacy compat)
+ *   user   →  welcome.php
  */
 
 session_start();
 require_once __DIR__ . '/db_config.php';
 
-// ── Already logged in → send to right place ──────────────────────────────────
 if (isset($_SESSION['user_id'])) {
     $role = $_SESSION['role'] ?? $_SESSION['user_role'] ?? 'user';
-    // Admins skip welcome screen; regular users see it
     header('Location: ' . ($role === 'admin' ? 'admin.php' : 'welcome.php'));
     exit;
 }
 
 $error = '';
 
-// ── Handle POST ───────────────────────────────────────────────────────────────
 if ($_SERVER['REQUEST_METHOD'] === 'POST') {
 
     $email    = trim($_POST['email']    ?? '');
@@ -53,7 +43,6 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
         if (!$error) {
             if ($user && password_verify($password, $user['password'])) {
 
-                // ── Valid credentials ─────────────────────────────────────
                 session_regenerate_id(true);
 
                 $_SESSION['user_id']   = (int)    $user['id'];
@@ -62,17 +51,14 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
                 $_SESSION['role']      = (string) $user['role'];
                 $_SESSION['user_role'] = (string) $user['role'];
 
-                // ── Role-based redirect ───────────────────────────────────
                 if ($user['role'] === 'admin') {
                     header('Location: admin.php');
                 } else {
-                    // Regular users see the Plant Tips Welcome Screen first
                     header('Location: welcome.php');
                 }
                 exit;
 
             } else {
-                // Separate messages help distinguish "wrong password" vs "no account"
                 $error = $user
                     ? 'Incorrect password. Please try again.'
                     : 'No account found with that email address.';
@@ -111,19 +97,21 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
             box-shadow: 0 8px 40px rgba(0,0,0,0.07);
         }
         .brand { display: flex; align-items: center; gap: 10px; justify-content: center; margin-bottom: 32px; }
-        .brand-mark {
-            width: 42px; height: 42px; border-radius: 12px;
-            background: linear-gradient(135deg, var(--g700), var(--g500));
-            display: flex; align-items: center; justify-content: center;
-            box-shadow: 0 4px 14px rgba(22,163,74,0.3);
-        }
-        .brand-mark svg { width: 22px; height: 22px; fill: white; }
         .brand-name { font-size: 24px; font-weight: 800; letter-spacing: -0.5px; color: var(--gr900); }
         .brand-name em { font-style: normal; color: var(--g600); }
         .heading { font-size: 22px; font-weight: 800; color: var(--gr900); text-align: center; margin-bottom: 6px; }
         .sub     { font-size: 14px; color: var(--gr500); text-align: center; margin-bottom: 28px; }
         .field       { margin-bottom: 18px; }
         .field label { display: block; font-size: 13px; font-weight: 600; color: var(--gr700); margin-bottom: 7px; }
+
+        /* Label row — label left, forgot right */
+        .field-label-row {
+            display: flex; justify-content: space-between; align-items: center; margin-bottom: 7px;
+        }
+        .field-label-row label { font-size: 13px; font-weight: 600; color: var(--gr700); }
+        .forgot-link { font-size: 12px; font-weight: 600; color: var(--g600); text-decoration: none; }
+        .forgot-link:hover { text-decoration: underline; }
+
         .field input {
             width: 100%; padding: 12px 16px;
             border: 1.5px solid var(--gr300); border-radius: 10px;
@@ -166,13 +154,8 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
 <body>
 <div class="card">
 
-    <div class="brand" >
+    <div class="brand">
         <img src="templates/app logo 01.png" alt="" width="40" height="50">
-        <!-- <div class="brand-mark">
-             <svg viewBox="0 0 24 24">
-                <path d="M17 8C8 10 5.9 16.17 3.82 21.34L5.71 22l1-2.3A4.49 4.49 0 008 20C19 20 22 3 22 3c-1 2-8 2-13 6 1-2.17 2.64-4.41 8-5z"/>
-            </svg> 
-        </div> -->
         <span class="brand-name">BATA<em>NOX</em></span>
     </div>
 
@@ -194,12 +177,18 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
                    value="<?= htmlspecialchars($_POST['email'] ?? '') ?>"
                    required autocomplete="email">
         </div>
+
+        <!-- Password field with "Forgot Password?" link -->
         <div class="field">
-            <label for="password">Password</label>
+            <div class="field-label-row">
+                <label for="password">Password</label>
+                <a href="forgot_password.php" class="forgot-link">Forgot password?</a>
+            </div>
             <input type="password" id="password" name="password"
                    placeholder="Enter your password"
                    required autocomplete="current-password">
         </div>
+
         <button type="submit" class="btn-submit">Sign In →</button>
     </form>
 
