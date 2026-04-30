@@ -314,7 +314,8 @@ try {
             'scanned_at'    => (string)($ur['scanned_at'] ?? ''),
         ];
     }
-    $user_records_json = json_encode($urmap, JSON_HEX_TAG | JSON_HEX_APOS | JSON_HEX_QUOT);
+   $user_records_json = json_encode($urmap, JSON_HEX_TAG | JSON_HEX_APOS | JSON_HEX_QUOT | JSON_HEX_AMP);
+   if ($user_records_json === false) { $user_records_json = "{}"; }
 } catch (PDOException $e) { $user_records_json = '{}'; }
 
 // ══════════════════════════════════════════════════════════════════════════════
@@ -382,6 +383,72 @@ $plant_opts = [];
 if ($has_plant) { try { $plant_opts = $pdo->query("SELECT DISTINCT plant_name FROM disease_records WHERE plant_name IS NOT NULL AND TRIM(plant_name)!='' ORDER BY plant_name")->fetchAll(PDO::FETCH_COLUMN); } catch (PDOException $e) {} }
 $user_opts = [];
 try { $user_opts = $pdo->query("SELECT DISTINCT name FROM users WHERE role='user' ORDER BY name")->fetchAll(PDO::FETCH_COLUMN); } catch (PDOException $e) {}
+
+// ══════════════════════════════════════════════════════════════════════════════
+//  ORDERS DATA  — medicine_orders + medicine_order_items
+// ══════════════════════════════════════════════════════════════════════════════
+$orders_exist = false;
+try {
+    $pdo->query("SELECT 1 FROM medicine_orders LIMIT 1");
+    $orders_exist = true;
+} catch (PDOException $e) { $orders_exist = false; }
+
+$all_orders   = [];
+$ttl_orders   = 0;
+$ttl_pending  = 0;
+$ttl_revenue  = 0.0;
+$orders_today = 0;
+
+if ($orders_exist) {
+    try {
+        $ttl_orders  = (int)$pdo->query("SELECT COUNT(*) FROM medicine_orders")->fetchColumn();
+        $ttl_pending = (int)$pdo->query("SELECT COUNT(*) FROM medicine_orders WHERE status='pending'")->fetchColumn();
+        $ttl_revenue = (float)$pdo->query("SELECT COALESCE(SUM(total_price),0) FROM medicine_orders WHERE status!='cancelled'")->fetchColumn();
+        $orders_today= (int)$pdo->query("SELECT COUNT(*) FROM medicine_orders WHERE DATE(ordered_at)=CURDATE()")->fetchColumn();
+    } catch (PDOException $e) {}
+
+    // Update status action
+    if ($sec === 'orders' && isset($_GET['order_status'], $_GET['oid'])) {
+        $allowed_st = ['pending','confirmed','shipped','delivered','cancelled'];
+        $new_st = $_GET['order_status'];
+        if (in_array($new_st, $allowed_st)) {
+            try { $pdo->prepare("UPDATE medicine_orders SET status=? WHERE id=?")->execute([$new_st, (int)$_GET['oid']]); }
+            catch (PDOException $e) {}
+        }
+        header("Location: admin.php?section=orders&flash=order_updated"); exit;
+    }
+
+    // Fetch orders with item details
+    $ord_fstat = trim($_GET['ord_fstat'] ?? '');
+    $ord_q     = trim($_GET['ord_q']     ?? '');
+    $ord_wp = ['1=1']; $ord_bp = [];
+    if ($ord_fstat !== '') { $ord_wp[] = 'o.status=?'; $ord_bp[] = $ord_fstat; }
+    if ($ord_q     !== '') { $lk2='%'.$ord_q.'%'; $ord_wp[]='(o.user_name LIKE ? OR o.user_email LIKE ?)'; $ord_bp[]=$lk2; $ord_bp[]=$lk2; }
+    $ord_wsql = implode(' AND ', $ord_wp);
+
+    try {
+        $all_orders = $pdo->prepare("
+            SELECT o.id, o.user_id, o.user_name, o.user_email,
+                   o.total_price, o.item_count, o.status, o.admin_note, o.ordered_at
+            FROM medicine_orders o
+            WHERE $ord_wsql
+            ORDER BY o.ordered_at DESC LIMIT 500
+        ");
+        $all_orders->execute($ord_bp);
+        $all_orders = $all_orders->fetchAll(PDO::FETCH_ASSOC);
+    } catch (PDOException $e) { $all_orders = []; }
+
+    // Fetch all items (for order detail popup)
+    $order_items_map = [];
+    try {
+        $oi = $pdo->query("SELECT * FROM medicine_order_items ORDER BY order_id, id");
+        foreach ($oi->fetchAll(PDO::FETCH_ASSOC) as $oi_row) {
+            $order_items_map[(int)$oi_row['order_id']][] = $oi_row;
+        }
+    } catch (PDOException $e) {}
+}
+
+$flash_msgs['order_updated'] = ['type'=>'ok', 'text'=>'✓ Order status updated successfully.'];
 
 // ── Flash message ──────────────────────────────────────────────────────────────
 $flash = $_GET['flash'] ?? '';
@@ -711,6 +778,16 @@ input[type="date"]{min-width:135px}
     </div>
 
     <div class="sb-grp">
+      <div class="sb-grp-lbl">Medicine Store</div>
+      <a href="admin.php?section=orders" class="sb-link <?= $sec==='orders'?'on':'' ?>">
+        <span class="sb-ico">🛒</span> Medicine Orders
+        <?php if ($ttl_pending > 0): ?>
+        <span class="sb-cnt alert"><?= $ttl_pending ?> new</span>
+        <?php endif; ?>
+      </a>
+    </div>
+
+    <div class="sb-grp">
       <div class="sb-grp-lbl">App</div>
       <a href="http://localhost:5000" class="sb-link" target="_blank">
         <span class="sb-ico">🔬</span> User Dashboard
@@ -741,6 +818,7 @@ input[type="date"]{min-width:135px}
         'reports'  => '📅 Reports &amp; Analytics',
         'insights' => '⚡ System Insights',
         'users'    => '👥 User Management',
+        'orders'   => '🛒 Medicine Orders',
         default    => '📊 Admin Dashboard',
       }; ?></h1>
       <p>BATANOX Agricultural Platform &nbsp;·&nbsp; <?= date('D, M j Y · g:i A') ?></p>
@@ -762,7 +840,7 @@ input[type="date"]{min-width:135px}
     <!-- Print header (hidden on screen) -->
     <div class="phdr">
       <h1>🌿 BATANOX — Detection Report</h1>
-      <p>Generated by <?= safeHtml($admin_name) ?> &nbsp;·&nbsp; <?= date('F j, Y  g:i A') ?></p>
+      <p>Generated by <?= safeHtml($admin_name) ?> &nbsp;·&nbsp; <?= date("F j, Y g:i A") ?></p>
     </div>
 
     <?php if ($flash_data): ?>
@@ -1190,7 +1268,6 @@ elseif ($sec === 'reports'): ?>
           <?php foreach ($all_users as $u):
             $uid_key = (int)$u['id'];
             $scan_count = 0;
-            try { $scan_count = (int)$pdo->prepare("SELECT COUNT(*) FROM disease_records WHERE user_id=?")->execute([$uid_key]) ? $pdo->prepare("SELECT COUNT(*) FROM disease_records WHERE user_id=?")->execute([$uid_key]) : 0; } catch(PDOException $e){}
             // Simple inline count approach
             try {
               $sc_stmt = $pdo->prepare("SELECT COUNT(*) FROM disease_records WHERE user_id=?");
@@ -1204,10 +1281,14 @@ elseif ($sec === 'reports'): ?>
               <td style="color:var(--gr500)"><?= safeHtml($u['email']) ?></td>
               <td><span class="chip chip-b"><?= $scan_count ?> scans</span></td>
               <td class="no-print" style="white-space:nowrap">
-                <button class="tbtn" style="background:#eff6ff;color:#1d4ed8"
+                <!-- <button class="tbtn" style="background:#eff6ff;color:#1d4ed8"
                   onclick="openUserReport(<?= $uid_key ?>, <?= json_encode($u['name']) ?>, <?= json_encode($u['email']) ?>)">
                   📋 Preview &amp; Print
-                </button>
+                </button> -->
+                <button class="tbtn" style="background:#eff6ff;color:#1d4ed8"
+    onclick="openUserReport('<?= $uid_key ?>', <?= htmlspecialchars(json_encode($u['name']), ENT_QUOTES) ?>, <?= htmlspecialchars(json_encode($u['email']), ENT_QUOTES) ?>)">
+    📋 Preview &amp; Print
+</button>
                 <a href="admin.php?export=user_csv&uid=<?= $uid_key ?>" target="_blank"
                    class="tbtn" style="background:#dcfce7;color:#15803d">
                   ⬇ Download CSV
@@ -1429,10 +1510,15 @@ elseif ($sec === 'users'): ?>
               <td><span class="chip chip-g" style="font-size:11px"><?= ucfirst($u['role']) ?></span></td>
               <td style="font-size:12px"><?= date('M j, Y', strtotime($u['created_at'])) ?></td>
               <td class="no-print">
-                <button class="tbtn" style="background:#eff6ff;color:#1d4ed8"
+                <!-- <button class="tbtn" style="background:#eff6ff;color:#1d4ed8"
                   onclick="openUserReport(<?= (int)$u['id'] ?>, <?= json_encode($u['name']) ?>, <?= json_encode($u['email']) ?>)">
                   📋 Print Report
-                </button>
+                </button>Version 1 -->
+                <button class="tbtn" style="background:#eff6ff;color:#1d4ed8"
+  onclick="openUserReport(<?= (int)$u['id'] ?>, '<?= addslashes($u['name']) ?>', '<?= addslashes($u['email']) ?>')">
+  📋 Print Report
+</button>
+
                 <a href="admin.php?export=user_csv&uid=<?= (int)$u['id'] ?>" target="_blank"
                    class="tbtn" style="background:#dcfce7;color:#15803d">
                   ⬇ CSV
@@ -1453,7 +1539,226 @@ elseif ($sec === 'users'): ?>
       </div>
     </div>
 
-<?php endif; /* end section switch */ ?>
+<?php endif; ?>
+
+<?php /* ═══════════════════════════════════════════════════════════════════════
+         SECTION ▸ MEDICINE ORDERS
+   ═══════════════════════════════════════════════════════════════════════ */
+if ($sec === 'orders'): ?>
+
+    <div class="hero hero-orange">
+      <div class="hero-pill">🛒 Medicine Store</div>
+      <h2>Medicine Orders Management</h2>
+      <p>View, manage and update all farmer medicine orders &nbsp;·&nbsp; <?= date('l, F j, Y') ?></p>
+    </div>
+
+    <?php if (!$orders_exist): ?>
+    <div style="text-align:center;padding:60px 20px;background:white;border-radius:16px;border:1px solid var(--gr200);">
+      <div style="font-size:52px;margin-bottom:14px;">⚠️</div>
+      <div style="font-size:18px;font-weight:800;margin-bottom:8px;">Orders Table Not Found</div>
+      <div style="font-size:14px;color:var(--gr500);margin-bottom:20px;">Please run <strong>create_orders_table.sql</strong> in phpMyAdmin first.</div>
+      <code style="background:var(--gr100);padding:10px 18px;border-radius:8px;font-size:13px;">SOURCE create_orders_table.sql</code>
+    </div>
+    <?php else: ?>
+
+    <!-- ── Stat cards ── -->
+    <div class="card-grid" style="grid-template-columns:repeat(4,1fr);margin-bottom:22px;">
+      <div class="card" style="border-top:3px solid var(--o500);">
+        <div class="card-ico" style="background:var(--o50);">🛒</div>
+        <div class="card-val"><?= $ttl_orders ?></div>
+        <div class="card-lbl">Total Orders</div>
+        <div class="card-sub">All time</div>
+      </div>
+      <div class="card" style="border-top:3px solid var(--y500);">
+        <div class="card-ico" style="background:var(--y50);">⏳</div>
+        <div class="card-val" style="color:<?= $ttl_pending>0?'var(--o700)':'var(--gr900)' ?>"><?= $ttl_pending ?></div>
+        <div class="card-lbl">Pending</div>
+        <div class="card-sub">Needs action</div>
+      </div>
+      <div class="card" style="border-top:3px solid var(--g500);">
+        <div class="card-ico" style="background:var(--g50);">💰</div>
+        <div class="card-val">$<?= number_format($ttl_revenue, 2) ?></div>
+        <div class="card-lbl">Total Revenue</div>
+        <div class="card-sub">Excl. cancelled</div>
+      </div>
+      <div class="card" style="border-top:3px solid var(--b500);">
+        <div class="card-ico" style="background:var(--b50);">📅</div>
+        <div class="card-val"><?= $orders_today ?></div>
+        <div class="card-lbl">Today's Orders</div>
+        <div class="card-sub"><?= date('M j, Y') ?></div>
+      </div>
+    </div>
+
+    <!-- ── Filter bar ── -->
+    <form method="GET" action="admin.php" style="display:flex;gap:10px;flex-wrap:wrap;align-items:center;margin-bottom:18px;">
+      <input type="hidden" name="section" value="orders">
+      <input type="text" name="ord_q" value="<?= safeHtml($ord_q ?? '') ?>"
+             placeholder="🔍 Search name or email…"
+             style="flex:1;min-width:180px;padding:9px 14px;border:1.5px solid var(--gr300);border-radius:9px;font-family:inherit;font-size:13px;outline:none;">
+      <select name="ord_fstat" style="padding:9px 12px;border:1.5px solid var(--gr300);border-radius:9px;font-family:inherit;font-size:13px;color:var(--gr700);background:white;outline:none;">
+        <option value="">All Statuses</option>
+        <option value="pending"   <?= ($ord_fstat??'')==='pending'   ?'selected':'' ?>>⏳ Pending</option>
+        <option value="confirmed" <?= ($ord_fstat??'')==='confirmed' ?'selected':'' ?>>✅ Confirmed</option>
+        <option value="shipped"   <?= ($ord_fstat??'')==='shipped'   ?'selected':'' ?>>🚚 Shipped</option>
+        <option value="delivered" <?= ($ord_fstat??'')==='delivered' ?'selected':'' ?>>📦 Delivered</option>
+        <option value="cancelled" <?= ($ord_fstat??'')==='cancelled' ?'selected':'' ?>>❌ Cancelled</option>
+      </select>
+      <button type="submit" style="padding:9px 18px;border:none;border-radius:9px;background:var(--o700);color:white;font-family:inherit;font-size:13px;font-weight:700;cursor:pointer;">Filter</button>
+      <a href="admin.php?section=orders" style="padding:9px 14px;border:1.5px solid var(--gr300);border-radius:9px;font-size:13px;color:var(--gr600);font-weight:600;">Clear</a>
+    </form>
+
+    <!-- ── Orders table ── -->
+    <div class="t-wrap">
+      <table>
+        <thead>
+          <tr>
+            <th>#</th>
+            <th>Order ID</th>
+            <th>Farmer / User</th>
+            <th>Email</th>
+            <th>Items</th>
+            <th>Total</th>
+            <th>Status</th>
+            <th>Ordered At</th>
+            <th>Actions</th>
+          </tr>
+        </thead>
+        <tbody>
+        <?php if (empty($all_orders)): ?>
+          <tr><td colspan="9">
+            <div class="empty-box">
+              <div class="empty-box-ico">🛒</div>
+              <p>No orders yet. Orders will appear here when farmers buy medicine.</p>
+            </div>
+          </td></tr>
+        <?php else: ?>
+        <?php foreach ($all_orders as $i => $ord):
+            $st = $ord['status'];
+            $st_style = match($st) {
+                'pending'   => 'background:#fef3c7;color:#92400e;border:1px solid #fde68a',
+                'confirmed' => 'background:#dbeafe;color:#1e40af;border:1px solid #bfdbfe',
+                'shipped'   => 'background:#ede9fe;color:#6d28d9;border:1px solid #ddd6fe',
+                'delivered' => 'background:#dcfce7;color:#166534;border:1px solid #bbf7d0',
+                'cancelled' => 'background:#fee2e2;color:#991b1b;border:1px solid #fecaca',
+                default     => 'background:var(--gr100);color:var(--gr700)',
+            };
+            $st_icon = match($st) {
+                'pending'=>'⏳','confirmed'=>'✅','shipped'=>'🚚','delivered'=>'📦','cancelled'=>'❌',default=>'•'
+            };
+            $oid = (int)$ord['id'];
+        ?>
+          <tr>
+            <td style="color:var(--gr400);font-weight:700"><?= $i+1 ?></td>
+            <td style="font-weight:800;color:var(--o700)">#<?= $oid ?></td>
+            <td style="font-weight:700"><?= safeHtml($ord['user_name']) ?></td>
+            <td style="font-size:12px;color:var(--gr500)"><?= safeHtml($ord['user_email']) ?></td>
+            <td style="font-weight:700;text-align:center"><?= (int)$ord['item_count'] ?></td>
+            <td style="font-weight:800;color:var(--g700)">$<?= number_format((float)$ord['total_price'],2) ?></td>
+            <td>
+              <span style="display:inline-flex;align-items:center;gap:5px;padding:4px 10px;border-radius:20px;font-size:11px;font-weight:700;<?= $st_style ?>">
+                <?= $st_icon ?> <?= ucfirst($st) ?>
+              </span>
+            </td>
+            <td style="font-size:12px;white-space:nowrap"><?= safeHtml(date('M j, Y g:i A', strtotime($ord['ordered_at']))) ?></td>
+            <td>
+              <div style="display:flex;gap:5px;flex-wrap:wrap;">
+                <!-- View items button -->
+                <button class="tbtn" style="background:var(--b50);color:var(--b700)"
+                  onclick="viewOrderItems(<?= $oid ?>)">📦 Items</button>
+                <!-- Status update dropdown -->
+                <select onchange="if(this.value)window.location='admin.php?section=orders&oid=<?= $oid ?>&order_status='+this.value"
+                  style="padding:4px 8px;border:1.5px solid var(--gr300);border-radius:7px;font-family:inherit;font-size:12px;color:var(--gr700);background:white;cursor:pointer;outline:none;">
+                  <option value="">✏️ Change Status</option>
+                  <option value="pending">⏳ Pending</option>
+                  <option value="confirmed">✅ Confirmed</option>
+                  <option value="shipped">🚚 Shipped</option>
+                  <option value="delivered">📦 Delivered</option>
+                  <option value="cancelled">❌ Cancel</option>
+                </select>
+              </div>
+            </td>
+          </tr>
+        <?php endforeach; ?>
+        <?php endif; ?>
+        </tbody>
+      </table>
+    </div>
+
+    <!-- ── Order Items Modal ── -->
+    <div id="orderModalBg" style="display:none;position:fixed;inset:0;background:rgba(0,0,0,0.5);z-index:500;align-items:center;justify-content:center;">
+      <div style="background:white;border-radius:18px;width:90%;max-width:640px;max-height:80vh;display:flex;flex-direction:column;box-shadow:0 24px 64px rgba(0,0,0,0.18);">
+        <div style="padding:20px 24px 16px;border-bottom:1px solid var(--gr100);display:flex;align-items:center;justify-content:space-between;">
+          <div>
+            <div style="font-size:17px;font-weight:800;" id="omodTitle">Order Items</div>
+            <div style="font-size:12px;color:var(--gr500);" id="omodSub"></div>
+          </div>
+          <button onclick="closeOrderModal()" style="border:none;background:var(--gr100);border-radius:8px;padding:6px 10px;cursor:pointer;font-size:14px;">✕</button>
+        </div>
+        <div style="flex:1;overflow-y:auto;padding:20px 24px;" id="omodBody"></div>
+      </div>
+    </div>
+
+    <!-- Embed order items as JSON for JS modal -->
+    <script id="orderItemsData" type="application/json"><?= json_encode($order_items_map, JSON_HEX_TAG|JSON_HEX_APOS|JSON_HEX_QUOT|JSON_HEX_AMP) ?></script>
+
+    <script>
+    (function(){
+        var itemsMap = {};
+        try { itemsMap = JSON.parse(document.getElementById('orderItemsData').textContent); } catch(e){}
+
+        window.viewOrderItems = function(oid) {
+            var items = itemsMap[String(oid)] || [];
+            document.getElementById('omodTitle').textContent = '📦 Order #' + oid + ' — Items';
+            document.getElementById('omodSub').textContent   = items.length + ' item type(s) in this order';
+
+            if (!items.length) {
+                document.getElementById('omodBody').innerHTML = '<div style="text-align:center;padding:40px;color:var(--gr400);">No items found for this order.</div>';
+            } else {
+                var rows = items.map(function(it) {
+                    return '<tr>'
+                        + '<td style="font-size:14px;font-weight:700">' + esc(it.medicine_name) + '</td>'
+                        + '<td><span style="background:var(--o50);color:var(--o700);padding:2px 8px;border-radius:10px;font-size:11px;font-weight:700">' + esc(it.medicine_type) + '</span></td>'
+                        + '<td style="font-size:12px;color:var(--gr500)">🌿 ' + esc(it.plant_target) + '</td>'
+                        + '<td style="text-align:center;font-weight:700">' + it.quantity + '</td>'
+                        + '<td style="color:var(--gr600)">$' + parseFloat(it.unit_price).toFixed(2) + '</td>'
+                        + '<td style="font-weight:800;color:var(--g700)">$' + parseFloat(it.line_total).toFixed(2) + '</td>'
+                        + '</tr>';
+                }).join('');
+                document.getElementById('omodBody').innerHTML =
+                    '<table style="width:100%;border-collapse:collapse;">'
+                    + '<thead><tr style="border-bottom:2px solid var(--gr200);font-size:11px;color:var(--gr500);font-weight:700;text-transform:uppercase;">'
+                    + '<th style="padding:8px 6px;text-align:left">Medicine</th>'
+                    + '<th style="padding:8px 6px;text-align:left">Type</th>'
+                    + '<th style="padding:8px 6px;text-align:left">For Plant</th>'
+                    + '<th style="padding:8px 6px;text-align:center">Qty</th>'
+                    + '<th style="padding:8px 6px;text-align:left">Unit Price</th>'
+                    + '<th style="padding:8px 6px;text-align:left">Total</th>'
+                    + '</tr></thead>'
+                    + '<tbody>' + rows + '</tbody>'
+                    + '</table>';
+            }
+
+            var bg = document.getElementById('orderModalBg');
+            bg.style.display = 'flex';
+        };
+
+        window.closeOrderModal = function() {
+            document.getElementById('orderModalBg').style.display = 'none';
+        };
+
+        document.getElementById('orderModalBg').addEventListener('click', function(e){
+            if (e.target === this) closeOrderModal();
+        });
+
+        function esc(s){ return String(s||'').replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;'); }
+    }());
+    </script>
+
+    <?php endif; /* orders_exist */ ?>
+
+<?php endif; /* end orders section */ ?>
+
+<?php /* end section switch */ ?>
 
 <!-- ══════════ USER PRINT MODAL ══════════ -->
 <div class="pmodal-bg" id="printModalBg">
@@ -1485,9 +1790,10 @@ elseif ($sec === 'users'): ?>
 <script>
 (function () {
   // ── Parse embedded data ──────────────────────────────────────────────────────
-  var urmap = {};
-  try { urmap = JSON.parse(document.getElementById('urmapData').textContent); }
+  window.urmap = {};
+  try { window.urmap = JSON.parse(document.getElementById('urmapData').textContent); }
   catch(e) { console.error('urmap parse error', e); }
+  var urmap = window.urmap;
 
   // User list from PHP (for names/emails)
   var allUsers = <?= json_encode(array_map(function($u){ return ['id'=>(int)$u['id'],'name'=>$u['name'],'email'=>$u['email'],'role'=>$u['role']]; }, $all_users)) ?>;
@@ -1504,14 +1810,14 @@ elseif ($sec === 'users'): ?>
 
   // ── Build report table HTML ───────────────────────────────────────────────────
   function buildReportTable(uid, uname) {
-    var recs = urmap[uid] || [];
+    var recs = urmap[String(uid)] || [];
     if (recs.length === 0) {
       return '<div class="empty-box"><div class="empty-box-ico">📭</div><p>No scan records found for this user.</p></div>';
     }
 
     var prptHead = '<div class="prpt-head">'
       + '<h2>🌿 BATANOX — Individual User Report</h2>'
-      + '<p>User: <strong>' + esc(uname) + '</strong> &nbsp;·&nbsp; Generated <?= date('F j, Y  g:i A') ?> &nbsp;·&nbsp; By <?= safeHtml($admin_name) ?></p>'
+      + '<p>User: <strong>' + esc(uname) + '</strong> &nbsp;·&nbsp; Generated <?= date("F j, Y g:i A") ?> &nbsp;·&nbsp; By <?= safeHtml($admin_name) ?></p>'
       + '</div>';
 
     var rows = recs.map(function(r, i) {
@@ -1558,11 +1864,14 @@ elseif ($sec === 'users'): ?>
 
   // ── Open modal ────────────────────────────────────────────────────────────────
   window.openUserReport = function(uid, uname, uemail) {
-    document.getElementById('pmTitle').textContent = '📋 User Report — ' + uname;
-    document.getElementById('pmSub').textContent   = uemail + '  ·  ' + (urmap[uid]||[]).length + ' records';
-    document.getElementById('pmRecCount').textContent = (urmap[uid]||[]).length + ' records total';
-    document.getElementById('pmBody').innerHTML    = buildReportTable(uid, uname);
-    document.getElementById('pmCsvBtn').href       = 'admin.php?export=user_csv&uid=' + uid;
+    // JSON keys are always strings — convert uid to string for lookup
+    var key  = String(uid);
+    var recs = urmap[key] || [];
+    document.getElementById('pmTitle').textContent    = '📋 User Report — ' + uname;
+    document.getElementById('pmSub').textContent      = uemail + '  ·  ' + recs.length + ' records';
+    document.getElementById('pmRecCount').textContent = recs.length + ' records total';
+    document.getElementById('pmBody').innerHTML       = buildReportTable(key, uname);
+    document.getElementById('pmCsvBtn').href          = 'admin.php?export=user_csv&uid=' + uid;
     document.getElementById('printModalBg').classList.add('open');
     document.body.style.overflow = 'hidden';
   };

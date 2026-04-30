@@ -342,13 +342,46 @@
         .ov-box p  { font-size: 14px; color: var(--gr500); }
 
         /* ─── RESPONSIVE ───────────────────────────────────────────── */
+        @media (max-width: 900px) {
+            .topbar { padding: 0 16px; gap: 10px; }
+            .page-wrap { padding: 20px 16px; }
+            .hero { padding: 28px 24px; }
+        }
         @media (max-width: 640px) {
-            .res-grid { grid-template-columns: 1fr; }
-            .hero { padding: 28px 22px; }
-            .hero h1 { font-size: 22px; }
-            .topbar { padding: 0 16px; gap: 8px; }
-            .brand-name { font-size: 17px; }
-            .cta-box { padding: 22px 20px; }
+            :root { --topbar: 58px; }
+            .topbar { padding: 0 12px; gap: 8px; height: 58px; }
+            .brand-name  { font-size: 17px; }
+            .brand-pill  { display: none; }
+            .guest-pill  { font-size: 11px; padding: 4px 10px; }
+            .top-login-btn { font-size: 12px; padding: 7px 11px; }
+
+            .hero { padding: 22px 18px; border-radius: 14px; }
+            .hero h1 { font-size: 20px; }
+            .hero p  { font-size: 13px; }
+
+            .res-grid { grid-template-columns: 1fr !important; }
+            .cta-box  { padding: 20px 16px; }
+
+            /* Result panel stacks */
+            .result-layout { flex-direction: column !important; gap: 14px; }
+            .res-imgs > div { width: 100% !important; }
+
+            /* Buttons */
+            .btn-row { flex-wrap: wrap; }
+            .btn-row button, .btn-row a { flex: 1; min-width: 120px; font-size: 13px; }
+
+            /* Drop zone */
+            .drop-zone { padding: 26px 14px; }
+
+            /* Status box */
+            #statusBox { padding: 18px 16px; }
+
+            /* Page padding */
+            .page-wrap { padding: 18px 12px; }
+        }
+        @media (max-width: 380px) {
+            .top-login-btn:first-of-type { display: none; }
+            .brand-name { font-size: 15px; }
         }
     </style>
 </head>

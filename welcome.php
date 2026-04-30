@@ -25,6 +25,19 @@ if ($role === 'admin') {
     exit;
 }
 
+// ── ONE-TIME welcome screen ────────────────────────────────────────────────
+// If the user has already seen the welcome screen this session,
+// skip it and go straight to the dashboard.
+if (!empty($_SESSION['welcome_shown'])) {
+    header('Location: http://localhost:5000/');
+    exit;
+}
+// Clean up any leftover guest flags before entering dashboard
+unset($_SESSION['is_guest']);
+unset($_SESSION['guest']);
+// Mark as shown so it never repeats this session
+$_SESSION['welcome_shown'] = true;
+
 $user_name = htmlspecialchars($_SESSION['user_name'] ?? $_SESSION['name'] ?? 'there');
 $redirect  = 'http://localhost:5000/';
 $delay_ms  = 2800;   // total screen time in milliseconds
@@ -231,7 +244,7 @@ $delay_ms  = 2800;   // total screen time in milliseconds
 
     <!-- Brand -->
     <div class="brand">
-         <img src="templates/app logo 01.png" alt="" width="40" height="50">
+         <img src="templates/fyp-logo-01.png" alt="" width="60" height="80">
         <!-- <div class="brand-mark">
             <svg viewBox="0 0 24 24">
                 <path d="M17 8C8 10 5.9 16.17 3.82 21.34L5.71 22l1-2.3A4.49 4.49 0 008 20C19 20 22 3 22 3c-1 2-8 2-13 6 1-2.17 2.64-4.41 8-5z"/>

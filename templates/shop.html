@@ -1,0 +1,847 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>BATANOX — Buy Medicine</title>
+    <link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@400;500;600;700;800&display=swap" rel="stylesheet">
+    <style>
+        *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+
+        :root {
+            --g50:#f0fdf4; --g100:#dcfce7; --g200:#bbf7d0;
+            --g500:#22c55e; --g600:#16a34a; --g700:#15803d;
+            --white:#ffffff;
+            --gr50:#f9fafb; --gr100:#f3f4f6; --gr200:#e5e7eb;
+            --gr300:#d1d5db; --gr400:#9ca3af; --gr500:#6b7280;
+            --gr600:#4b5563; --gr700:#374151; --gr900:#111827;
+            --r50:#fef2f2; --r100:#fee2e2; --r200:#fecaca;
+            --r600:#dc2626; --r700:#b91c1c;
+            --y50:#fefce8; --y200:#fef08a; --y700:#a16207;
+            --b50:#eff6ff; --b200:#bfdbfe; --b700:#1d4ed8;
+            --o50:#fff7ed; --o200:#fed7aa; --o700:#c2410c;
+            --topbar:66px; --sidebar:270px; --radius:14px;
+        }
+
+        body { font-family:'Plus Jakarta Sans',sans-serif; background:var(--gr50); color:var(--gr900); }
+
+        /* ─── TOPBAR ─────────────────────────────────────────── */
+        .topbar {
+            position:fixed; top:0; left:0; right:0; height:var(--topbar);
+            background:var(--white); border-bottom:1px solid var(--gr200);
+            display:flex; align-items:center; padding:0 28px; gap:14px; z-index:200;
+            box-shadow:0 1px 6px rgba(0,0,0,0.04);
+        }
+        .brand { display:flex; align-items:center; gap:10px; text-decoration:none; flex-shrink:0; }
+        .brand-name { font-size:20px; font-weight:800; letter-spacing:-0.4px; color:var(--gr900); }
+        .brand-name em { font-style:normal; color:var(--g600); }
+        .brand-pill {
+            font-size:11px; font-weight:700; color:var(--g700);
+            background:var(--g50); border:1px solid var(--g200);
+            border-radius:20px; padding:2px 9px;
+        }
+        .top-spacer { flex:1; }
+        .back-btn {
+            display:flex; align-items:center; gap:7px;
+            padding:8px 16px; border-radius:9px; border:1.5px solid var(--gr200);
+            background:white; font-family:inherit; font-size:13px; font-weight:600;
+            color:var(--gr600); cursor:pointer; text-decoration:none; transition:all 0.15s;
+        }
+        .back-btn:hover { background:var(--gr50); border-color:var(--gr300); color:var(--gr900); }
+        .cart-topbtn {
+            position:relative; display:flex; align-items:center; gap:8px;
+            padding:9px 18px; border:none; border-radius:9px;
+            background:linear-gradient(135deg,var(--g700),var(--g500));
+            color:white; font-family:inherit; font-size:14px; font-weight:700;
+            cursor:pointer; box-shadow:0 4px 14px rgba(34,197,94,0.28); transition:all 0.18s;
+        }
+        .cart-topbtn:hover { transform:translateY(-1px); box-shadow:0 6px 20px rgba(34,197,94,0.38); }
+        .cart-badge {
+            background:var(--r600); color:white; font-size:11px; font-weight:800;
+            padding:2px 7px; border-radius:10px; min-width:20px; text-align:center;
+        }
+
+        /* ─── LAYOUT ─────────────────────────────────────────── */
+        .layout { margin-top:var(--topbar); display:flex; min-height:calc(100vh - var(--topbar)); }
+
+        /* ─── SIDEBAR ────────────────────────────────────────── */
+        .sidebar {
+            width:var(--sidebar); flex-shrink:0;
+            background:var(--white); border-right:1px solid var(--gr200);
+            position:sticky; top:var(--topbar); height:calc(100vh - var(--topbar));
+            overflow-y:auto; padding:24px 14px;
+            display:flex; flex-direction:column; gap:6px;
+        }
+        .s-lbl { font-size:11px; font-weight:700; color:var(--gr400); text-transform:uppercase; letter-spacing:1px; padding:0 8px; margin:14px 0 6px; }
+        .s-item {
+            display:flex; align-items:center; gap:10px; width:100%;
+            padding:10px 12px; border-radius:9px; border:none;
+            font-family:inherit; font-size:14px; font-weight:600;
+            color:var(--gr600); background:transparent; cursor:pointer;
+            text-align:left; transition:all 0.15s;
+        }
+        .s-item:hover { background:var(--gr50); color:var(--gr900); }
+        .s-item.on { background:var(--g50); color:var(--g700); }
+        .s-item.cat-btn.on { background:var(--o50); color:var(--o700); }
+        .s-ico { width:22px; text-align:center; font-size:17px; flex-shrink:0; }
+        .s-count { margin-left:auto; background:var(--gr100); color:var(--gr500); font-size:11px; font-weight:700; padding:2px 8px; border-radius:10px; }
+
+        /* ─── MAIN ───────────────────────────────────────────── */
+        .main { flex:1; padding:32px 36px; min-width:0; }
+
+        /* ─── HERO ───────────────────────────────────────────── */
+        .hero {
+            background:linear-gradient(130deg,#7c2d12 0%,var(--o700) 55%,#f97316 100%);
+            border-radius:18px; padding:36px 42px; color:white;
+            margin-bottom:26px; position:relative; overflow:hidden;
+        }
+        .hero::before { content:''; position:absolute; top:-60px; right:-60px; width:260px; height:260px; border-radius:50%; background:rgba(255,255,255,0.06); }
+        .hero::after  { content:''; position:absolute; bottom:-40px; left:35%; width:180px; height:180px; border-radius:50%; background:rgba(255,255,255,0.04); }
+        .hero-pill {
+            display:inline-flex; align-items:center; gap:6px;
+            background:rgba(255,255,255,0.15); border:1px solid rgba(255,255,255,0.22);
+            border-radius:20px; padding:4px 13px; font-size:12px; font-weight:600; margin-bottom:14px;
+        }
+        .hero h1 { font-size:28px; font-weight:800; letter-spacing:-0.5px; margin-bottom:8px; }
+        .hero p  { font-size:14px; opacity:0.85; max-width:460px; line-height:1.6; }
+        .hero-stats { display:flex; gap:24px; margin-top:18px; flex-wrap:wrap; }
+        .hero-stat { font-size:13px; opacity:0.8; font-weight:500; }
+        .hero-stat strong { font-weight:800; opacity:1; }
+
+        /* ─── TOOLBAR ────────────────────────────────────────── */
+        .toolbar {
+            display:flex; gap:10px; margin-bottom:22px; flex-wrap:wrap; align-items:center;
+        }
+        .search-wrap { position:relative; flex:1; min-width:200px; }
+        .search-ico { position:absolute; left:14px; top:50%; transform:translateY(-50%); font-size:15px; pointer-events:none; }
+        .search-input {
+            width:100%; padding:11px 16px 11px 40px;
+            border:1.5px solid var(--gr300); border-radius:10px;
+            font-family:inherit; font-size:14px; color:var(--gr900); outline:none;
+            transition:border-color 0.2s, box-shadow 0.2s; background:white;
+        }
+        .search-input:focus { border-color:var(--o700); box-shadow:0 0 0 3px rgba(194,65,12,0.1); }
+        .search-input::placeholder { color:var(--gr300); }
+        .sort-select {
+            padding:11px 14px; border:1.5px solid var(--gr300); border-radius:10px;
+            font-family:inherit; font-size:14px; color:var(--gr700);
+            background:white; cursor:pointer; outline:none; transition:border-color 0.2s;
+        }
+        .sort-select:focus { border-color:var(--o700); }
+
+        /* ─── RESULTS BAR ────────────────────────────────────── */
+        .results-bar { font-size:13px; color:var(--gr500); margin-bottom:16px; font-weight:500; }
+        .results-bar strong { color:var(--gr900); }
+
+        /* ─── MEDICINE GRID ──────────────────────────────────── */
+        .med-grid { display:grid; grid-template-columns:repeat(auto-fill,minmax(230px,1fr)); gap:18px; }
+
+        .med-card {
+            background:white; border:1px solid var(--gr200); border-radius:16px;
+            overflow:hidden; transition:transform 0.18s, box-shadow 0.18s;
+            display:flex; flex-direction:column; align-items:center; position:relative;
+        }
+        .med-card:hover { transform:translateY(-4px); box-shadow:0 12px 36px rgba(0,0,0,0.1); }
+
+        .med-card-img {
+            width:150px; height:150px;
+            margin: 12px auto 0;
+            border-radius:12px;
+            display:flex; align-items:center; justify-content:center;
+            overflow:hidden; flex-shrink:0;
+            background:#f3f4f6;
+        }
+        .med-card-img img {
+            width:150px; height:150px; object-fit:cover;
+            display:block; transition:transform 0.22s ease;
+            border-radius:12px;
+        }
+        .med-card:hover .med-card-img img { transform:scale(1.06); }
+        .med-card-img .img-placeholder {
+            font-size:56px; display:flex; align-items:center; justify-content:center;
+            width:150px; height:150px;
+        }
+        .bg-fungicide   { background:linear-gradient(135deg,#fef3c7,#fde68a); }
+        .bg-bactericide { background:linear-gradient(135deg,#fee2e2,#fecaca); }
+        .bg-fertilizer  { background:linear-gradient(135deg,#dcfce7,#bbf7d0); }
+        .bg-insecticide { background:linear-gradient(135deg,#ede9fe,#ddd6fe); }
+
+        .med-card-body { padding:12px 16px 16px; flex:1; display:flex; flex-direction:column; gap:7px; width:100%; }
+
+        .med-badge {
+            display:inline-block; padding:3px 9px; border-radius:20px;
+            font-size:11px; font-weight:700; align-self:flex-start;
+        }
+        .badge-fungicide   { background:#fef3c7; color:#92400e; }
+        .badge-bactericide { background:#fee2e2; color:#b91c1c; }
+        .badge-fertilizer  { background:#dcfce7; color:#15803d; }
+        .badge-insecticide { background:#ede9fe; color:#6d28d9; }
+
+        .med-name  { font-size:15px; font-weight:800; color:var(--gr900); line-height:1.3; }
+        .med-plant { font-size:12px; color:var(--gr500); font-weight:500; }
+        .med-disease { font-size:12px; color:var(--gr600); line-height:1.5; }
+        .med-price { font-size:20px; font-weight:800; color:var(--o700); margin-top:2px; }
+        .med-price span { font-size:12px; font-weight:500; color:var(--gr400); }
+
+        .med-stock { font-size:11px; font-weight:600; color:var(--g600); }
+
+        .add-btn {
+            margin-top:auto; padding:10px 14px; border:none; border-radius:10px;
+            font-family:inherit; font-size:13px; font-weight:700; cursor:pointer;
+            transition:all 0.18s; display:flex; align-items:center; justify-content:center; gap:6px;
+        }
+        .add-btn.default {
+            background:linear-gradient(135deg,var(--o700),#f97316);
+            color:white; box-shadow:0 4px 12px rgba(194,65,12,0.28);
+        }
+        .add-btn.default:hover { transform:translateY(-1px); box-shadow:0 6px 18px rgba(194,65,12,0.38); }
+        .add-btn.added {
+            background:linear-gradient(135deg,var(--g700),var(--g500));
+            color:white; box-shadow:0 4px 12px rgba(34,197,94,0.28);
+        }
+
+        /* ─── EMPTY STATE ────────────────────────────────────── */
+        .empty-state {
+            text-align:center; padding:80px 20px; color:var(--gr400);
+        }
+        .empty-state .e-ico { font-size:52px; margin-bottom:14px; }
+        .empty-state .e-ttl { font-size:18px; font-weight:700; color:var(--gr600); margin-bottom:6px; }
+        .empty-state .e-sub { font-size:13px; }
+
+        /* ─── CART PANEL ─────────────────────────────────────── */
+        .cart-panel {
+            position:fixed; top:var(--topbar); right:0;
+            width:360px; height:calc(100vh - var(--topbar));
+            background:white; border-left:1px solid var(--gr200);
+            z-index:300; display:none; flex-direction:column;
+            box-shadow:-8px 0 32px rgba(0,0,0,0.1);
+        }
+        .cart-panel.open { display:flex; }
+
+        .cart-head {
+            padding:20px 22px 16px; border-bottom:1px solid var(--gr100);
+            display:flex; align-items:center; justify-content:space-between; flex-shrink:0;
+        }
+        .cart-head h3 { font-size:17px; font-weight:800; }
+        .cart-close {
+            border:none; background:var(--gr100); border-radius:8px;
+            padding:6px 10px; cursor:pointer; font-size:14px; transition:background 0.15s;
+        }
+        .cart-close:hover { background:var(--gr200); }
+
+        .cart-body { flex:1; overflow-y:auto; padding:16px 22px; }
+
+        .cart-empty { text-align:center; padding:50px 0; color:var(--gr400); }
+        .cart-empty .ce-ico { font-size:40px; margin-bottom:10px; }
+        .cart-empty .ce-ttl { font-size:14px; font-weight:600; }
+        .cart-empty .ce-sub { font-size:12px; margin-top:4px; }
+
+        .cart-item {
+            display:flex; align-items:center; gap:12px;
+            padding:13px 0; border-bottom:1px solid var(--gr100);
+        }
+        .ci-ico  { width:44px; height:44px; border-radius:8px; overflow:hidden; flex-shrink:0; display:flex; align-items:center; justify-content:center; font-size:22px; }
+        .ci-info { flex:1; min-width:0; }
+        .ci-name  { font-size:13px; font-weight:700; color:var(--gr900); white-space:nowrap; overflow:hidden; text-overflow:ellipsis; }
+        .ci-price { font-size:12px; color:var(--o700); font-weight:600; margin-top:2px; }
+        .qty-ctrl { display:flex; align-items:center; gap:6px; flex-shrink:0; }
+        .qty-btn {
+            width:26px; height:26px; border:1.5px solid var(--gr300); border-radius:7px;
+            background:white; cursor:pointer; font-size:14px; font-weight:700;
+            display:flex; align-items:center; justify-content:center; transition:all 0.12s;
+        }
+        .qty-btn:hover { background:var(--gr50); border-color:var(--gr400); }
+        .qty-val { font-size:13px; font-weight:700; min-width:18px; text-align:center; }
+
+        .cart-foot { padding:16px 22px; border-top:1px solid var(--gr100); flex-shrink:0; }
+        .cart-total-row {
+            display:flex; justify-content:space-between; align-items:center;
+            font-size:15px; font-weight:800; margin-bottom:14px;
+        }
+        .cart-total-price { color:var(--g700); font-size:20px; }
+
+        .order-btn {
+            width:100%; padding:13px; border:none; border-radius:11px;
+            background:linear-gradient(135deg,var(--g700),var(--g500));
+            color:white; font-family:inherit; font-size:15px; font-weight:700;
+            cursor:pointer; box-shadow:0 4px 16px rgba(34,197,94,0.32);
+            transition:all 0.18s; margin-bottom:10px;
+        }
+        .order-btn:hover { transform:translateY(-1px); box-shadow:0 6px 22px rgba(34,197,94,0.42); }
+        .order-note { font-size:11px; color:var(--gr400); text-align:center; }
+
+        /* ─── SUCCESS MODAL ──────────────────────────────────── */
+        .success-overlay {
+            position:fixed; inset:0; background:rgba(0,0,0,0.4); z-index:500;
+            display:none; align-items:center; justify-content:center;
+        }
+        .success-overlay.open { display:flex; }
+        .success-box {
+            background:white; border-radius:20px; padding:48px 44px; text-align:center;
+            max-width:400px; width:90%; box-shadow:0 24px 64px rgba(0,0,0,0.18);
+            animation:popIn 0.35s cubic-bezier(0.34,1.56,0.64,1);
+        }
+        @keyframes popIn { from { transform:scale(0.8); opacity:0; } to { transform:scale(1); opacity:1; } }
+        .success-ico { font-size:60px; margin-bottom:16px; }
+        .success-box h2 { font-size:22px; font-weight:800; margin-bottom:8px; }
+        .success-box p  { font-size:14px; color:var(--gr500); line-height:1.6; margin-bottom:22px; }
+        .ok-btn {
+            padding:12px 32px; border:none; border-radius:10px; cursor:pointer;
+            background:linear-gradient(135deg,var(--g700),var(--g500));
+            color:white; font-family:inherit; font-size:15px; font-weight:700;
+        }
+
+        /* ─── TOAST ──────────────────────────────────────────── */
+        .toast {
+            position:fixed; bottom:24px; right:24px; background:var(--gr900);
+            color:white; padding:13px 18px; border-radius:12px; font-size:14px; font-weight:600;
+            z-index:9999; max-width:320px; transform:translateY(70px); opacity:0;
+            transition:all 0.3s cubic-bezier(0.34,1.56,0.64,1);
+        }
+        .toast.show { transform:translateY(0); opacity:1; }
+        .toast.t-ok  { background:var(--g700); }
+        .toast.t-err { background:var(--r700); }
+
+        /* ─── RESPONSIVE ─────────────────────────────────────── */
+
+        /* Tablet: 768px - 900px */
+        @media (max-width: 900px) {
+            :root { --sidebar: 0px; }
+            .sidebar {
+                position: fixed; top: var(--topbar); left: 0;
+                width: 270px; height: calc(100vh - var(--topbar));
+                transform: translateX(-100%); transition: transform 0.28s ease;
+                z-index: 400; box-shadow: 4px 0 24px rgba(0,0,0,0.12);
+                display: flex;
+            }
+            .sidebar.drawer-open { transform: translateX(0); }
+            .sidebar-backdrop {
+                display: none; position: fixed; inset: 0;
+                background: rgba(0,0,0,0.35); z-index: 399;
+            }
+            .sidebar-backdrop.open { display: block; }
+            .menu-btn { display: flex; }
+            .main    { padding: 24px 20px; }
+            .topbar  { padding: 0 16px; gap: 10px; }
+            .hero    { padding: 28px 26px; }
+        }
+
+        /* Mobile: ≤ 640px */
+        @media (max-width: 640px) {
+            :root { --topbar: 58px; }
+
+            /* Topbar */
+            .topbar      { padding: 0 14px; gap: 8px; height: 58px; }
+            .brand-name  { font-size: 16px; }
+            .brand-pill  { display: none; }
+            .back-btn span { display: none; }
+            .back-btn    { font-size: 12px; padding: 7px 10px; gap: 4px; }
+            .cart-topbtn { padding: 8px 12px; font-size: 13px; }
+
+            /* Main */
+            .main { padding: 14px 12px; }
+
+            /* Hero */
+            .hero { padding: 20px 18px; border-radius: 14px; margin-bottom: 18px; }
+            .hero-pill { font-size: 11px; padding: 3px 10px; margin-bottom: 10px; }
+            .hero h1 { font-size: 20px; letter-spacing: -0.3px; margin-bottom: 6px; }
+            .hero p  { font-size: 13px; line-height: 1.5; }
+            .hero-stats { gap: 10px; margin-top: 14px; }
+            .hero-stat  { font-size: 12px; }
+
+            /* Toolbar stacks */
+            .toolbar { flex-direction: column; align-items: stretch; gap: 8px; margin-bottom: 16px; }
+            .search-wrap { width: 100%; min-width: unset; }
+            .sort-select { width: 100%; }
+
+            /* Grid: 2 columns */
+            .med-grid { grid-template-columns: 1fr 1fr; gap: 10px; }
+            .med-card-img  { width:110px; height:110px; }
+            .med-card-img img { width:110px; height:110px; }
+            .med-card-img .img-placeholder { width:110px; height:110px; font-size:36px; }
+            .med-card-body { padding: 10px 10px 12px; gap: 5px; }
+            .med-badge     { font-size: 10px; padding: 2px 7px; }
+            .med-name      { font-size: 12.5px; line-height: 1.25; }
+            .med-plant,
+            .med-disease   { font-size: 10.5px; }
+            .med-price     { font-size: 16px; }
+            .med-price span { font-size: 11px; }
+            .med-stock     { font-size: 10px; }
+            .add-btn       { font-size: 11.5px; padding: 8px 6px; border-radius: 8px; gap: 3px; }
+
+            /* Cart full-width */
+            .cart-panel { width: 100%; left: 0; right: 0; }
+
+            /* Results bar */
+            .results-bar { font-size: 12px; margin-bottom: 12px; }
+
+            /* Success modal */
+            .success-box { padding: 36px 24px; }
+            .success-ico { font-size: 48px; }
+            .success-box h2 { font-size: 18px; }
+
+            /* Toast */
+            .toast { bottom: 16px; right: 12px; left: 12px; max-width: unset; font-size: 13px; }
+        }
+
+        /* Very small: ≤ 400px — single column */
+        @media (max-width: 400px) {
+            .med-grid { grid-template-columns: 1fr; }
+            .med-card { flex-direction: row; }
+            .med-card-img { width:90px; height:90px; margin:12px 0 12px 12px; flex-shrink:0; }
+            .med-card-img img { width:90px; height:90px; }
+            .med-card-img .img-placeholder { width:90px; height:90px; font-size:30px; }
+            .med-card-body { padding: 10px 12px; }
+            .brand-name { font-size: 15px; }
+        }
+
+        /* Menu button — hidden on desktop */
+        .menu-btn {
+            display: none; align-items: center; justify-content: center;
+            width: 38px; height: 38px; border: 1.5px solid var(--gr200);
+            border-radius: 9px; background: white; cursor: pointer;
+            font-size: 18px; flex-shrink: 0; transition: all 0.15s;
+        }
+        .menu-btn:hover { background: var(--gr50); border-color: var(--gr300); }
+    </style>
+</head>
+<body>
+
+<!-- ════════ TOPBAR ════════ -->
+<header class="topbar">
+    <button class="menu-btn" id="menuBtn" onclick="toggleSidebar()" aria-label="Menu">☰</button>
+    <a href="/" class="brand">
+        <span class="brand-name">BATA<em>NOX</em></span>
+        <span class="brand-pill">AI Powered</span>
+    </a>
+    <div class="top-spacer"></div>
+    <a href="/" class="back-btn">← Back to Dashboard</a>
+    <button class="cart-topbtn" onclick="toggleCart()">
+        🛒 Cart
+        <span class="cart-badge" id="cartCount">0</span>
+    </button>
+</header>
+
+<!-- ════════ LAYOUT ════════ -->
+<div class="layout">
+
+    <!-- SIDEBAR BACKDROP (mobile) -->
+    <div class="sidebar-backdrop" id="sidebarBackdrop" onclick="toggleSidebar()"></div>
+
+    <!-- SIDEBAR -->
+    <aside class="sidebar" id="mainSidebar">
+        <div class="s-lbl" style="margin-top:0;">Browse by Plant</div>
+        <button class="s-item cat-btn on" id="cat-all"         onclick="setFilter('all')">         <span class="s-ico">🌿</span> All Medicines       <span class="s-count" id="cnt-all">21</span></button>
+        <button class="s-item cat-btn"    id="cat-tomato"      onclick="setFilter('tomato')">      <span class="s-ico">🍅</span> Tomato              <span class="s-count" id="cnt-tomato">4</span></button>
+        <button class="s-item cat-btn"    id="cat-potato"      onclick="setFilter('potato')">      <span class="s-ico">🥔</span> Potato              <span class="s-count" id="cnt-potato">2</span></button>
+        <button class="s-item cat-btn"    id="cat-corn"        onclick="setFilter('corn')">        <span class="s-ico">🌽</span> Corn / Maize        <span class="s-count" id="cnt-corn">2</span></button>
+        <button class="s-item cat-btn"    id="cat-apple"       onclick="setFilter('apple')">       <span class="s-ico">🍎</span> Apple               <span class="s-count" id="cnt-apple">3</span></button>
+        <button class="s-item cat-btn"    id="cat-grape"       onclick="setFilter('grape')">       <span class="s-ico">🍇</span> Grape               <span class="s-count" id="cnt-grape">2</span></button>
+        <button class="s-item cat-btn"    id="cat-strawberry"  onclick="setFilter('strawberry')">  <span class="s-ico">🍓</span> Strawberry          <span class="s-count" id="cnt-strawberry">2</span></button>
+        <button class="s-item cat-btn"    id="cat-cherry"      onclick="setFilter('cherry')">      <span class="s-ico">🍒</span> Cherry              <span class="s-count" id="cnt-cherry">1</span></button>
+        <button class="s-item cat-btn"    id="cat-peach"       onclick="setFilter('peach')">       <span class="s-ico">🍑</span> Peach               <span class="s-count" id="cnt-peach">1</span></button>
+        <button class="s-item cat-btn"    id="cat-general"     onclick="setFilter('general')">     <span class="s-ico">🌱</span> General / Multi-crop <span class="s-count" id="cnt-general">4</span></button>
+
+        <div class="s-lbl">By Type</div>
+        <button class="s-item" onclick="setTypeFilter('fungicide')"  ><span class="s-ico">🧪</span> Fungicide</button>
+        <button class="s-item" onclick="setTypeFilter('bactericide')"><span class="s-ico">💊</span> Bactericide</button>
+        <button class="s-item" onclick="setTypeFilter('insecticide')"><span class="s-ico">🐛</span> Insecticide</button>
+        <button class="s-item" onclick="setTypeFilter('fertilizer')" ><span class="s-ico">🌱</span> Fertilizer</button>
+        <button class="s-item" onclick="setFilter('all')"            ><span class="s-ico">↺</span>  Clear Filter</button>
+    </aside>
+
+    <!-- MAIN -->
+    <main class="main">
+
+        <!-- Hero -->
+        <div class="hero">
+            <div class="hero-pill">🛒 Plant Medicine Store</div>
+            <h1>Buy Plant Disease Medicine</h1>
+            <p>Fungicides, bactericides, insecticides and fertilizers — categorized by crop and disease type. Protect your harvest.</p>
+            <div class="hero-stats">
+                <span class="hero-stat"><strong>21</strong> Products</span>
+                <span class="hero-stat"><strong>9</strong> Plant types</span>
+                <span class="hero-stat"><strong>Fast</strong> Delivery (Demo)</span>
+            </div>
+        </div>
+
+        <!-- Toolbar -->
+        <div class="toolbar">
+            <div class="search-wrap">
+                <span class="search-ico">🔍</span>
+                <input type="text" id="searchInput" class="search-input"
+                       placeholder="Search medicine name or disease…"
+                       oninput="renderGrid()">
+            </div>
+            <select id="sortSelect" class="sort-select" onchange="renderGrid()">
+                <option value="default">Sort: Default</option>
+                <option value="price-asc">Price: Low → High</option>
+                <option value="price-desc">Price: High → Low</option>
+                <option value="name">Name A → Z</option>
+            </select>
+        </div>
+
+        <!-- Results count -->
+        <div class="results-bar" id="resultsBar">Showing <strong>21</strong> products</div>
+
+        <!-- Grid -->
+        <div class="med-grid" id="shopGrid"></div>
+
+        <!-- Empty state -->
+        <div class="empty-state" id="emptyState" style="display:none;">
+            <div class="e-ico">🔍</div>
+            <div class="e-ttl">No medicines found</div>
+            <div class="e-sub">Try a different search term or clear the filter</div>
+        </div>
+
+    </main>
+</div><!-- /layout -->
+
+<!-- ════════ CART PANEL ════════ -->
+<div class="cart-panel" id="cartPanel">
+    <div class="cart-head">
+        <h3>🛒 Your Cart</h3>
+        <button class="cart-close" onclick="toggleCart()">✕</button>
+    </div>
+    <div class="cart-body" id="cartBody">
+        <div class="cart-empty">
+            <div class="ce-ico">🛒</div>
+            <div class="ce-ttl">Cart is empty</div>
+            <div class="ce-sub">Add medicines from the store</div>
+        </div>
+    </div>
+    <div class="cart-foot" id="cartFoot" style="display:none;">
+        <div class="cart-total-row">
+            <span>Total</span>
+            <span class="cart-total-price" id="cartTotal">$0.00</span>
+        </div>
+        <button class="order-btn" onclick="placeOrder()">✅ Place Order</button>
+        <div class="order-note">Your order will be saved and reviewed by admin</div>
+    </div>
+</div>
+
+<!-- ════════ SUCCESS MODAL ════════ -->
+<div class="success-overlay" id="successOverlay" onclick="closeSuccess(event)">
+    <div class="success-box">
+        <div class="success-ico">🎉</div>
+        <h2>Order Placed!</h2>
+        <p>
+            Your medicine order <strong id="successOrderId"></strong> has been received.<br>
+            Total: <strong id="successTotal" style="color:var(--g700);"></strong><br><br>
+            A farmer support agent will contact you shortly.
+        </p>
+        <button class="ok-btn" onclick="closeSuccess()">OK, Got it!</button>
+    </div>
+</div>
+
+<!-- TOAST -->
+<div class="toast" id="toast"></div>
+
+<!-- ════════ JAVASCRIPT ════════ -->
+<script>
+(function () {
+    'use strict';
+
+    /* ── Medicine catalogue ─────────────────────────────────────────── */
+    var MEDICINES = [
+        /* TOMATO */
+        { id:1,  name:"Daconil (Chlorothalonil)",       type:"fungicide",   plant:"tomato",     disease:"Early Blight, Late Blight, Septoria Leaf Spot", price:12.99, img:"static/medicines/a (2).png", stock:48 },
+        { id:2,  name:"Copper Fungicide Spray",          type:"fungicide",   plant:"tomato",     disease:"Bacterial Spot, Early Blight",                  price:10.49, img:"static/medicines/b (1).png", stock:35 },
+        { id:3,  name:"Metalaxyl — Ridomil Gold",        type:"fungicide",   plant:"tomato",     disease:"Late Blight, Downy Mildew",                     price:18.99, img:"static/medicines/c.png", stock:22 },
+        { id:4,  name:"Streptomycin Sulfate",            type:"bactericide", plant:"tomato",     disease:"Bacterial Speck, Bacterial Spot",               price:14.50, img:"static/medicines/d.png", stock:17 },
+        /* POTATO */
+        { id:5,  name:"Mancozeb 80% WP",                type:"fungicide",   plant:"potato",     disease:"Early Blight, Late Blight",                     price:9.99,  img:"static/medicines/e.png", stock:60 },
+        { id:6,  name:"Cymoxanil + Mancozeb",           type:"fungicide",   plant:"potato",     disease:"Late Blight (Systemic)",                        price:16.75, img:"static/medicines/f.png", stock:28 },
+        /* CORN */
+        { id:7,  name:"Propiconazole — Tilt",            type:"fungicide",   plant:"corn",       disease:"Common Rust, Gray Leaf Spot",                   price:22.00, img:"static/medicines/j.png", stock:19 },
+        { id:8,  name:"Azoxystrobin — Quadris",          type:"fungicide",   plant:"corn",       disease:"Common Rust, Blight",                           price:26.50, img:"static/medicines/h.png", stock:14 },
+        /* APPLE */
+        { id:9,  name:"Captan 50 WP",                   type:"fungicide",   plant:"apple",      disease:"Apple Scab, Black Rot",                         price:13.25, img:"static/medicines/i.png", stock:42 },
+        { id:10, name:"Myclobutanil — Rally",            type:"fungicide",   plant:"apple",      disease:"Apple Scab, Powdery Mildew",                    price:19.99, img:"static/medicines/k.png", stock:31 },
+        { id:11, name:"Kocide Copper Hydroxide",         type:"bactericide", plant:"apple",      disease:"Fire Blight",                                   price:15.80, img:"static/medicines/l.png", stock:25 },
+        /* GRAPE */
+        { id:12, name:"Sulfur Dust 90%",                type:"fungicide",   plant:"grape",      disease:"Powdery Mildew, Black Rot",                     price:8.99,  img:"static/medicines/m.png", stock:55 },
+        { id:13, name:"Captan + Folpet Combo",          type:"fungicide",   plant:"grape",      disease:"Black Rot, Downy Mildew",                       price:17.50, img:"static/medicines/n.png", stock:20 },
+        /* STRAWBERRY */
+        { id:14, name:"Thiram 80% WDG",                 type:"fungicide",   plant:"strawberry", disease:"Gray Mold (Botrytis), Leaf Spot",               price:11.20, img:"static/medicines/o.png", stock:38 },
+        { id:15, name:"Iprodione — Rovral",              type:"fungicide",   plant:"strawberry", disease:"Gray Mold, Crown Rot",                          price:20.00, img:"static/medicines/p.jpg", stock:12 },
+        /* CHERRY */
+        { id:16, name:"Chlorothalonil + Copper",         type:"fungicide",   plant:"cherry",     disease:"Cherry Leaf Spot, Brown Rot",                   price:13.99, img:"static/medicines/q.png", stock:30 },
+        /* PEACH */
+        { id:17, name:"Ziram 76% WDG",                  type:"fungicide",   plant:"peach",      disease:"Peach Leaf Curl, Brown Rot",                    price:12.50, img:"static/medicines/r.png", stock:22 },
+        /* GENERAL */
+        { id:18, name:"Neem Oil Spray 100%",             type:"insecticide", plant:"general",    disease:"Aphids, Whitefly, Fungal control",              price:7.99,  img:"static/medicines/s.png", stock:80 },
+        { id:19, name:"Potassium Bicarbonate (Organic)", type:"fungicide",   plant:"general",    disease:"Powdery Mildew — Organic safe",                 price:9.50,  img:"static/medicines/t.png", stock:45 },
+        { id:20, name:"NPK Fertilizer 20-20-20",         type:"fertilizer",  plant:"general",    disease:"Nutrient Deficiency, Recovery support",         price:15.00, img:"static/medicines/u.png", stock:70 },
+        { id:21, name:"SeaWeed Bio Stimulant",           type:"fertilizer",  plant:"general",    disease:"Post-disease plant recovery",                   price:11.75, img:"static/medicines/v.png", stock:33 },
+    ];
+
+    /* ── State ──────────────────────────────────────────────────────── */
+    var currentFilter = 'all';
+    var currentType   = '';
+    var cart = {};   /* { id: qty } */
+
+    /* ── Filter helpers ─────────────────────────────────────────────── */
+    window.setFilter = function (f) {
+        currentFilter = f;
+        currentType   = '';
+        document.querySelectorAll('.cat-btn').forEach(function (b) { b.classList.remove('on'); });
+        var el = document.getElementById('cat-' + f);
+        if (el) el.classList.add('on');
+        renderGrid();
+    };
+
+    window.setTypeFilter = function (t) {
+        currentType   = t;
+        currentFilter = 'all';
+        document.querySelectorAll('.cat-btn').forEach(function (b) { b.classList.remove('on'); });
+        renderGrid();
+    };
+
+    /* ── Render grid ─────────────────────────────────────────────────── */
+    window.renderGrid = function () {
+        var q    = (document.getElementById('searchInput').value || '').toLowerCase().trim();
+        var sort = document.getElementById('sortSelect').value;
+
+        var list = MEDICINES.filter(function (m) {
+            var matchPlant = (currentFilter === 'all' || m.plant === currentFilter);
+            var matchType  = (!currentType || m.type === currentType);
+            var matchQ     = !q
+                || m.name.toLowerCase().indexOf(q) !== -1
+                || m.disease.toLowerCase().indexOf(q) !== -1
+                || m.plant.toLowerCase().indexOf(q) !== -1
+                || m.type.toLowerCase().indexOf(q) !== -1;
+            return matchPlant && matchType && matchQ;
+        });
+
+        if (sort === 'price-asc')  list.sort(function (a,b) { return a.price - b.price; });
+        if (sort === 'price-desc') list.sort(function (a,b) { return b.price - a.price; });
+        if (sort === 'name')       list.sort(function (a,b) { return a.name.localeCompare(b.name); });
+
+        var grid  = document.getElementById('shopGrid');
+        var empty = document.getElementById('emptyState');
+        var bar   = document.getElementById('resultsBar');
+
+        if (!list.length) {
+            grid.innerHTML = '';
+            empty.style.display = '';
+            bar.innerHTML = 'No products found';
+            return;
+        }
+        empty.style.display = 'none';
+        bar.innerHTML = 'Showing <strong>' + list.length + '</strong> product' + (list.length !== 1 ? 's' : '');
+
+        grid.innerHTML = list.map(function (m) {
+            var inCart = !!cart[m.id];
+            var badgeClass = {fungicide:'badge-fungicide', bactericide:'badge-bactericide',
+                              fertilizer:'badge-fertilizer', insecticide:'badge-insecticide'}[m.type] || '';
+            var bgClass    = {fungicide:'bg-fungicide',   bactericide:'bg-bactericide',
+                              fertilizer:'bg-fertilizer', insecticide:'bg-insecticide'}[m.type] || 'bg-fungicide';
+            var typeCap = m.type.charAt(0).toUpperCase() + m.type.slice(1);
+            var plantCap = m.plant.charAt(0).toUpperCase() + m.plant.slice(1);
+            var imgHtml = m.img
+                ? '<img src="' + m.img + '" alt="' + esc(m.name) + '" onerror="this.style.display=\'none\';this.parentNode.querySelector(\'.img-placeholder\').style.display=\'flex\'">'
+                  + '<span class="img-placeholder" style="display:none">💊</span>'
+                : '<span class="img-placeholder">💊</span>';
+            return '<div class="med-card">'
+                + '<div class="med-card-img ' + (m.img ? '' : bgClass) + '">' + imgHtml + '</div>'
+                + '<div class="med-card-body">'
+                + '<span class="med-badge ' + badgeClass + '">' + typeCap + '</span>'
+                + '<div class="med-name">' + esc(m.name) + '</div>'
+                + '<div class="med-plant">🌿 For: ' + plantCap + '</div>'
+                + '<div class="med-disease">🦠 ' + esc(m.disease) + '</div>'
+                + '<div class="med-price">$' + m.price.toFixed(2) + ' <span>/ unit</span></div>'
+                + '<div class="med-stock">✅ In Stock (' + m.stock + ' units)</div>'
+                + '<button class="add-btn ' + (inCart ? 'added' : 'default') + '" onclick="addToCart(' + m.id + ')">'
+                + (inCart ? '✅ Added (' + cart[m.id] + ')' : '🛒 Add to Cart')
+                + '</button>'
+                + '</div></div>';
+        }).join('');
+    };
+
+    /* ── Cart ────────────────────────────────────────────────────────── */
+    window.addToCart = function (id) {
+        cart[id] = (cart[id] || 0) + 1;
+        updateCount();
+        renderGrid();
+        renderCartBody();
+        showToast('💊 Added to cart!', 't-ok');
+    };
+
+    window.changeQty = function (id, delta) {
+        var n = (cart[id] || 0) + delta;
+        if (n <= 0) delete cart[id];
+        else cart[id] = n;
+        updateCount();
+        renderGrid();
+        renderCartBody();
+    };
+
+    function updateCount() {
+        var n = Object.keys(cart).reduce(function (s, k) { return s + cart[k]; }, 0);
+        document.getElementById('cartCount').textContent = n;
+    }
+
+    function renderCartBody() {
+        var body = document.getElementById('cartBody');
+        var foot = document.getElementById('cartFoot');
+        var ids  = Object.keys(cart);
+
+        if (!ids.length) {
+            body.innerHTML = '<div class="cart-empty">'
+                + '<div class="ce-ico">🛒</div>'
+                + '<div class="ce-ttl">Cart is empty</div>'
+                + '<div class="ce-sub">Add medicines from the store</div>'
+                + '</div>';
+            foot.style.display = 'none';
+            return;
+        }
+
+        var total = 0;
+        body.innerHTML = ids.map(function (id) {
+            var m = MEDICINES.find(function (x) { return x.id == id; });
+            if (!m) return '';
+            var line = m.price * cart[id];
+            total += line;
+            var bgClass = {fungicide:'bg-fungicide', bactericide:'bg-bactericide',
+                           fertilizer:'bg-fertilizer', insecticide:'bg-insecticide'}[m.type] || 'bg-fungicide';
+            var ciImg = m.img
+                ? '<img src="' + m.img + '" alt="" style="width:100%;height:100%;object-fit:cover;border-radius:8px;" onerror="this.style.display=\'none\'">'
+                : '💊';
+            return '<div class="cart-item">'
+                + '<div class="ci-ico ' + (m.img ? '' : bgClass) + '">' + ciImg + '</div>'
+                + '<div class="ci-info">'
+                + '<div class="ci-name">' + esc(m.name) + '</div>'
+                + '<div class="ci-price">$' + m.price.toFixed(2) + ' × ' + cart[id] + ' = $' + line.toFixed(2) + '</div>'
+                + '</div>'
+                + '<div class="qty-ctrl">'
+                + '<button class="qty-btn" onclick="changeQty(' + id + ',-1)">−</button>'
+                + '<span class="qty-val">' + cart[id] + '</span>'
+                + '<button class="qty-btn" onclick="changeQty(' + id + ',1)">+</button>'
+                + '</div>'
+                + '</div>';
+        }).join('');
+
+        document.getElementById('cartTotal').textContent = '$' + total.toFixed(2);
+        foot.style.display = '';
+    }
+
+    window.toggleCart = function () {
+        var panel = document.getElementById('cartPanel');
+        panel.classList.toggle('open');
+        renderCartBody();
+    };
+
+    window.placeOrder = function () {
+        var ids = Object.keys(cart);
+        if (!ids.length) return;
+
+        /* Build items array from cart */
+        var items = ids.map(function (id) {
+            var m   = MEDICINES.find(function (x) { return x.id == id; });
+            return {
+                id:       m.id,
+                name:     m.name,
+                type:     m.type,
+                plant:    m.plant,
+                price:    m.price,
+                quantity: cart[id],
+            };
+        });
+
+        /* Disable order button while sending */
+        var btn = document.querySelector('.order-btn');
+        if (btn) { btn.disabled = true; btn.textContent = '⏳ Placing Order…'; }
+
+        fetch('/api/shop/order', {
+            method:  'POST',
+            headers: { 'Content-Type': 'application/json' },
+            body:    JSON.stringify({ items: items }),
+        })
+        .then(function (r) { return r.json(); })
+        .then(function (data) {
+            if (data.success) {
+                /* Clear cart */
+                cart = {};
+                updateCount();
+                renderGrid();
+                renderCartBody();
+                document.getElementById('cartPanel').classList.remove('open');
+
+                /* Update success modal with real order ID */
+                var oIdEl = document.getElementById('successOrderId');
+                if (oIdEl && data.order_id) oIdEl.textContent = '#' + data.order_id;
+                var oTotalEl = document.getElementById('successTotal');
+                if (oTotalEl && data.total_price) oTotalEl.textContent = '$' + parseFloat(data.total_price).toFixed(2);
+
+                document.getElementById('successOverlay').classList.add('open');
+            } else {
+                showToast('❌ ' + (data.error || 'Order failed. Try again.'), 't-err');
+            }
+        })
+        .catch(function () {
+            showToast('❌ Could not connect. Is Flask running?', 't-err');
+        })
+        .finally(function () {
+            if (btn) { btn.disabled = false; btn.textContent = '✅ Place Order'; }
+        });
+    };
+
+    window.closeSuccess = function (e) {
+        if (e && e.target !== document.getElementById('successOverlay')) return;
+        document.getElementById('successOverlay').classList.remove('open');
+    };
+
+    /* ── Toast ───────────────────────────────────────────────────────── */
+    function showToast(msg, cls) {
+        var t = document.getElementById('toast');
+        t.textContent = msg;
+        t.className   = 'toast ' + (cls || '');
+        t.classList.add('show');
+        setTimeout(function () { t.classList.remove('show'); }, 2800);
+    }
+
+    /* ── Escape HTML ─────────────────────────────────────────────────── */
+    function esc(s) {
+        return String(s).replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;');
+    }
+
+    /* ── Sidebar drawer (mobile) ─────────────────────────────────────── */
+    window.toggleSidebar = function () {
+        var sb  = document.getElementById('mainSidebar');
+        var bd  = document.getElementById('sidebarBackdrop');
+        var btn = document.getElementById('menuBtn');
+        var isOpen = sb.classList.toggle('drawer-open');
+        bd.classList.toggle('open', isOpen);
+        btn.textContent = isOpen ? '✕' : '☰';
+        document.body.style.overflow = isOpen ? 'hidden' : '';
+    };
+
+    // Close sidebar when a filter button inside it is clicked (mobile UX)
+    document.getElementById('mainSidebar').addEventListener('click', function (e) {
+        if (window.innerWidth <= 900 && e.target.classList.contains('s-item')) {
+            window.toggleSidebar();
+        }
+    });
+
+    // Close sidebar if window resizes to desktop
+    window.addEventListener('resize', function () {
+        if (window.innerWidth > 900) {
+            var sb  = document.getElementById('mainSidebar');
+            var bd  = document.getElementById('sidebarBackdrop');
+            var btn = document.getElementById('menuBtn');
+            sb.classList.remove('drawer-open');
+            bd.classList.remove('open');
+            btn.textContent = '☰';
+            document.body.style.overflow = '';
+        }
+    });
+
+    /* ── Init ────────────────────────────────────────────────────────── */
+    renderGrid();
+
+}());
+</script>
+
+</body>
+</html>

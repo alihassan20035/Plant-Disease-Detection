@@ -348,8 +348,9 @@
             pointer-events: none; white-space: nowrap;
         }
         .toast.show { transform: translateX(-50%) translateY(0); }
-        .toast-ok  { background: #166534; }
-        .toast-err { background: #991b1b; }
+        .toast-ok   { background: #166534; }
+        .toast-err  { background: #991b1b; }
+        .toast-warn { background: #92400e; }
 
         /* ─── EMPTY STATE ────────────────────────────────────── */
         .empty-msg { padding: 40px 24px; text-align: center; color: var(--gr400); }
@@ -404,6 +405,65 @@
             font-size: 13px; color: #713f12; font-weight: 600;
             margin-bottom: 22px;
         }
+
+        /* ─── ADMIN READ-ONLY OVERLAY ───────────────────────── */
+        .admin-readonly-badge {
+            display: inline-flex; align-items: center; gap: 6px;
+            background: #fef3c7; border: 1px solid #fcd34d;
+            color: #92400e; border-radius: 8px;
+            padding: 4px 12px; font-size: 12px; font-weight: 700;
+        }
+        .readonly-field {
+            pointer-events: none; opacity: 0.7; user-select: none;
+        }
+
+        /* ─── ADMIN SUGGEST MEDICINE CARD ───────────────────── */
+        .suggest-card {
+            background: linear-gradient(135deg, #f0fdf4, #dcfce7);
+            border: 1.5px solid var(--g200);
+            border-radius: var(--radius);
+            margin-bottom: 22px; overflow: hidden;
+        }
+        .suggest-card .card-head {
+            background: linear-gradient(135deg, var(--g700), var(--g600));
+            color: white; border-bottom: none;
+        }
+        .suggest-card .card-head h2 { color: white; }
+        .suggest-card .card-head p  { color: rgba(255,255,255,0.8); }
+        .suggest-card .card-body { padding: 26px; }
+        .med-suggest-wrap {
+            display: flex; flex-direction: column; gap: 14px;
+        }
+        .notify-tag {
+            display: inline-flex; align-items: center; gap: 6px;
+            background: var(--g100); color: var(--g700);
+            border-radius: 20px; padding: 3px 12px;
+            font-size: 12px; font-weight: 700; border: 1px solid var(--g200);
+        }
+
+        /* ─── USER NOTIFICATION BANNER ───────────────────────── */
+        .notif-banner {
+            background: linear-gradient(135deg, #f0fdf4, #dcfce7);
+            border: 1.5px solid var(--g300);
+            border-radius: 12px; padding: 16px 20px;
+            margin-bottom: 22px;
+        }
+        .notif-title {
+            font-size: 14px; font-weight: 700; color: var(--g700);
+            display: flex; align-items: center; gap: 8px; margin-bottom: 10px;
+        }
+        .notif-item {
+            background: white; border: 1px solid var(--g200);
+            border-radius: 10px; padding: 12px 16px; margin-top: 8px;
+        }
+        .notif-item-top {
+            display: flex; align-items: center; justify-content: space-between;
+            gap: 8px; margin-bottom: 6px;
+        }
+        .notif-admin-name { font-size: 12px; font-weight: 700; color: var(--g600); }
+        .notif-time { font-size: 11px; color: var(--gr400); }
+        .notif-medicine { font-size: 14px; font-weight: 700; color: var(--gr900); }
+        .notif-notes { font-size: 13px; color: var(--gr600); margin-top: 4px; line-height: 1.5; }
 
         /* ─── EDIT ROW IN TABLE ──────────────────────────────── */
         .edit-cell-btn {
@@ -663,7 +723,7 @@
                         <span class="c-ico">💊</span>
                         <div>
                             <h2>Recommended Treatment Plan</h2>
-                            <p>AI-generated guidance for this disease</p>
+                            <!-- <p>AI-generated guidance for this disease</p> -->
                         </div>
                     </div>
                 </div>
@@ -775,7 +835,7 @@
             'Detailed tracking for: ' + (record.disease_name || 'Unknown');
 
         var ownerMeta = record.is_admin_view && record.owner_name
-            ? '<div class="hero-meta-item"><span>Patient (User)</span>' + esc(record.owner_name) + ' — ' + esc(record.owner_email || '') + '</div>'
+            ? '<div class="hero-meta-item"><span>User (User)</span>' + esc(record.owner_name) + ' — ' + esc(record.owner_email || '') + '</div>'
             : '';
 
         document.getElementById('heroMeta').innerHTML =
@@ -857,19 +917,59 @@
         /* Hide status select for healthy plants */
         document.getElementById('statusField').style.display = healthy ? 'none' : '';
 
+        /* ── Admin view: make Record Settings read-only ──────── */
+        if (record.is_admin_view) {
+            document.getElementById('metaSaveBtn').style.display = 'none';
+            document.getElementById('toggleDD').disabled   = true;
+            document.getElementById('toggleAgri').disabled = true;
+            document.getElementById('statusSelect').disabled = true;
+            /* Show read-only badge next to card head */
+            var mh = document.querySelector('#metaCard .card-head');
+            if (mh && !mh.querySelector('.admin-readonly-badge')) {
+                var rb = document.createElement('span');
+                rb.className = 'admin-readonly-badge';
+                rb.innerHTML = '👁 View Only';
+                mh.appendChild(rb);
+            }
+        } else {
+            document.getElementById('metaSaveBtn').style.display = '';
+            document.getElementById('toggleDD').disabled   = false;
+            document.getElementById('toggleAgri').disabled = false;
+            document.getElementById('statusSelect').disabled = false;
+        }
+
         /* Weekly table + add form — only show if disease detected */
         if (!healthy) {
             renderProgressSummary();
             renderWeekTable();
             document.getElementById('progressSummary').style.display = 'grid';
             document.getElementById('weekTableCard').style.display   = '';
-            document.getElementById('addWeekCard').style.display     = '';
 
-            /* Pre-fill next week number */
-            var nextWeek = weeks.length > 0
-                ? Math.max.apply(null, weeks.map(function (w) { return w.week_number; })) + 1
-                : 1;
-            document.getElementById('fWeekNum').value = nextWeek;
+            /* Add week form: hide for admin, show for user */
+            if (record.is_admin_view) {
+                document.getElementById('addWeekCard').style.display = 'none';
+            } else {
+                document.getElementById('addWeekCard').style.display = '';
+                /* Pre-fill next week number */
+                var nextWeek = weeks.length > 0
+                    ? Math.max.apply(null, weeks.map(function (w) { return w.week_number; })) + 1
+                    : 1;
+                document.getElementById('fWeekNum').value = nextWeek;
+            }
+        }
+
+        /* ── Admin: show medicine suggestion card ─────────────── */
+        var existingSuggestCard = document.getElementById('adminSuggestCard');
+        if (existingSuggestCard) existingSuggestCard.remove();
+        if (record.is_admin_view && !healthy) {
+            renderAdminSuggestCard();
+        }
+
+        /* ── User: show admin notifications if any ────────────── */
+        var existingNotifBanner = document.getElementById('userNotifBanner');
+        if (existingNotifBanner) existingNotifBanner.remove();
+        if (!record.is_admin_view) {
+            loadUserNotifications();
         }
 
         /* Treatment plan */
@@ -949,7 +1049,9 @@
                 + '<td>' + sevBadge + '</td>'
                 + '<td>' + recBar + '</td>'
                 + '<td>' + noteCell + '</td>'
-                + '<td><button class="edit-cell-btn" onclick="editWeek(' + w.week_number + ')">✏ Edit</button></td>'
+                + (record && record.is_admin_view
+                    ? '<td><span style="color:var(--gr400);font-size:12px;font-style:italic">View only</span></td>'
+                    : '<td><button class="edit-cell-btn" onclick="editWeek(' + w.week_number + ')">✏ Edit</button></td>')
                 + '</tr>';
         }).join('');
 
@@ -984,59 +1086,124 @@
 
     /* ── Save meta + status ──────────────────────────────── */
     window.saveMeta = function () {
-        var btn = document.getElementById('metaSaveBtn');
-        btn.disabled = true;
-        btn.textContent = 'Saving…';
+    var btn = document.getElementById('metaSaveBtn');
+    btn.disabled = true;
+    btn.textContent = 'Saving…';
 
-        var dd   = document.getElementById('toggleDD').checked   ? 1 : 0;
-        var agri = document.getElementById('toggleAgri').checked ? 1 : 0;
-        var stat = document.getElementById('statusSelect').value;
+    var dd   = document.getElementById('toggleDD').checked   ? 1 : 0;
+    var agri = document.getElementById('toggleAgri').checked ? 1 : 0;
+    var stat = document.getElementById('statusSelect').value;
 
-        // Save meta flags
-        var metaPayload = {
-            record_id:        recordId,
-            disease_detected: dd,
-            agri_contacted:   agri
-        };
-
-        // Also update status via update_status.php
-        var statusPayload = { record_id: recordId, status: stat };
-
-        var metaPath   = '/api/treatment_log';
-        var statusPath = '/api/update_status';
-
-        Promise.all([
-            fetch(metaPath, {
-                method: 'POST', credentials: 'include',
-                headers: { 'Content-Type': 'application/json' },
-                body: JSON.stringify(metaPayload)
-            }).then(function (r) { return r.json(); }),
-            fetch(statusPath, {
-                method: 'POST', credentials: 'include',
-                headers: { 'Content-Type': 'application/json' },
-                body: JSON.stringify(statusPayload)
-            }).then(function (r) { return r.json(); })
-        ]).then(function (results) {
-            var ok = results.every(function (r) { return r.success; });
-            if (ok) {
-                // Update local record
-                record.disease_detected = dd;
-                record.agri_contacted   = agri;
-                record.status           = stat;
-                showToast('✅ Record settings saved!', 'toast-ok');
-                // Re-render detail grid to reflect new values
-                renderPage();
-            } else {
-                var err = results.map(function (r) { return r.error || ''; }).filter(Boolean).join(' | ');
-                showToast('❌ ' + (err || 'Save failed'), 'toast-err');
-            }
-        }).catch(function () {
-            showToast('❌ Network error. Make sure WAMP is running.', 'toast-err');
-        }).finally(function () {
-            btn.disabled = false;
-            btn.textContent = '💾 Save Changes';
-        });
+    // Combine everything into ONE payload
+    var combinedPayload = {
+        record_id: recordId,
+        disease_detected: dd,
+        agri_contacted: agri,
+        status: stat // Added status here
     };
+
+    fetch('/api/treatment_log', {
+        method: 'POST', 
+        credentials: 'include',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify(combinedPayload)
+    })
+    .then(function (r) { return r.json(); })
+    .then(function (result) {
+        if (result.success) {
+            // Update local record state
+            record.disease_detected = dd;
+            record.agri_contacted = agri;
+            record.status = stat;
+            
+            showToast('✅ All settings saved successfully!', 'toast-ok');
+            renderPage();
+        } else {
+            showToast('❌ Save failed: ' + (result.error || 'Unknown error'), 'toast-err');
+        }
+    })
+    .catch(function (err) {
+        showToast('❌ Network error. Check your connection.', 'toast-err');
+    })
+    .finally(function () {
+        btn.disabled = false;
+        btn.textContent = '💾 Save Changes';
+    });
+};
+    // window.saveMeta = function () {
+    //     var btn = document.getElementById('metaSaveBtn');
+    //     btn.disabled = true;
+    //     btn.textContent = 'Saving…';
+
+    //     var dd   = document.getElementById('toggleDD').checked   ? 1 : 0;
+    //     var agri = document.getElementById('toggleAgri').checked ? 1 : 0;
+    //     var stat = document.getElementById('statusSelect').value;
+
+    //     // Save meta flags
+    //     var metaPayload = {
+    //         record_id:        recordId,
+    //         disease_detected: dd,
+    //         agri_contacted:   agri
+    //     };
+
+    //     // Also update status via update_status.php
+    //     var statusPayload = { record_id: recordId, status: stat };
+
+    //     var metaPath   = '/api/treatment_log';
+    //     var statusPath = '/api/update_status';
+
+    //     // Step 1: Save meta flags first
+    //     fetch(metaPath, {
+    //         method: 'POST', credentials: 'include',
+    //         headers: { 'Content-Type': 'application/json' },
+    //         body: JSON.stringify(metaPayload)
+    //     })
+    //     .then(function (r) { return r.json(); })
+    //     .then(function (metaResult) {
+    //         if (!metaResult.success) {
+    //             //showToast('❌ ' + (metaResult.error || 'Meta save failed'), 'toast-err');
+    //             btn.disabled = false;
+    //             btn.textContent = '💾 Save Changes';
+    //             return;
+    //         }
+
+    //         // Step 2: Update status (best-effort — don't block on failure)
+    //         fetch(statusPath, {
+    //             method: 'POST', credentials: 'include',
+    //             headers: { 'Content-Type': 'application/json' },
+    //             body: JSON.stringify(statusPayload)
+    //         })
+    //         .then(function (r) { return r.json(); })
+    //         .then(function (statResult) {
+    //             record.disease_detected = dd;
+    //             record.agri_contacted   = agri;
+    //             record.status           = stat;
+    //             if (statResult.success) {
+    //                 showToast('✅ Record settings saved!', 'toast-ok');
+    //             } else {
+    //                 // Meta saved but status update failed — still update UI
+    //                 showToast('⚠️ Settings saved, but status update failed: ' + (statResult.error || 'unknown error'), 'toast-warn');
+    //             }
+    //             renderPage();
+    //         })
+    //         .catch(function () {
+    //             // Status update network error — meta was saved, still update UI
+    //             record.disease_detected = dd;
+    //             record.agri_contacted   = agri;
+    //             showToast('⚠️ Settings saved, but status update failed (network error).', 'toast-warn');
+    //             renderPage();
+    //         })
+    //         .finally(function () {
+    //             btn.disabled = false;
+    //             btn.textContent = '💾 Save Changes';
+    //         });
+    //     })
+    //     .catch(function () {
+    //         showToast('❌ Network error. Make sure WAMP is running.', 'toast-err');
+    //         btn.disabled = false;
+    //         btn.textContent = '💾 Save Changes';
+    //     });
+    // };
 
     /* ── Radio group helpers ─────────────────────────────── */
     document.querySelectorAll('input[name="infLeaf"]').forEach(function (r) {
@@ -1222,6 +1389,153 @@
             window.location.href = '/';
         }
     });
+
+    /* ── Render Admin Medicine Suggestion Card ──────────── */
+    function renderAdminSuggestCard() {
+        var container = document.getElementById('pageContent');
+        var treatCard = document.getElementById('treatPlanCard');
+
+        var card = document.createElement('div');
+        card.id = 'adminSuggestCard';
+        card.className = 'suggest-card';
+        card.innerHTML =
+            '<div class="card-head" style="background:linear-gradient(135deg,var(--g700),var(--g600));color:white;border-bottom:none;">'
+            + '<div class="card-head-left">'
+            + '<span class="c-ico">💊</span>'
+            + '<div><h2 style="color:white;">Suggest Medicine to User</h2>'
+            + '<p style="color:rgba(255,255,255,0.8);">Your suggestion will be sent as a notification to the User</p></div>'
+            + '</div>'
+            + '</div>'
+            + '<div class="card-body">'
+            + '<div class="med-suggest-wrap">'
+            + '<div id="suggestFormMsg"></div>'
+
+            + '<div class="form-grid">'
+            + '<div class="form-group full">'
+            + '<label class="f-label">Medicine / Treatment Name</label>'
+            + '<input type="text" class="f-input" id="sMedicineName" placeholder="e.g. Sulfur Dust (Bonide), Potassium Bicarbonate spray…">'
+            + '</div>'
+            + '<div class="form-group full">'
+            + '<label class="f-label">Instructions / Notes for User</label>'
+            + '<textarea class="f-textarea" id="sMedicineNotes" placeholder="e.g. Apply every 7 days. Improve canopy airflow. Remove heavily infected leaves…"></textarea>'
+            + '</div>'
+            + '</div>'
+
+            + '<div class="btn-row">'
+            + '<button class="btn-green" onclick="submitMedicineSuggestion()" id="suggestSubmitBtn">'
+            + '📨 Send Suggestion to User'
+            + '</button>'
+            + '</div>'
+
+            + '<div id="previousSuggestions" style="margin-top:20px;"></div>'
+            + '</div>'
+            + '</div>';
+
+        // Insert before treatment plan card or at end
+        if (treatCard && treatCard.parentNode) {
+            treatCard.parentNode.insertBefore(card, treatCard);
+        } else {
+            container.appendChild(card);
+        }
+
+        loadPreviousSuggestions();
+    }
+
+    /* ── Load previous suggestions (admin view) ──────────── */
+    function loadPreviousSuggestions() {
+        var wrap = document.getElementById('previousSuggestions');
+        if (!wrap) return;
+        apiGet('/api/medicine_suggestions?record_id=' + recordId)
+            .then(function(d) {
+                if (!d.success || !d.suggestions || d.suggestions.length === 0) {
+                    wrap.innerHTML = '';
+                    return;
+                }
+                var html = '<div style="font-size:12px;font-weight:700;text-transform:uppercase;letter-spacing:0.8px;color:var(--gr400);margin-bottom:10px;">Previous Suggestions Sent</div>';
+                d.suggestions.forEach(function(s) {
+                    html += '<div class="notif-item">'
+                        + '<div class="notif-item-top">'
+                        + '<span class="notif-admin-name">💊 ' + esc(s.medicine_name) + '</span>'
+                        + '<span class="notif-time">' + fmt(s.created_at) + '</span>'
+                        + '</div>'
+                        + (s.notes ? '<div class="notif-notes">' + esc(s.notes) + '</div>' : '')
+                        + '</div>';
+                });
+                wrap.innerHTML = html;
+            })
+            .catch(function() {});
+    }
+
+    /* ── Submit medicine suggestion ──────────────────────── */
+    window.submitMedicineSuggestion = function() {
+        var btn = document.getElementById('suggestSubmitBtn');
+        var msgEl = document.getElementById('suggestFormMsg');
+        var medicine = document.getElementById('sMedicineName').value.trim();
+        var notes = document.getElementById('sMedicineNotes').value.trim();
+
+        if (!medicine) {
+            msgEl.innerHTML = '<div class="alert alert-err">⚠ Please enter a medicine or treatment name.</div>';
+            return;
+        }
+
+        btn.disabled = true;
+        btn.textContent = 'Sending…';
+        msgEl.innerHTML = '';
+
+        apiPost('/api/medicine_suggestions', {
+            record_id: recordId,
+            medicine_name: medicine,
+            notes: notes || null
+        }).then(function(d) {
+            if (d.success) {
+                showToast('✅ Suggestion sent to User!', 'toast-ok');
+                document.getElementById('sMedicineName').value = '';
+                document.getElementById('sMedicineNotes').value = '';
+                loadPreviousSuggestions();
+            } else {
+                msgEl.innerHTML = '<div class="alert alert-err">❌ ' + esc(d.error || 'Failed to send.') + '</div>';
+            }
+        }).catch(function() {
+            msgEl.innerHTML = '<div class="alert alert-err">❌ Network error.</div>';
+        }).finally(function() {
+            btn.disabled = false;
+            btn.textContent = '📨 Send Suggestion to User';
+        });
+    };
+
+    /* ── Load user notifications (patient view) ──────────── */
+    function loadUserNotifications() {
+        apiGet('/api/medicine_suggestions?record_id=' + recordId)
+            .then(function(d) {
+                if (!d.success || !d.suggestions || d.suggestions.length === 0) return;
+
+                var banner = document.createElement('div');
+                banner.id = 'userNotifBanner';
+                banner.className = 'notif-banner';
+
+                var html = '<div class="notif-title">💊 Medicine Suggestions from Admin</div>';
+                d.suggestions.forEach(function(s) {
+                    html += '<div class="notif-item">'
+                        + '<div class="notif-item-top">'
+                        + '<span class="notif-admin-name">💊 ' + esc(s.medicine_name) + '</span>'
+                        + '<span class="notif-time">' + fmt(s.created_at) + '</span>'
+                        + '</div>'
+                        + (s.notes ? '<div class="notif-notes">' + esc(s.notes) + '</div>' : '')
+                        + '</div>';
+                });
+                banner.innerHTML = html;
+
+                // Insert after admin strip or before first card
+                var pageContent = document.getElementById('pageContent');
+                var firstCard = pageContent.querySelector('.card');
+                if (firstCard) {
+                    pageContent.insertBefore(banner, firstCard);
+                } else {
+                    pageContent.appendChild(banner);
+                }
+            })
+            .catch(function() {});
+    }
 
     /* ── Bootstrap ───────────────────────────────────────── */
     loadData();

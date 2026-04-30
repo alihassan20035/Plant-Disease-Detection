@@ -33,6 +33,14 @@
             box-shadow:0 1px 6px rgba(0,0,0,0.04);
         }
         .brand { display:flex; align-items:center; gap:10px; text-decoration:none; flex-shrink:0; }
+        .brand img {
+            height:46px;
+            width:auto;
+            object-fit:contain;
+            border-radius:8px;
+            display:block;
+            flex-shrink:0;
+        }
         .brand-mark {
             width:38px; height:38px; border-radius:10px;
             background:linear-gradient(135deg,var(--g700),var(--g500));
@@ -662,8 +670,238 @@
             .db-insight-row { grid-template-columns: 1fr; }
         }
 
+
+        /* ─── MEDICINE SUGGESTIONS SECTION ──────────────── */
+        .med-notif-hero {
+            background: linear-gradient(130deg, var(--g700) 0%, var(--g500) 100%);
+            border-radius: 16px; padding: 28px 36px; color: white;
+            margin-bottom: 22px; position: relative; overflow: hidden;
+        }
+        .med-notif-hero::before {
+            content: ''; position: absolute; top: -40px; right: -40px;
+            width: 200px; height: 200px; border-radius: 50%;
+            background: rgba(255,255,255,0.06);
+        }
+        .med-notif-pill {
+            display: inline-flex; align-items: center; gap: 6px;
+            background: rgba(255,255,255,0.15); border: 1px solid rgba(255,255,255,0.22);
+            border-radius: 20px; padding: 4px 12px;
+            font-size: 12px; font-weight: 600; margin-bottom: 12px;
+        }
+        .med-notif-hero h1 { font-size: 24px; font-weight: 800; letter-spacing: -.4px; margin-bottom: 6px; }
+        .med-notif-hero p  { font-size: 13px; opacity: 0.85; }
+
+        /* Individual suggestion card */
+        .sug-card {
+            background: var(--white); border: 1px solid var(--gr200);
+            border-radius: 14px; margin-bottom: 16px; overflow: hidden;
+            box-shadow: 0 2px 10px rgba(0,0,0,0.04);
+            transition: transform 0.15s, box-shadow 0.15s;
+        }
+        .sug-card:hover { transform: translateY(-2px); box-shadow: 0 6px 20px rgba(0,0,0,0.08); }
+        .sug-card-head {
+            padding: 14px 20px; display: flex; align-items: center;
+            justify-content: space-between; gap: 12px;
+            background: linear-gradient(135deg, #f0fdf4, #dcfce7);
+            border-bottom: 1px solid var(--g200);
+        }
+        .sug-card-title {
+            display: flex; align-items: center; gap: 10px;
+        }
+        .sug-pill-icon {
+            width: 40px; height: 40px; border-radius: 12px;
+            background: linear-gradient(135deg, var(--g700), var(--g500));
+            display: flex; align-items: center; justify-content: center;
+            font-size: 18px; flex-shrink: 0;
+            box-shadow: 0 3px 10px rgba(22,163,74,0.28);
+        }
+        .sug-med-name {
+            font-size: 16px; font-weight: 800; color: var(--gr900); letter-spacing: -.2px;
+        }
+        .sug-disease {
+            font-size: 12px; color: var(--g700); font-weight: 600; margin-top: 2px;
+        }
+        .sug-date-badge {
+            font-size: 11px; font-weight: 700; color: var(--gr500);
+            background: var(--white); border: 1px solid var(--gr200);
+            border-radius: 20px; padding: 4px 11px; white-space: nowrap;
+            flex-shrink: 0;
+        }
+        .sug-card-body { padding: 18px 20px; }
+        .sug-note-label {
+            font-size: 10px; font-weight: 700; text-transform: uppercase;
+            letter-spacing: 0.8px; color: var(--gr400); margin-bottom: 8px;
+        }
+        .sug-note-text {
+            font-size: 14px; color: var(--gr700); line-height: 1.65;
+            background: var(--gr50); border: 1px solid var(--gr100);
+            border-radius: 10px; padding: 12px 16px;
+        }
+        .sug-meta-row {
+            display: flex; align-items: center; gap: 10px; margin-top: 12px;
+            flex-wrap: wrap;
+        }
+        .sug-from-badge {
+            display: inline-flex; align-items: center; gap: 6px;
+            background: var(--b50); color: var(--b700);
+            border: 1px solid var(--b200); border-radius: 20px;
+            font-size: 12px; font-weight: 700; padding: 4px 12px;
+        }
+        .sug-plant-badge {
+            display: inline-flex; align-items: center; gap: 6px;
+            background: var(--g50); color: var(--g700);
+            border: 1px solid var(--g200); border-radius: 20px;
+            font-size: 12px; font-weight: 700; padding: 4px 12px;
+        }
+        .sug-view-btn {
+            margin-left: auto; padding: 6px 14px; border-radius: 8px;
+            border: 1.5px solid var(--g200); background: var(--g50);
+            color: var(--g700); font-family: inherit; font-size: 12px;
+            font-weight: 700; cursor: pointer; transition: all 0.15s;
+            text-decoration: none; display: inline-flex; align-items: center; gap: 5px;
+        }
+        .sug-view-btn:hover { background: var(--g100); border-color: var(--g300); }
+
+        /* Empty state */
+        .sug-empty {
+            padding: 60px 20px; text-align: center; color: var(--gr400);
+        }
+        .sug-empty-ico { font-size: 48px; margin-bottom: 14px; }
+        .sug-empty-ttl { font-size: 16px; font-weight: 700; color: var(--gr600); margin-bottom: 6px; }
+        .sug-empty-sub { font-size: 13px; }
+
+        /* New badge on sidebar */
+        .s-badge-new {
+            margin-left: auto; background: var(--r100); color: var(--r700);
+            font-size: 10px; font-weight: 700; padding: 2px 8px; border-radius: 10px;
+            animation: pulse-new 2s ease-in-out infinite;
+        }
+        @keyframes pulse-new {
+            0%, 100% { opacity: 1; } 50% { opacity: 0.5; }
+        }
+
         @media (max-width:900px) { .sidebar { display:none; } .main { padding:20px 16px; } }
         @media (max-width:640px) { .res-grid { grid-template-columns:1fr; } }
+
+        /* ══════════════════════════════════════════════════
+           FULL RESPONSIVE SYSTEM
+           ══════════════════════════════════════════════════ */
+
+        /* ── Hamburger button (hidden on desktop) ── */
+        .ham-btn {
+            display:none; flex-direction:column; justify-content:center; gap:5px;
+            width:38px; height:38px; background:none; border:none; cursor:pointer;
+            padding:6px; border-radius:8px; flex-shrink:0;
+        }
+        .ham-btn span {
+            display:block; width:22px; height:2.5px;
+            background:var(--gr700); border-radius:4px;
+            transition:all 0.25s;
+        }
+        .ham-btn.open span:nth-child(1){ transform:translateY(7.5px) rotate(45deg); }
+        .ham-btn.open span:nth-child(2){ opacity:0; transform:scaleX(0); }
+        .ham-btn.open span:nth-child(3){ transform:translateY(-7.5px) rotate(-45deg); }
+
+        /* ── Mobile sidebar overlay ── */
+        .sidebar-overlay {
+            display:none; position:fixed; inset:0;
+            background:rgba(0,0,0,0.45); z-index:149;
+        }
+        .sidebar-overlay.open { display:block; }
+
+        /* ── Slide-in sidebar on mobile ── */
+        @media (max-width:900px) {
+            .ham-btn { display:flex; }
+            .top-tabs { display:none; }
+
+            .sidebar {
+                display:flex !important;
+                position:fixed; left:-280px; top:var(--topbar);
+                height:calc(100vh - var(--topbar));
+                width:270px; z-index:150;
+                transition:left 0.28s cubic-bezier(0.4,0,0.2,1);
+                box-shadow:none;
+            }
+            .sidebar.open {
+                left:0;
+                box-shadow:4px 0 24px rgba(0,0,0,0.12);
+            }
+            .main { padding:20px 16px; margin-left:0 !important; }
+        }
+
+        /* ── Tablet (601–900px) ── */
+        @media (max-width:900px) {
+            .topbar { padding:0 16px; gap:10px; }
+            .hero   { padding:28px 24px; }
+            .hero h2{ font-size:22px; }
+            .db-cards { grid-template-columns:1fr 1fr; }
+            .res-grid { grid-template-columns:1fr 1fr; }
+            .result-layout { flex-direction:column; }
+        }
+
+        /* ── Mobile (≤600px) ── */
+        @media (max-width:600px) {
+            /* Topbar */
+            .topbar { padding:0 12px; gap:8px; height:58px; }
+            :root   { --topbar:58px; }
+            .brand-name { font-size:17px; }
+            .brand-pill { display:none; }
+            .chip-name  { display:none; }
+            .sign-out   { font-size:12px; padding:6px 10px; }
+            .user-chip  { gap:6px; padding:4px 8px 4px 4px; }
+
+            /* Hero */
+            .hero { padding:22px 18px; border-radius:14px; }
+            .hero h2 { font-size:19px; }
+            .hero p  { font-size:13px; }
+            .hero-pill { font-size:11px; }
+
+            /* Cards / grids → single column */
+            .db-cards         { grid-template-columns:1fr 1fr; gap:10px; }
+            .db-insight-row   { grid-template-columns:1fr; }
+            .res-grid         { grid-template-columns:1fr; }
+            .med-grid         { grid-template-columns:1fr; }
+
+            /* Upload / detect area */
+            .drop-zone { padding:28px 16px; }
+            .res-imgs   { flex-direction:column; gap:10px; }
+            .res-imgs > div { width:100% !important; }
+
+            /* Result panel */
+            .result-layout { flex-direction:column; gap:14px; }
+            #statusBox     { padding:18px; }
+            .conf-row      { font-size:13px; }
+
+            /* Buttons */
+            .btn-row { flex-wrap:wrap; gap:8px; }
+            .btn-row button, .btn-row a { flex:1; min-width:130px; font-size:13px; padding:10px 12px; }
+
+            /* Tables → horizontal scroll */
+            .t-wrap { overflow-x:auto; -webkit-overflow-scrolling:touch; }
+            table   { min-width:540px; }
+
+            /* Modal */
+            .modal-box { padding:22px 18px; margin:12px; border-radius:16px; }
+
+            /* Cards */
+            .card      { border-radius:12px; }
+            .card-head { padding:14px 18px; }
+            .card-body, .card-body-pad { padding:16px 18px; }
+
+            /* Activity / records rows */
+            .act-row  { flex-wrap:wrap; gap:6px; }
+            .rec-meta { flex-wrap:wrap; }
+
+            /* Bottom safe area for iOS */
+            .main { padding-bottom:32px; }
+        }
+
+        /* ── Very small (≤380px) ── */
+        @media (max-width:380px) {
+            .db-cards { grid-template-columns:1fr; }
+            .brand-name { font-size:15px; }
+            .sign-out { display:none; }
+        }
 
         /* ─── ABOUT DISEASE MODAL ────────────────────────── */
         .modal-overlay {
@@ -796,25 +1034,161 @@
         @keyframes spin { to{transform:rotate(360deg)} }
         .modal-loading p { font-size:14px; color:var(--gr500); font-weight:500; }
 
+         /* ── Brand ───────────────────────────────────────────── */
+         /* ── BotanoX AI Advisor Button ─────────────────────────────────── */
+ 
+/* Wrapper that centres the button and adds breathing room */
+.advisor-wrap {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 6px;
+  margin-top: 18px;
+  width: 100%;
+}
+ 
+/* The anchor tag styled as a full-width button */
+.advisor-btn {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  gap: 9px;
+  width: 100%;
+  max-width: 480px;
+  padding: 14px 24px;
+  border-radius: 12px;
+  border: none;
+  cursor: pointer;
+  text-decoration: none;
+  font-family: 'Plus Jakarta Sans', sans-serif;   /* matches BotanoX font */
+  font-size: 14px;
+  font-weight: 700;
+  letter-spacing: 0.1px;
+  color: #ffffff;
+ 
+  /* Agri-Tech green gradient — uses the same palette as BotanoX */
+  background: linear-gradient(135deg, #1a7a35 0%, #28a745 60%, #34c759 100%);
+  box-shadow: 0 4px 18px rgba(40, 167, 69, 0.36);
+ 
+  /* Smooth transitions for hover/active states */
+  transition:
+    transform 0.18s ease,
+    box-shadow 0.18s ease,
+    background 0.18s ease,
+    filter 0.18s ease;
+}
+ 
+/* Hover — grows slightly and deepens the shadow */
+.advisor-btn:hover {
+  transform: translateY(-2px) scale(1.012);
+  background: linear-gradient(135deg, #155c29 0%, #218838 60%, #28a745 100%);
+  box-shadow: 0 8px 28px rgba(40, 167, 69, 0.48);
+  filter: brightness(1.04);
+}
+ 
+/* Active / click feedback */
+.advisor-btn:active {
+  transform: translateY(0) scale(0.99);
+  box-shadow: 0 3px 10px rgba(40, 167, 69, 0.30);
+}
+ 
+/* Pill emoji / icon inside the button */
+.advisor-btn-icon {
+  font-size: 18px;
+  line-height: 1;
+  flex-shrink: 0;
+}
+ 
+/* External-link indicator (optional visual cue) */
+.advisor-btn-arrow {
+  font-size: 12px;
+  opacity: 0.75;
+  margin-left: 2px;
+}
+ 
+/* Sub-caption "Powered by AWS Generative AI" */
+.advisor-caption {
+  font-family: 'Plus Jakarta Sans', sans-serif;
+  font-size: 11px;
+  font-weight: 600;
+  color: #6b7280;           /* --gr500 in BotanoX */
+  letter-spacing: 0.4px;
+  display: flex;
+  align-items: center;
+  gap: 5px;
+}
+ 
+/* Small AWS-orange accent dot before the caption */
+.advisor-caption::before {
+  content: '';
+  display: inline-block;
+  width: 6px;
+  height: 6px;
+  border-radius: 50%;
+  background: #ff9900;      /* AWS brand orange */
+  flex-shrink: 0;
+}
+ 
+/* ── Responsive tweaks ─────────────────────────────────────────── */
+ 
+/* Tablet / narrow desktop: keep button comfortable */
+@media (max-width: 900px) {
+  .advisor-btn {
+    font-size: 13px;
+    padding: 13px 20px;
+  }
+}
+ 
+/* Mobile: full-width, slightly smaller text */
+@media (max-width: 640px) {
+  .advisor-btn {
+    font-size: 13px;
+    padding: 13px 16px;
+    border-radius: 10px;
+  }
+  .advisor-btn-icon {
+    font-size: 16px;
+  }
+}
+ 
+/* ── Inside the Disease Modal (optional overrides) ─────────────── */
+/*  When the button is rendered inside .modal-box the max-width is
+    already constrained, so we let it breathe a bit more.          */
+.modal-box .advisor-wrap {
+  margin-top: 22px;
+  padding: 0 4px;
+}
+.modal-box .advisor-btn {
+  max-width: 100%;
+}
+
     </style>
 </head>
 <body>
 
 <!-- TOPBAR -->
 <header class="topbar">
-    <a href="/" class="brand">
-        <div class="brand-mark">
-            <svg viewBox="0 0 24 24"><path d="M17 8C8 10 5.9 16.17 3.82 21.34L5.71 22l1-2.3A4.49 4.49 0 008 20C19 20 22 3 22 3c-1 2-8 2-13 6 1-2.17 2.64-4.41 8-5z"/></svg>
-        </div>
-        <span class="brand-name">BATA<em>NOX</em></span>
-        <span class="brand-pill">AI Powered</span>
-    </a>
+    <button class="ham-btn" id="hamBtn" onclick="toggleSidebar()" aria-label="Open menu">
+        <span></span><span></span><span></span>
+    </button>
+   <a href="/" class="brand">
+    <!-- <img src="./templates/fyp-logo-01.png" alt="BOTANOX Logo"> -->
+    <span class="brand-name">BATA<em>NOX</em></span>
+    <span class="brand-pill">AI Powered</span>
+</a>
     <div class="top-spacer"></div>
     <div class="top-tabs">
-        <button class="top-tab"    id="tDashboard" onclick="showTab('dashboard')">📊 Dashboard</button>
-        <button class="top-tab on" id="tDetect"    onclick="showTab('detect')">🔬 Detect</button>
-        <button class="top-tab"    id="tActivity"  onclick="showTab('activity')">📅 Activity</button>
-        <button class="top-tab"    id="tRecords"   onclick="showTab('records')">📋 Records</button>
+        <button class="top-tab"    id="tDashboard"    onclick="showTab('dashboard')">📊 Dashboard</button>
+        <button class="top-tab on" id="tDetect"       onclick="showTab('detect')">🔬 Detect</button>
+        <button class="top-tab"    id="tActivity"     onclick="showTab('activity')">📅 Activity</button>
+        <button class="top-tab"    id="tRecords"      onclick="showTab('records')">📋 Records</button>
+        <button class="top-tab"    id="tMedsuggestions" onclick="showTab('medsuggestions')" style="position:relative;">💊 Medicine
+            <span id="tMedBadge" style="display:none;position:absolute;top:4px;right:4px;width:8px;height:8px;background:var(--r600);border-radius:50%;"></span>
+        </button>
+        <button class="top-tab" id="tMyorders" onclick="showTab('myorders')" style="position:relative;">📦 My Orders
+            <span id="tOrderBadge" style="display:none;position:absolute;top:4px;right:4px;width:8px;height:8px;background:var(--o700);border-radius:50%;"></span>
+        </button>
+        <a href="/shop.html" class="top-tab" style="color:var(--o700);font-weight:700;text-decoration:none;">🛒 Buy Medicine</a>
     </div>
     <div class="user-chip">
         <div class="avatar"     id="avatarLetter">U</div>
@@ -836,6 +1210,9 @@
 <div class="toast" id="toast"></div>
 
 <!-- LAYOUT -->
+<!-- SIDEBAR OVERLAY (mobile) -->
+<div class="sidebar-overlay" id="sidebarOverlay" onclick="closeSidebar()"></div>
+
 <div class="layout">
 
     <!-- SIDEBAR -->
@@ -856,6 +1233,21 @@
                 <span class="s-ico">📋</span> My Records
                 <span class="s-badge" id="recBadge">—</span>
             </button>
+            <button class="s-item"    id="sMedsuggestions" onclick="showTab('medsuggestions')">
+                <span class="s-ico">💊</span> Medicine Suggestions
+                <span id="sMedBadge" class="s-badge-new" style="display:none;">New</span>
+            </button>
+            <button class="s-item" id="sMyorders" onclick="showTab('myorders')">
+                <span class="s-ico">📦</span> My Orders
+                <span id="sOrderBadge" style="display:none;margin-left:auto;background:var(--o100);color:var(--o700);font-size:11px;font-weight:700;padding:2px 8px;border-radius:10px;"></span>
+            </button>
+            <a href="/shop" class="s-item" style="text-decoration:none;margin-top:4px;background:linear-gradient(135deg,#fff7ed,#ffedd5);color:var(--o700);border:1.5px solid var(--o200);border-radius:9px;">
+                <span class="s-ico">🛒</span> Buy Medicine
+                <span style="margin-left:auto;background:var(--o700);color:white;font-size:10px;font-weight:700;padding:2px 7px;border-radius:8px;">Store</span>
+            </a>
+                <span class="s-ico"></span> 
+                <!-- <span style="margin-left:auto;background:var(--o700);color:white;font-size:10px;font-weight:700;padding:5px 7px;border-radius:8px;"></span> -->
+            </a>
         </div>
         <div>
             <div class="s-lbl">Reminders</div>
@@ -1205,6 +1597,24 @@
                                 <button class="btn-sm-o" onclick="showTab('activity')">📅 View Activity</button>
                                 <button class="btn-sm-o" onclick="showTab('records')">📋 All Records</button>
                             </div>
+                            <div class="advisor-wrap" id="advisorWrap">
+  <a
+    href="https://partyrock.aws/u/alihassan03/j3-pm3ztV/BotanoX-Medicine-Advisor"
+    target="_blank"
+    rel="noopener noreferrer"
+    class="advisor-btn"
+    title="Open BotanoX AI Medicine Advisor in a new tab"
+    aria-label="Get AI-powered medicine and prevention tips for the detected disease"
+  >
+    <span class="advisor-btn-icon" aria-hidden="true">💊</span>
+    Get Medicine &amp; Prevention Tips (AI Advisor)
+    <span class="advisor-btn-arrow" aria-hidden="true">↗</span>
+  </a>
+ 
+  <span class="advisor-caption">
+    <!-- Powered by AWS Generative AI -->
+  </span>
+</div>
                             <div id="saveMsg" style="display:none;margin-top:10px;padding:10px 14px;border-radius:9px;font-size:13px;font-weight:600;"></div>
                         </div>
 
@@ -1268,7 +1678,53 @@
             </div>
         </div>
 
-    </main>
+        <!-- ════════ TAB: MEDICINE SUGGESTIONS ════════ -->
+        <div id="tabMedsuggestions" style="display:none;">
+
+            <!-- Hero Banner -->
+            <div class="med-notif-hero">
+                <div class="med-notif-pill">💊 Admin Recommendations</div>
+                <h1>Medicine Suggestions</h1>
+                <p>Medicines and treatments suggested by the admin for your detected plant diseases.</p>
+            </div>
+
+            <!-- Suggestion cards container -->
+            <div id="medSugList">
+                <div class="sug-empty">
+                    <div class="sug-empty-ico">⏳</div>
+                    <div class="sug-empty-ttl">Loading…</div>
+                </div>
+            </div>
+
+        </div><!-- /tabMedsuggestions -->
+
+        <!-- ════════ TAB: MY ORDERS ════════ -->
+        <div id="tabMyorders" style="display:none;">
+
+            <div class="hero" style="background:linear-gradient(130deg,#7c2d12 0%,var(--o700) 55%,#f97316 100%);">
+                <div class="hero-pill">📦 Medicine Orders</div>
+                <h2>My Medicine Orders</h2>
+                <p>Track all your medicine orders and their current delivery status.</p>
+            </div>
+
+            <!-- Loading state -->
+            <div id="ordersLoading" style="text-align:center;padding:50px;color:var(--gr400);">
+                <div style="font-size:36px;margin-bottom:12px;">⏳</div>
+                <div style="font-size:15px;font-weight:600;">Loading your orders…</div>
+            </div>
+
+            <!-- Empty state -->
+            <div id="ordersEmpty" style="display:none;text-align:center;padding:60px 20px;background:white;border-radius:16px;border:1px solid var(--gr200);">
+                <div style="font-size:52px;margin-bottom:14px;">🛒</div>
+                <div style="font-size:18px;font-weight:800;margin-bottom:8px;">No orders yet</div>
+                <div style="font-size:14px;color:var(--gr500);margin-bottom:22px;">You haven't placed any medicine orders yet.</div>
+                <a href="/shop" style="display:inline-block;padding:12px 28px;background:linear-gradient(135deg,var(--o700),#f97316);color:white;border-radius:10px;font-weight:700;font-size:14px;text-decoration:none;">🛒 Go to Medicine Store</a>
+            </div>
+
+            <!-- Orders list -->
+            <div id="ordersList" style="display:none;display:flex;flex-direction:column;gap:16px;"></div>
+
+        </div><!-- /tabMyorders -->
 </div><!-- /layout -->
 
 <!-- ════════ ABOUT THIS DISEASE MODAL ════════ -->
@@ -1467,7 +1923,7 @@
     }
 
     /* ── Tab switching ───────────────────────────────────── */
-    var TABS = ["dashboard", "detect", "activity", "records"];
+    var TABS = ["dashboard", "detect", "activity", "records", "medsuggestions", "myorders"];
     window.showTab = function (tab) {
         TABS.forEach(function (t) {
             var cap = t.charAt(0).toUpperCase() + t.slice(1);
@@ -1476,9 +1932,10 @@
             var sEl = document.getElementById("s" + cap);
             if (sEl) sEl.classList.toggle("on", t === tab);
         });
-        if (tab === "records")   loadRecords();
-        if (tab === "activity")  loadActivity();
-        if (tab === "dashboard") loadDashboard(false);
+        if (tab === "records")       loadRecords();
+        if (tab === "activity")      loadActivity();
+        if (tab === "dashboard")     loadDashboard(false);
+        if (tab === "medsuggestions") loadMedSuggestions();
     };
 
     /* ══════════════════════════════════════════════════════
@@ -2336,6 +2793,113 @@
             });
     };
 
+    /* ══════════════════════════════════════════════════════
+       MEDICINE SUGGESTIONS — Load all admin suggestions for this user
+    ══════════════════════════════════════════════════════ */
+    var medSugLoaded = false;
+
+    window.loadMedSuggestions = function() {
+        if (medSugLoaded) return;
+        medSugLoaded = true;
+
+        var container = document.getElementById('medSugList');
+        container.innerHTML =
+            '<div class="sug-empty"><div class="sug-empty-ico">⏳</div>'
+            + '<div class="sug-empty-ttl">Loading suggestions…</div></div>';
+
+        fetch('/api/all_medicine_suggestions', { credentials: 'include' })
+            .then(function(r) { return r.json(); })
+            .then(function(d) {
+                if (!d.success) {
+                    container.innerHTML =
+                        '<div class="sug-empty"><div class="sug-empty-ico">⚠️</div>'
+                        + '<div class="sug-empty-ttl">Could not load suggestions</div>'
+                        + '<div class="sug-empty-sub">' + esc(d.error || 'Server error') + '</div></div>';
+                    return;
+                }
+
+                var suggestions = d.suggestions || [];
+
+                // Update badge count
+                if (suggestions.length > 0) {
+                    var tBadge = document.getElementById('tMedBadge');
+                    var sBadge = document.getElementById('sMedBadge');
+                    if (tBadge) tBadge.style.display = 'block';
+                    if (sBadge) sBadge.style.display = '';
+                }
+
+                if (suggestions.length === 0) {
+                    container.innerHTML =
+                        '<div class="sug-empty">'
+                        + '<div class="sug-empty-ico">💊</div>'
+                        + '<div class="sug-empty-ttl">No suggestions yet</div>'
+                        + '<div class="sug-empty-sub">When admin suggests a medicine for your plant disease, it will appear here.</div>'
+                        + '</div>';
+                    return;
+                }
+
+                var html = suggestions.map(function(s) {
+                    var dateStr = s.created_at
+                        ? new Date(s.created_at.replace(' ', 'T')).toLocaleDateString('en-GB', {day:'2-digit', month:'short', year:'numeric'})
+                        : '—';
+                    var notesHtml = s.notes
+                        ? '<div class="sug-note-label">📝 Instructions</div>'
+                          + '<div class="sug-note-text">' + esc(s.notes) + '</div>'
+                        : '';
+                    var plantHtml = s.plant_name
+                        ? '<span class="sug-plant-badge">🌱 ' + esc(s.plant_name) + '</span>'
+                        : '';
+
+                    return '<div class="sug-card">'
+                        + '<div class="sug-card-head">'
+                        +   '<div class="sug-card-title">'
+                        +     '<div class="sug-pill-icon">💊</div>'
+                        +     '<div>'
+                        +       '<div class="sug-med-name">' + esc(s.medicine_name) + '</div>'
+                        +       '<div class="sug-disease">🦠 ' + esc(s.disease_name || 'Unknown Disease') + '</div>'
+                        +     '</div>'
+                        +   '</div>'
+                        +   '<span class="sug-date-badge">📅 ' + dateStr + '</span>'
+                        + '</div>'
+                        + '<div class="sug-card-body">'
+                        +   notesHtml
+                        +   '<div class="sug-meta-row">'
+                        +     '<span class="sug-from-badge">👨‍⚕️ Suggested by: ' + esc(s.admin_name || 'Admin') + '</span>'
+                        +     plantHtml
+                        +     '<a href="/treatment_log?record_id=' + (s.record_id || '') + '" class="sug-view-btn" target="_blank">'
+                        +       '📋 View Treatment Log →'
+                        +     '</a>'
+                        +   '</div>'
+                        + '</div>'
+                        + '</div>';
+                }).join('');
+
+                container.innerHTML = html;
+            })
+            .catch(function(err) {
+                medSugLoaded = false;
+                container.innerHTML =
+                    '<div class="sug-empty"><div class="sug-empty-ico">⚠️</div>'
+                    + '<div class="sug-empty-ttl">Could not load suggestions</div>'
+                    + '<div class="sug-empty-sub">Make sure WAMP is running.</div></div>';
+            });
+    };
+
+    // Auto-check for new suggestions on page load (to show badge)
+    setTimeout(function() {
+        fetch('/api/all_medicine_suggestions', { credentials: 'include' })
+            .then(function(r) { return r.json(); })
+            .then(function(d) {
+                if (d.success && d.suggestions && d.suggestions.length > 0) {
+                    var tBadge = document.getElementById('tMedBadge');
+                    var sBadge = document.getElementById('sMedBadge');
+                    if (tBadge) tBadge.style.display = 'block';
+                    if (sBadge) sBadge.style.display = '';
+                }
+            })
+            .catch(function() {});
+    }, 1500);
+
     loadReminders();
 
     /* ══════════════════════════════════════════════════════
@@ -2697,5 +3261,204 @@
 
 }());
 </script>
+<!-- ✅ BotanoX Medicine Advisor — Step 3 JS -->
+
+<!-- ════════ MY ORDERS JS ════════ -->
+<script>
+(function () {
+    'use strict';
+
+    /* Status display config */
+    var STATUS_CFG = {
+        pending:   { icon:'⏳', label:'Pending',   bg:'#fef3c7', color:'#92400e', border:'#fde68a', msg:'Your order has been received and is awaiting confirmation.' },
+        confirmed: { icon:'✅', label:'Confirmed',  bg:'#dbeafe', color:'#1e40af', border:'#bfdbfe', msg:'Your order has been confirmed and is being prepared.' },
+        shipped:   { icon:'🚚', label:'Shipped',    bg:'#ede9fe', color:'#6d28d9', border:'#ddd6fe', msg:'Your order is on its way! Expect delivery soon.' },
+        delivered: { icon:'📦', label:'Delivered',  bg:'#dcfce7', color:'#166534', border:'#bbf7d0', msg:'Your order has been delivered. Happy farming! 🌿' },
+        cancelled: { icon:'❌', label:'Cancelled',  bg:'#fee2e2', color:'#991b1b', border:'#fecaca', msg:'This order was cancelled. Visit the store to place a new order.' },
+    };
+    var STATUS_STEP = { pending:1, confirmed:2, shipped:3, delivered:4, cancelled:0 };
+
+    function esc(s){ return String(s||'').replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;'); }
+
+    function renderProgressBar(status) {
+        if (status === 'cancelled') {
+            return '<div style="display:flex;align-items:center;gap:8px;padding:12px 16px;background:#fee2e2;border-radius:10px;font-size:13px;font-weight:600;color:#991b1b;margin:12px 0;">❌ This order was cancelled</div>';
+        }
+        var steps  = [{label:'Placed',icon:'🛒'},{label:'Confirmed',icon:'✅'},{label:'Shipped',icon:'🚚'},{label:'Delivered',icon:'📦'}];
+        var step   = STATUS_STEP[status] || 1;
+        var html   = '<div style="display:flex;align-items:flex-start;gap:0;margin:16px 0 8px;">';
+        steps.forEach(function(s, i){
+            var done    = (i+1) <= step;
+            var current = (i+1) === step;
+            html += '<div style="display:flex;flex-direction:column;align-items:center;flex:1;position:relative;">';
+            if (i > 0)               html += '<div style="position:absolute;left:0;right:50%;top:16px;height:3px;background:' + (done?'#16a34a':'#e5e7eb') + ';z-index:0;"></div>';
+            if (i < steps.length-1)  html += '<div style="position:absolute;left:50%;right:0;top:16px;height:3px;background:' + (i+1<step?'#16a34a':'#e5e7eb') + ';z-index:0;"></div>';
+            html += '<div style="width:34px;height:34px;border-radius:50%;display:flex;align-items:center;justify-content:center;font-size:15px;z-index:1;border:3px solid ' + (done?'#16a34a':'#e5e7eb') + ';background:' + (done?'#dcfce7':'white') + ';' + (current?'box-shadow:0 0 0 4px rgba(22,163,74,0.15);':'') + '">' + s.icon + '</div>';
+            html += '<div style="font-size:10px;font-weight:' + (current?'800':'600') + ';color:' + (done?'#16a34a':'#9ca3af') + ';margin-top:5px;text-align:center;">' + s.label + '</div>';
+            html += '</div>';
+        });
+        return html + '</div>';
+    }
+
+    function renderOrderCard(o) {
+        var cfg  = STATUS_CFG[o.status] || STATUS_CFG['pending'];
+        var date = '';
+        try { date = new Date(o.ordered_at).toLocaleDateString('en-US',{year:'numeric',month:'short',day:'numeric',hour:'2-digit',minute:'2-digit'}); } catch(e){ date = o.ordered_at; }
+
+        var itemsHtml = '';
+        if (o.items && o.items.length) {
+            itemsHtml = '<div style="margin-top:14px;border-top:1px solid var(--gr100);padding-top:14px;">'
+                + '<div style="font-size:11px;font-weight:700;color:var(--gr400);text-transform:uppercase;letter-spacing:0.5px;margin-bottom:10px;">Items Ordered</div>'
+                + o.items.map(function(it){
+                    return '<div style="display:flex;align-items:center;justify-content:space-between;padding:9px 12px;background:var(--gr50);border-radius:9px;margin-bottom:6px;">'
+                        + '<div><div style="font-size:13px;font-weight:700;">' + esc(it.medicine_name) + '</div>'
+                        + '<div style="font-size:11px;color:var(--gr500);">🌿 ' + esc(it.plant_target) + ' &nbsp;·&nbsp; ' + esc(it.medicine_type) + '</div></div>'
+                        + '<div style="text-align:right;"><div style="font-size:13px;font-weight:800;color:var(--g700);">$' + parseFloat(it.line_total).toFixed(2) + '</div>'
+                        + '<div style="font-size:11px;color:var(--gr400);">×' + it.quantity + ' @ $' + parseFloat(it.unit_price).toFixed(2) + '</div></div>'
+                        + '</div>';
+                }).join('') + '</div>';
+        }
+
+        return '<div style="background:white;border:1px solid var(--gr200);border-radius:16px;overflow:hidden;box-shadow:0 2px 12px rgba(0,0,0,0.04);">'
+            + '<div style="padding:18px 22px;border-bottom:1px solid var(--gr100);display:flex;align-items:center;justify-content:space-between;flex-wrap:wrap;gap:10px;">'
+            +   '<div><div style="font-size:16px;font-weight:800;">Order <span style="color:var(--o700);">#' + o.id + '</span></div>'
+            +   '<div style="font-size:12px;color:var(--gr400);margin-top:2px;">📅 ' + esc(date) + ' &nbsp;·&nbsp; ' + o.item_count + ' item(s)</div></div>'
+            +   '<div style="display:flex;align-items:center;gap:10px;">'
+            +     '<span style="font-size:20px;font-weight:800;color:var(--g700);">$' + parseFloat(o.total_price).toFixed(2) + '</span>'
+            +     '<span style="display:inline-flex;align-items:center;gap:5px;padding:6px 13px;border-radius:20px;font-size:12px;font-weight:700;background:' + cfg.bg + ';color:' + cfg.color + ';border:1px solid ' + cfg.border + ';">' + cfg.icon + ' ' + cfg.label + '</span>'
+            +   '</div></div>'
+            + '<div style="padding:18px 22px;">'
+            +   '<div style="display:flex;align-items:flex-start;gap:10px;padding:12px 16px;background:' + cfg.bg + ';border-radius:10px;border:1px solid ' + cfg.border + ';">'
+            +     '<span style="font-size:20px;">' + cfg.icon + '</span>'
+            +     '<div><div style="font-size:13px;font-weight:700;color:' + cfg.color + ';">Status: ' + cfg.label + '</div>'
+            +     '<div style="font-size:12px;color:' + cfg.color + ';opacity:0.85;margin-top:2px;">' + cfg.msg + '</div></div></div>'
+            +   renderProgressBar(o.status)
+            +   itemsHtml
+            + '</div></div>';
+    }
+
+    function loadMyOrders() {
+        var loading = document.getElementById('ordersLoading');
+        var empty   = document.getElementById('ordersEmpty');
+        var list    = document.getElementById('ordersList');
+        loading.style.display = ''; empty.style.display = 'none'; list.style.display = 'none'; list.innerHTML = '';
+
+        fetch('/api/shop/my_orders')
+            .then(function(r){ return r.json(); })
+            .then(function(data){
+                loading.style.display = 'none';
+                if (!data.success || !data.orders || !data.orders.length) { empty.style.display = ''; return; }
+
+                /* Badge — show if any active orders */
+                var active = data.orders.filter(function(o){ return o.status==='pending'||o.status==='confirmed'||o.status==='shipped'; });
+                var tb = document.getElementById('tOrderBadge'), sb = document.getElementById('sOrderBadge');
+                if (active.length){ if(tb)tb.style.display=''; if(sb){sb.style.display='';sb.textContent=active.length;} }
+                else              { if(tb)tb.style.display='none'; if(sb)sb.style.display='none'; }
+
+                list.style.display = 'flex';
+                list.innerHTML = data.orders.map(renderOrderCard).join('');
+            })
+            .catch(function(){
+                loading.style.display = 'none';
+                list.style.display = 'flex';
+                list.innerHTML = '<div style="text-align:center;padding:40px;color:var(--gr400);background:white;border-radius:16px;border:1px solid var(--gr200);">'
+                    + '<div style="font-size:36px;margin-bottom:10px;">⚠️</div>'
+                    + '<div style="font-size:15px;font-weight:700;margin-bottom:6px;">Could not load orders</div>'
+                    + '<div style="font-size:13px;">Make sure Flask and WAMP are running.</div></div>';
+            });
+    }
+
+    /* Wrap showTab to auto-load when tab opens */
+    var _orig2 = window.showTab;
+    window.showTab = function(tab){
+        _orig2(tab);
+        if (tab === 'myorders') loadMyOrders();
+    };
+
+}());
+</script>
+
+<!-- ════════ RESPONSIVE SIDEBAR JS ════════ -->
+<script>
+(function(){
+    function getSidebar() { return document.querySelector('.sidebar'); }
+    function getOverlay() { return document.getElementById('sidebarOverlay'); }
+    function getHamBtn()  { return document.getElementById('hamBtn'); }
+
+    window.toggleSidebar = function() {
+        var s = getSidebar();
+        if (!s) return;
+        s.classList.contains('open') ? closeSidebar() : openSidebar();
+    };
+    window.openSidebar = function() {
+        var s=getSidebar(), o=getOverlay(), b=getHamBtn();
+        if(s)s.classList.add('open');
+        if(o)o.classList.add('open');
+        if(b)b.classList.add('open');
+        document.body.style.overflow='hidden';
+    };
+    window.closeSidebar = function() {
+        var s=getSidebar(), o=getOverlay(), b=getHamBtn();
+        if(s)s.classList.remove('open');
+        if(o)o.classList.remove('open');
+        if(b)b.classList.remove('open');
+        document.body.style.overflow='';
+    };
+    var sb = getSidebar();
+    if(sb) {
+        sb.addEventListener('click', function(e){
+            if(window.innerWidth<=900 && e.target.closest('.s-item, a')) closeSidebar();
+        });
+    }
+    document.addEventListener('keydown',function(e){ if(e.key==='Escape') closeSidebar(); });
+}());
+</script>
+
+<!-- <script>
+(function () {
+  'use strict';
+
+  window.showAdvisorBtn = function (isDisease) {
+    var wrap = document.getElementById('advisorWrap');
+    if (!wrap) return;
+    if (isDisease) {
+      wrap.style.display = 'flex';
+      wrap.style.opacity = '0';
+      wrap.style.transform = 'translateY(8px)';
+      requestAnimationFrame(function () {
+        wrap.style.transition = 'opacity 0.35s ease, transform 0.35s ease';
+        wrap.style.opacity = '1';
+        wrap.style.transform = 'translateY(0)';
+      });
+    } else {
+      wrap.style.display = 'none';
+    }
+  };
+
+  var observer = new MutationObserver(function (mutations) {
+    mutations.forEach(function (m) {
+      if (m.type === 'childList' || m.type === 'attributes') {
+        var statusBox = document.querySelector('.status-box');
+        if (!statusBox) return;
+        var isDisease = statusBox.classList.contains('is-disease');
+        window.showAdvisorBtn(isDisease);
+      }
+    });
+  });
+
+  document.addEventListener('DOMContentLoaded', function () {
+    var wrap = document.getElementById('advisorWrap');
+    if (wrap) wrap.style.display = 'none';
+
+    var resultsArea = document.querySelector('.res-stack') || document.body;
+    observer.observe(resultsArea, {
+      subtree: true,
+      childList: true,
+      attributes: true,
+      attributeFilter: ['class']
+    });
+  });
+}()); -->
+
 </body>
 </html>

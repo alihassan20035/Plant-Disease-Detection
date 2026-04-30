@@ -3,7 +3,8 @@ session_start();
 require_once 'db_config.php';
 
 if (isset($_SESSION['user_id'])) {
-    header('Location: http://localhost:5000');
+    $role = $_SESSION['role'] ?? $_SESSION['user_role'] ?? 'user';
+    header('Location: ' . ($role === 'admin' ? 'admin.php' : 'http://localhost:5000/'));
     exit;
 }
 
@@ -148,9 +149,7 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
 <div class="page-bg"></div>
 <div class="card">
     <div class="logo">
-        <div class="logo-mark">
-            <svg viewBox="0 0 24 24"><path d="M17 8C8 10 5.9 16.17 3.82 21.34L5.71 22l1-2.3A4.49 4.49 0 008 20C19 20 22 3 22 3c-1 2-8 2-13 6 1-2.17 2.64-4.41 8-5z"/></svg>
-        </div>
+        <img src="templates/fyp-logo-01.png" alt="BATANOX Logo" style="height:42px;width:auto;object-fit:contain;border-radius:8px;">
         <div class="logo-name">BATA<span>NOX</span></div>
     </div>
 

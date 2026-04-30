@@ -12,7 +12,8 @@ require_once __DIR__ . '/db_config.php';
 
 if (isset($_SESSION['user_id'])) {
     $role = $_SESSION['role'] ?? $_SESSION['user_role'] ?? 'user';
-    header('Location: ' . ($role === 'admin' ? 'admin.php' : 'welcome.php'));
+    // Go directly — don't re-trigger welcome screen on every visit
+    header('Location: ' . ($role === 'admin' ? 'admin.php' : 'http://localhost:5000/'));
     exit;
 }
 
@@ -50,6 +51,10 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
                 $_SESSION['name']      = (string) $user['name'];
                 $_SESSION['role']      = (string) $user['role'];
                 $_SESSION['user_role'] = (string) $user['role'];
+                // Clear welcome flag so fresh login always shows welcome screen
+                unset($_SESSION['welcome_shown']);
+                // Clear any leftover guest flag from previous session
+                unset($_SESSION['is_guest']);
 
                 if ($user['role'] === 'admin') {
                     header('Location: admin.php');
@@ -155,7 +160,7 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
 <div class="card">
 
     <div class="brand">
-        <img src="templates/app logo 01.png" alt="" width="40" height="50">
+        <img src="templates/fyp-logo-01.png" alt="" width="60" height="80">
         <span class="brand-name">BATA<em>NOX</em></span>
     </div>
 

@@ -39,13 +39,24 @@ if (!$record_id || !in_array($status, $allowed, true)) {
     exit;
 }
 
-$user_id = (int) $_SESSION['user_id'];
+$user_id  = (int) $_SESSION['user_id'];
+$role     = $_SESSION['role'] ?? $_SESSION['user_role'] ?? 'user';
+$is_admin = ($role === 'admin');
 
 try {
-    $stmt = $pdo->prepare(
-        "UPDATE disease_records SET status = ? WHERE id = ? AND user_id = ?"
-    );
-    $stmt->execute([$status, $record_id, $user_id]);
+    if ($is_admin) {
+        // Admin can update any record — no user_id restriction
+        $stmt = $pdo->prepare(
+            "UPDATE disease_records SET status = ? WHERE id = ?"
+        );
+        $stmt->execute([$status, $record_id]);
+    } else {
+        // Regular users can only update their own records
+        $stmt = $pdo->prepare(
+            "UPDATE disease_records SET status = ? WHERE id = ? AND user_id = ?"
+        );
+        $stmt->execute([$status, $record_id, $user_id]);
+    }
 
     if ($stmt->rowCount() === 0) {
         http_response_code(404);
